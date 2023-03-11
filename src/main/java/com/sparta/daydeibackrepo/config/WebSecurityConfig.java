@@ -54,8 +54,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         http.authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/docs").permitAll()
-                .antMatchers("/api/user/signup").permitAll()
-                .antMatchers("/api/user/login").permitAll()
+                .antMatchers("/api/users/signup").permitAll()
+                .antMatchers("/api/users/login").permitAll()
                // .antMatchers(HttpMethod.GET, "/api/studies/**").permitAll()
                 .anyRequest().authenticated()
 

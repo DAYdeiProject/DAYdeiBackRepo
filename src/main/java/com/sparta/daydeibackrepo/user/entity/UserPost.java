@@ -1,7 +1,6 @@
-package com.sparta.daydeibackrepo.postSubscribe.entity;
+package com.sparta.daydeibackrepo.user.entity;
 
 import com.sparta.daydeibackrepo.post.entity.Post;
-import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor
-public class PostSubscribe {
+public class UserPost {
 
     @Id
     @Column
@@ -24,5 +23,6 @@ public class PostSubscribe {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
+
 
 }

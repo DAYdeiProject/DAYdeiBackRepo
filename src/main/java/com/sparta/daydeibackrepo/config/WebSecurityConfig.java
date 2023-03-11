@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.config;
 
+import com.sparta.daydeibackrepo.jwt.JwtAuthFilter;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 
 @Configuration
 @RequiredArgsConstructor

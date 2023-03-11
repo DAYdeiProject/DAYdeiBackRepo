@@ -1,11 +1,20 @@
 package com.sparta.daydeibackrepo.jwt;
 
 import com.sparta.daydeibackrepo.security.UserDetailsServiceImpl;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.*;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 @Slf4j
 @Component

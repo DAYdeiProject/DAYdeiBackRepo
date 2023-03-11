@@ -27,8 +27,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebSecurityConfig implements WebMvcConfigurer {
 
     private final JwtUtil jwtUtil;
-    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -64,9 +63,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .and()
                 .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
-        //Controller 단 전에 시큐리티에서 검사하므로 따로 Exceptionhandler가 필요하다
-        http.exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
-        http.exceptionHandling().accessDeniedHandler(customAccessDeniedHandler);
+
         return http.build();
     }
 

@@ -1,7 +1,7 @@
 package com.sparta.daydeibackrepo.security;
 
-import com.sparta.sweetterbe.entity.User;
-import com.sparta.sweetterbe.repository.UserRepository;
+import com.sparta.daydeibackrepo.user.entity.User;
+import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

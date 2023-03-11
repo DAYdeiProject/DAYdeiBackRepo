@@ -1,10 +1,6 @@
 package com.sparta.daydeibackrepo.config;
 
-
-import com.sparta.sweetterbe.jwt.JwtAuthFilter;
-import com.sparta.sweetterbe.jwt.JwtUtil;
-import com.sparta.sweetterbe.security.CustomAccessDeniedHandler;
-import com.sparta.sweetterbe.security.CustomAuthenticationEntryPoint;
+import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;

@@ -1,12 +1,11 @@
 package com.sparta.daydeibackrepo.user.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.sparta.daydeibackrepo.friend.entity.Friend;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity(name = "users")
 @Getter
@@ -26,7 +25,7 @@ public class User {
     @Column(nullable = false)
     private String nickName;
 
-    @Column(nullable = false)
+    @Column
     private String birthday; //추후 Date 타입으로 바꿔야 함
 
     private String profileImage; //추후 s3 Multipart 로 타입 변경해야 함
@@ -42,7 +41,21 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private CategoryEnum categoryEnum;
 
+//    private List<String> friendEmailList;
 
+
+    //카카오 회원가입
+    public User(Long kakaoId, String email, String nickName, String img, String birthday, String password) {
+        this.kakaoId = kakaoId;
+        this.email = email;
+        this.nickName = nickName;
+        this.password = password;
+        this.profileImage = img;
+        this.birthday = birthday;
+        this.role = UserRoleEnum.USER;
+    }
+
+    //일반 회원가입
     public User(String email, String password, String nickName, String birthday) {
         this.email = email;
         this.password = password;
@@ -50,4 +63,18 @@ public class User {
         this.birthday = birthday;
         this.role = UserRoleEnum.USER;
     }
+
+//    public User(Long id, String email, String nickName, String password) {
+//        this.id = id;
+//        this.email = email;
+//        this.password = password;
+//        this.nickName = nickName;
+//        this.role = UserRoleEnum.USER;
+//    }
+
+    public User kakaoIdUpdate(Long kakaoId) {
+        this.kakaoId = kakaoId;
+        return this;
+    }
+
 }

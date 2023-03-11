@@ -20,8 +20,8 @@ public class StatusResponseDto<T> {
         return new StatusResponseDto<>(HttpStatus.OK.value(), data);
     }
 
-    public static <T> StatusResponseDto<T> fail(int statusCode, T data){
-        return new StatusResponseDto<>(statusCode, data);
+    public static <T> StatusResponseDto<T> fail(HttpStatus httpStatus, T data){
+        return new StatusResponseDto<>(httpStatus.value(), data);
     }
 
 }

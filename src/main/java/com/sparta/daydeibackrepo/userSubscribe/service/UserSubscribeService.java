@@ -12,8 +12,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.nio.file.AccessDeniedException;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,8 +30,8 @@ public class UserSubscribeService {
         if(subscribing==subscriber){
             throw new IllegalArgumentException("구독 요청이 올바르지 않습니다.");
         }
-        Optional<UserSubscribe> userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(subscribing, subscriber);
-        if (userSubscribe.isPresent()){
+        UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(subscribing, subscriber);
+        if (userSubscribe != null){
             throw new IllegalArgumentException("이미 구독하고 있는 유저입니다.");
         }
         UserSubscribe userSubscribe1 = new UserSubscribe(subscribing, subscriber);
@@ -52,9 +50,10 @@ public class UserSubscribeService {
         if(subscribing==subscriber){
             throw new IllegalArgumentException("구독 취소 요청이 올바르지 않습니다.");
         }
-        UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(subscribing, subscriber).orElseThrow(
-                () -> new IllegalArgumentException("구독 취소 요청이 올바르지 않습니다.")
-        );
+        UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(subscribing, subscriber);
+        if (userSubscribe == null){
+            throw new IllegalArgumentException("구독 취소 요청이 올바르지 않습니다.");
+        }
         userSubscribeRepository.delete(userSubscribe);
     }
 }

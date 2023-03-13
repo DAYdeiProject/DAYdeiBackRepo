@@ -91,7 +91,7 @@ public class KakaoService {
             User friendUser = userRepository.findById(Long.parseLong(friendId)).orElseThrow(
                     () -> new NullPointerException("등록된 사용자가 없습니다.")
             );
-            friendRepository.save(new Friend(currentUser, friendUser));
+            friendRepository.save(new Friend(currentUser, friendUser, true));
         }
 
         return ResponseEntity.ok()

@@ -15,7 +15,7 @@ public class KakaoUserInfoDto {
     private String nickName;
     private String img;
     private String birthday;
-    private List<String> friendEmailList;
+//    private List<String> friendEmailList;
 
 //    public KakaoUserInfoDto(Long id, String nickName, String email) {
 //        this.id = id;

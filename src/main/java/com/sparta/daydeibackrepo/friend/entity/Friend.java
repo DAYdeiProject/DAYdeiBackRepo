@@ -27,6 +27,10 @@ public class Friend {
     @Column
     private Boolean friendCheck;
 
-    
 
+    public Friend(User loggedUser, User friend) {
+        this.friendRequestId = loggedUser;
+        this.friendResponseId = friend;
+//        this.friendCheck = istrue;
+    }
 }

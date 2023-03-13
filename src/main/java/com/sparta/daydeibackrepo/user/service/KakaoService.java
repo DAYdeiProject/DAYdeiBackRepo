@@ -46,7 +46,8 @@ public class KakaoService {
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
 
-    public ResponseEntity<StatusResponseDto<String>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    //ResponseEntity<StatusResponseDto<String>>
+    public String kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
 
@@ -64,9 +65,10 @@ public class KakaoService {
 //        currentUser = kakaoUser;
 
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(StatusResponseDto.success("success"));
+//        return ResponseEntity.ok()
+//                .headers(headers)
+//                .body(StatusResponseDto.success("success"));
+        return createToken;
 
     }
 

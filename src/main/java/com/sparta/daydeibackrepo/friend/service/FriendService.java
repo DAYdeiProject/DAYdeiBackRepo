@@ -151,7 +151,6 @@ public class FriendService {
             if (userSubscribe != null){
                 userSubscribeCheck = true;
             }
-            // 친구 / 구독을 둘다 한 경우가 아니라면 추천 목록에 뜹니다.
             if (!friendCheck || !userSubscribeCheck){
             recommendResponseList.add(new UserResponseDto(user1,friendCheck,userSubscribeCheck));}
         }

@@ -134,7 +134,7 @@ public class FriendService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        CategoryEnum categoryEnum = CategoryEnum.valueOf(category);
+        CategoryEnum categoryEnum = CategoryEnum.valueOf(category.toUpperCase());
         List<User> recommendList = userRepository.findAllByCategoryEnum(categoryEnum);
         List<UserResponseDto> recommendResponseList = new ArrayList<>();
         if (recommendList == null){

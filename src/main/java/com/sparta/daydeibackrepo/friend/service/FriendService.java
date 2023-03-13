@@ -5,6 +5,7 @@ import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
+import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
@@ -106,7 +107,8 @@ public class FriendService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        List<Friend> friends = friendRepository.findAllByFriendRequestIdOrFriendResponseId(user, user);
+        // 친구 리스트에 true
+        List<Friend> friends = friendRepository.findFriends(user);
         List<User> friendList = new ArrayList<>();
         List<UserResponseDto> friendResponseList = new ArrayList<>();
         for(Friend friend : friends){
@@ -118,18 +120,12 @@ public class FriendService {
             }
         }
         for(User user1 : friendList){
-            Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(user, user1);
-            Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(user1, user);
             UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
-            boolean friendCheck = false;
             boolean userSubscribeCheck = false;
-            if (friend1 != null || friend2 != null){
-                friendCheck = true;
-            }
             if (userSubscribe != null){
                 userSubscribeCheck = true;
             }
-            friendResponseList.add( new UserResponseDto(user1, friendCheck, userSubscribeCheck));
+            friendResponseList.add( new UserResponseDto(user1, true, userSubscribeCheck));
         }
         return friendResponseList;
     }
@@ -138,24 +134,24 @@ public class FriendService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        List<User> recommendList = userRepository.findAllByCategoryEnum(category);
+        CategoryEnum categoryEnum = CategoryEnum.valueOf(category);
+        List<User> recommendList = userRepository.findAllByCategoryEnum(categoryEnum);
         List<UserResponseDto> recommendResponseList = new ArrayList<>();
         if (recommendList == null){
             return null;
         }
         for (User user1 : recommendList){
-            Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(user, user1);
-            Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(user1, user);
+            Friend friend = friendRepository.findFriend(user, user1);
             UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
             boolean friendCheck = false;
             boolean userSubscribeCheck = false;
-            if (friend1 != null || friend2 != null){
+            if (friend!= null){
                 friendCheck = true;
             }
             if (userSubscribe != null){
                 userSubscribeCheck = true;
             }
-            // 친구 + 구독을 둘다 한 경우가 아니라면 다 추천에 뜨게끔?
+            // 친구 / 구독을 둘다 한 경우가 아니라면 추천 목록에 뜹니다.
             if (!friendCheck || !userSubscribeCheck){
             recommendResponseList.add(new UserResponseDto(user1,friendCheck,userSubscribeCheck));}
         }

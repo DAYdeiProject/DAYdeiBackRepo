@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -20,7 +19,6 @@ import javax.persistence.EntityNotFoundException;
 public class UserSubscribeService {
     private final UserSubscribeRepository userSubscribeRepository;
     private final UserRepository userRepository;
-    @Transactional
     public UserSubscribeResponseDto getSubscribe(Long userid, UserDetailsImpl userDetails) {
         User subscribing = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다.")
@@ -40,7 +38,7 @@ public class UserSubscribeService {
         userSubscribeRepository.save(userSubscribe1);
         return new UserSubscribeResponseDto(userSubscribe1);
     }
-    @Transactional
+
     public void deleteSubscribe(Long userid, UserDetailsImpl userDetails) {
         User subscribing = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다.")

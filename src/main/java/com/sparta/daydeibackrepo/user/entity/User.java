@@ -24,7 +24,7 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private String nickname;
+    private String nickName;
 
     @Column(nullable = false)
     private String Birthday; //추후 Date 타입으로 바꿔야 함

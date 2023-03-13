@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
+import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.KakaoUserInfoDto;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
@@ -40,7 +41,7 @@ public class KakaoService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final JwtUtil jwtUtil;
-    private static User currentUser;
+    private User currentUser;
 
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
@@ -57,10 +58,10 @@ public class KakaoService {
 
         // 4. JWT 토큰 반환
         HttpHeaders headers = new HttpHeaders();
-        String createToken = jwtUtil.createToken(kakaoUser.getNickName(), UserRoleEnum.USER);
+        String createToken = jwtUtil.createToken(kakaoUser.getEmail(), UserRoleEnum.USER);
         headers.set("Authorization", createToken);
 
-        currentUser = kakaoUser;
+//        currentUser = kakaoUser;
 
 
         return ResponseEntity.ok()
@@ -69,7 +70,7 @@ public class KakaoService {
 
     }
 
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, UserDetailsImpl userDetails) throws JsonProcessingException {
         String accessToken = getTokenFriendsList(code);
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -92,7 +93,7 @@ public class KakaoService {
             if (friendUser == null) {
                 return ResponseEntity.ok().body(StatusResponseDto.success("친구없음"));
             }
-            friendRepository.save(new Friend(currentUser, friendUser, true));
+            friendRepository.save(new Friend(userDetails.getUser(), friendUser, true));
         }
 
         return ResponseEntity.ok()

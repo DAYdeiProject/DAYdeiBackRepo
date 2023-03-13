@@ -60,7 +60,7 @@ public class UserService {
             throw new IllegalArgumentException("비밀 번호가 옳지 않습니다.");
         }
 
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getNickName(), UserRoleEnum.USER));
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getEmail(), UserRoleEnum.USER));
         isLogin = true;
         return new LoginResponseDto(user, isLogin);
     }

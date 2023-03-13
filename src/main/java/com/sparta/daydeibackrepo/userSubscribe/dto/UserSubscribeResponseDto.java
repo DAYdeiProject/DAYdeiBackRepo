@@ -1,7 +1,13 @@
 package com.sparta.daydeibackrepo.userSubscribe.dto;
 
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class UserSubscribeResponseDto {
     private Long userSubscrbingId;
     private Long userSubscrberId;

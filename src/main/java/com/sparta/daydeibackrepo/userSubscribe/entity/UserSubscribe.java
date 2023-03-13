@@ -25,4 +25,9 @@ public class UserSubscribe extends TimeStamped {
     @JoinColumn(name = "subscriber_Id")
     private User subscriberId;
 
+    public UserSubscribe(User subscribingId, User subscriberId){
+        this.subscribingId = subscribingId;
+        this.subscriberId = subscriberId;
+    }
+
 }

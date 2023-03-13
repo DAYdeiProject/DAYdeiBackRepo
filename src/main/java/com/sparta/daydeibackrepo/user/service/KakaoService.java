@@ -88,9 +88,10 @@ public class KakaoService {
             String friendKakaoId = friendNode.path("id").asText();
 //            String friendNickname = friendNode.path("profile_nickname").asText();
             // friends 테이블에 사용자와 친구를 저장하는 코드
-            User friendUser = userRepository.findByKakaoId(Long.parseLong(friendKakaoId)).orElseThrow(
-                    () -> new NullPointerException("등록된 사용자가 없습니다.")
-            );
+            User friendUser = userRepository.findByKakaoId(Long.parseLong(friendKakaoId)).orElse(null);
+            if (friendUser == null) {
+                return ResponseEntity.ok().body(StatusResponseDto.success("친구없음"));
+            }
             friendRepository.save(new Friend(currentUser, friendUser, true));
         }
 

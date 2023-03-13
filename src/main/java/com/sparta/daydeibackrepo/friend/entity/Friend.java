@@ -37,4 +37,10 @@ public class Friend {
         this.friendResponseId = friendResponseId;
         this.friendCheck = friendCheck;
     }
+
+    public Friend(User loggedUser, User friend, Boolean isTrue) {
+        this.friendRequestId = loggedUser;
+        this.friendResponseId = friend;
+        this.friendCheck = isTrue;
+    }
 }

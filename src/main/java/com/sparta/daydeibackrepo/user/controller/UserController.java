@@ -44,8 +44,13 @@ public class UserController {
     }
 
     @GetMapping("/users/kakao/callback")
-    public ResponseEntity<StatusResponseDto<String>> kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException, UnsupportedEncodingException {
+    public ResponseEntity<StatusResponseDto<String>> kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         return kakaoService.kakaoLogin(code, response);
+    }
+
+    @GetMapping("/users/kakao_friends/callback")
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+        return kakaoService.kakaoFriends(code, response);
     }
 
 

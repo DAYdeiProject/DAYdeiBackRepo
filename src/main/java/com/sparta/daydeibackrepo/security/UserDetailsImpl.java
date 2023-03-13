@@ -14,9 +14,9 @@ public class UserDetailsImpl implements UserDetails {
     private final User user;
     private final String username;
 
-    public UserDetailsImpl(User user, String username) {
+    public UserDetailsImpl(User user, String email) {
         this.user = user;
-        this.username = username;
+        this.username = email;
     }
 
     public User getUser() {   //Getter가 없어서 안씀

@@ -23,16 +23,23 @@ public class Post extends TimeStamped {
     @Column(nullable = false)
     private String endDate;     //추후 Date 타입으로 변경해야함
 
+    @Column
     private String startTime;   //추후 Time 타입으로 변경해야함
 
+    @Column
     private String endTime;     //추후 Time 타입으로 변경해야함
 
+    @Column
     private String image; //s3 연동 후 multipart로 변경해야함
 
+    @Column
     private String location; //위치
 
     @Column(nullable = false)
     private ScopeEnum scope;
+
+    @Column
+    private ColorEnum color;
 
 
 

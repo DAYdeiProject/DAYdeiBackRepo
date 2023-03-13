@@ -27,6 +27,16 @@ public class Friend {
     @Column
     private Boolean friendCheck;
 
+    public Friend(User friendRequestId, User friendResponseId, boolean friendCheck) {
+        this.friendRequestId = friendRequestId;
+        this.friendResponseId = friendResponseId;
+        this.friendCheck = friendCheck;
+    }
+    public void update(User friendRequestId, User friendResponseId, boolean friendCheck) {
+        this.friendRequestId =  friendRequestId;
+        this.friendResponseId = friendResponseId;
+        this.friendCheck = friendCheck;
+    }
 
     public Friend(User loggedUser, User friend, Boolean isTrue) {
         this.friendRequestId = loggedUser;

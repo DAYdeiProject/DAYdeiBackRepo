@@ -22,4 +22,6 @@ public class GlobalExceptionHandler {
     public StatusResponseDto<?> handleException(Exception ex) {
         return StatusResponseDto.fail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
+
+
 }

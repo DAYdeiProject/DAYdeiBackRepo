@@ -2,8 +2,10 @@ package com.sparta.daydeibackrepo.user.entity;
 
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import lombok.*;
+import org.hibernate.boot.model.relational.SqlStringGenerationContext;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +43,8 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private CategoryEnum categoryEnum;
 
-//    private List<String> friendEmailList;
+    @ElementCollection
+    private List<String> friendEmailList;
 
 
     //카카오 회원가입
@@ -52,6 +55,7 @@ public class User {
         this.password = password;
         this.profileImage = img;
         this.birthday = birthday;
+//        this.friendEmailList = friendEmailList;
         this.role = UserRoleEnum.USER;
     }
 

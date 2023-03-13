@@ -2,6 +2,7 @@ package com.sparta.daydeibackrepo.user.service;
 
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.user.dto.LoginRequestDto;
+import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
 import com.sparta.daydeibackrepo.user.dto.SignupRequestDto;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
@@ -37,10 +38,6 @@ public class UserService {
         if (foundUsername.isPresent()) {
             throw new IllegalArgumentException("이미 가입된 사용자입니다.");
         }
-        Optional<User> foundNickname = userRepository.findByNickName(nickName);
-        if (foundNickname.isPresent()) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
-        }
         if (password.equals(passwordCheck)){
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
@@ -50,9 +47,10 @@ public class UserService {
     }
 
     @Transactional
-    public String login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+    public LoginResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
+        Boolean isLogin = false;
 
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
@@ -63,6 +61,7 @@ public class UserService {
         }
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getNickName(), UserRoleEnum.USER));
-        return "로그인 성공";
+        isLogin = true;
+        return new LoginResponseDto(user, isLogin);
     }
 }

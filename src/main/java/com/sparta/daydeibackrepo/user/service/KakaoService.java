@@ -114,7 +114,7 @@ public class KakaoService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         Long id = jsonNode.get("id").asLong();
-        String nickname = jsonNode.get("properties")
+        String nickName = jsonNode.get("properties")
                 .get("nickname").asText();
         String email = jsonNode.get("kakao_account")
                 .get("email").asText();
@@ -134,6 +134,8 @@ public class KakaoService {
 //            }
 //        }
 
+
+                /*    ----나중에 추가하기----
         //친구 목록 불러오기
         ResponseEntity<String> friendsResponse = rt.exchange(
                 "https://kapi.kakao.com/v1/api/talk/friends",
@@ -141,6 +143,8 @@ public class KakaoService {
                 kakaoUserInfoRequest,
                 String.class
         );
+
+
         // 친구 이메일 목록 추출
         String friendsResponseBody = friendsResponse.getBody();
         JsonNode friendsJsonNode = objectMapper.readTree(friendsResponseBody);
@@ -153,10 +157,11 @@ public class KakaoService {
                         .get("account_email").asText();
                 friendEmailList.add(friendEmail);
             }
-        }
+        }*/
+        List<String> friendEmailList = new ArrayList<>();
 
-        log.info("카카오 사용자 정보: " + id + ", " + nickname + ", " + email);
-        return new KakaoUserInfoDto(id, nickname, email, img, birthday, friendEmailList);
+        log.info("카카오 사용자 정보: " + id + ", " + nickName + ", " + email);
+        return new KakaoUserInfoDto(id, nickName, email, img, birthday, friendEmailList);
 
 
     }

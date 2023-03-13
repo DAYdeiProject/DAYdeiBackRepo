@@ -3,6 +3,7 @@ package com.sparta.daydeibackrepo.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.daydeibackrepo.user.dto.LoginRequestDto;
+import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
 import com.sparta.daydeibackrepo.user.dto.SignupRequestDto;
 import com.sparta.daydeibackrepo.user.service.KakaoService;
 import com.sparta.daydeibackrepo.user.service.UserService;
@@ -38,7 +39,7 @@ public class UserController {
     }
 
     @PostMapping("/users/login")
-    public StatusResponseDto<String> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
+    public StatusResponseDto<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
         return StatusResponseDto.success(userService.login(loginRequestDto, response));
     }
 

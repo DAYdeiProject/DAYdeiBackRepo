@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class FriendService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final UserSubscribeRepository userSubscribeRepository;
+    @Transactional
     public FriendResponseDto requestFriend(Long userId, UserDetailsImpl userDetails) {
         User requestUser = userRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
@@ -43,9 +45,10 @@ public class FriendService {
             throw new IllegalArgumentException("이미 친구 관계입니다");
         }
         Friend friend = new Friend(requestUser, responseUser, false);
+        friendRepository.save(friend);
         return new FriendResponseDto(friend);
     }
-
+    @Transactional
     public FriendResponseDto setFriend(Long userId, UserDetailsImpl userDetails) {
         User requestUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
@@ -60,7 +63,7 @@ public class FriendService {
         friend.update(requestUser, responseUser, true);
         return new FriendResponseDto(friend);
     }
-
+    @Transactional
     public String deleteFriend(Long userId, UserDetailsImpl userDetails) {
         User requestUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
@@ -93,7 +96,7 @@ public class FriendService {
             throw new IllegalArgumentException("삭제 요청이 올바르지 않습니다.");
         }
     }
-
+    @Transactional(readOnly = true)
     public List<UserResponseDto> getFriendList(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
@@ -125,7 +128,7 @@ public class FriendService {
         }
         return friendResponseList;
     }
-
+    @Transactional(readOnly = true)
     public List<UserResponseDto> getRecommendList(String category, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")

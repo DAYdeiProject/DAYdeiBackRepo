@@ -47,20 +47,19 @@ public class UserController {
     }
 //    ResponseEntity<StatusResponseDto<String>>
     @GetMapping("/users/kakao/callback")
-    public String kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
-        String createToken = kakaoService.kakaoLogin(code, response);
-        // Cookie 생성 및 직접 브라우저에 Set
-        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        return "success";
-
-//        String accessToken = kakaoService.
+    public ResponseEntity<StatusResponseDto<String>> kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+//        String createToken = kakaoService.kakaoLogin(code, response);
+//        // Cookie 생성 및 직접 브라우저에 Set
+//        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
+//        cookie.setPath("/");
+//        response.addCookie(cookie);
+//        return "success";
+        return kakaoService.kakaoLogin(code, response);
     }
 
     @GetMapping("/users/kakao_friends/callback")                                                //HttpServletResponse response
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
-        return kakaoService.kakaoFriends(code, userDetails);
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+        return kakaoService.kakaoFriends(code, response);
     }
 
 

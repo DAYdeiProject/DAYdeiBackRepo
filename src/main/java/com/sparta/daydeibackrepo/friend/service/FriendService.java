@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -26,7 +26,7 @@ public class FriendService {
         User responseUser = userRepository.findById(userId).orElseThrow(
                 () -> new UsernameNotFoundException("유저가 존재하지 않습니다.")
         );
-        if(requestUser==responseUser){
+        if(Objects.equals(requestUser.getId(), responseUser.getId())){
             throw new IllegalArgumentException("올바르지 않은 친구 요청입니다.");
         }
         Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(requestUser, responseUser);
@@ -63,10 +63,10 @@ public class FriendService {
         Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(requestUser, responseUser);
         Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(responseUser, requestUser);
         if(friend1 != null){
-            friendRepository.deleteById(friend1);
+            friendRepository.deleteById(friend1.getId());
         }
         else if(friend2 != null){
-            friendRepository.deleteById(friend2);
+            friendRepository.deleteById(friend2.getId());
         }
         else {
             throw new IllegalArgumentException("삭제 요청이 올바르지 않습니다.");

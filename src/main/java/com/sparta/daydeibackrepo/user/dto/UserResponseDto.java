@@ -2,7 +2,13 @@ package com.sparta.daydeibackrepo.user.dto;
 
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.User;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class UserResponseDto {
     Long id;
     String email;

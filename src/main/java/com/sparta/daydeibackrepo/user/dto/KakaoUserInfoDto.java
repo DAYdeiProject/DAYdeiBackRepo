@@ -22,13 +22,13 @@ public class KakaoUserInfoDto {
 //        this.nickName = nickName;
 //        this.email = email;
 //    }
-
-    public KakaoUserInfoDto(Long id, String nickName, String email, String img, String birthday, List<String> friendEmailList) {
+                                                                                                    //, List<String> friendEmailList
+    public KakaoUserInfoDto(Long id, String nickName, String email, String img, String birthday) {
         this.id = id;
         this.nickName = nickName;
         this.email = email;
         this.img = img;
         this.birthday = birthday;
-        this.friendEmailList = friendEmailList;
+//        this.friendEmailList = friendEmailList;
     }
 }

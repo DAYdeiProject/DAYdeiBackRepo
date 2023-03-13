@@ -42,9 +42,9 @@ public class User {
 
     @Enumerated(value = EnumType.STRING)
     private CategoryEnum categoryEnum;
-
-    @ElementCollection
-    private List<String> friendEmailList;
+//
+//    @ElementCollection
+//    private List<String> friendEmailList;
 
 
     //카카오 회원가입

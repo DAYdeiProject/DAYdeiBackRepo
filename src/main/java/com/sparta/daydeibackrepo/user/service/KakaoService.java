@@ -135,7 +135,7 @@ public class KakaoService {
 //        }
 
 
-                /*    ----나중에 추가하기----
+                  /*  //----나중에 추가하기----
         //친구 목록 불러오기
         ResponseEntity<String> friendsResponse = rt.exchange(
                 "https://kapi.kakao.com/v1/api/talk/friends",
@@ -158,10 +158,10 @@ public class KakaoService {
                 friendEmailList.add(friendEmail);
             }
         }*/
-        List<String> friendEmailList = new ArrayList<>();
 
-        log.info("카카오 사용자 정보: " + id + ", " + nickName + ", " + email);
-        return new KakaoUserInfoDto(id, nickName, email, img, birthday, friendEmailList);
+        List<String> friendEmailList = new ArrayList<>();
+        log.info("카카오 사용자 정보: " + id + ", " + nickName + ", " + email + ", ");
+        return new KakaoUserInfoDto(id, nickName, email, img, birthday);
 
 
     }

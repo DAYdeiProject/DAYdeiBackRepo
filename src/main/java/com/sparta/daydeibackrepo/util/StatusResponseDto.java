@@ -9,21 +9,19 @@ import org.springframework.http.HttpStatus;
 public class StatusResponseDto<T> {
 
     private int statusCode;
-    private String message;
     private T data;
 
-    public StatusResponseDto(int statusCode, String message, T data){
+    public StatusResponseDto(int statusCode, T data){
         this.statusCode = statusCode;
-        this.message = message;
         this.data = data;
     }
 
     public static <T> StatusResponseDto<T> success(T data){
-        return new StatusResponseDto<>(HttpStatus.OK.value(), "success", data);
+        return new StatusResponseDto<>(HttpStatus.OK.value(), data);
     }
 
-    public static <T> StatusResponseDto<T> fail(int statusCode, T data){
-        return new StatusResponseDto<>(statusCode, "fail", data);
+    public static <T> StatusResponseDto<T> fail(HttpStatus httpStatus, T data){
+        return new StatusResponseDto<>(httpStatus.value(), data);
     }
 
 }

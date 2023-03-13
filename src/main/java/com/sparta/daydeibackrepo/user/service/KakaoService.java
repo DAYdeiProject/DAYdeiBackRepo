@@ -58,9 +58,9 @@ public class KakaoService {
         User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
 
         // 4. JWT 토큰 반환
-        HttpHeaders headers = new HttpHeaders();
+        //HttpHeaders headers = new HttpHeaders();
         String createToken = jwtUtil.createToken(kakaoUser.getEmail(), UserRoleEnum.USER);
-        headers.set("Authorization", createToken);
+        //headers.set("Authorization", createToken);
 
 //        currentUser = kakaoUser;
 

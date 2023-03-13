@@ -53,7 +53,7 @@ public class UserController {
         Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
         cookie.setPath("/");
         response.addCookie(cookie);
-        return kakaoService.kakaoLogin(code, response);
+        return "success";
     }
 
     @GetMapping("/users/kakao_friends/callback")                                                //HttpServletResponse response

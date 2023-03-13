@@ -23,7 +23,6 @@ import java.io.UnsupportedEncodingException;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class UserController {
-
     private final UserService userService;
     private final KakaoService kakaoService;
 

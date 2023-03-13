@@ -85,10 +85,10 @@ public class KakaoService {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         JsonNode friendsNode = jsonNode.path("elements");
         for (JsonNode friendNode : friendsNode) {
-            String friendId = friendNode.path("id").asText();
+            String friendKakaoId = friendNode.path("id").asText();
 //            String friendNickname = friendNode.path("profile_nickname").asText();
             // friends 테이블에 사용자와 친구를 저장하는 코드
-            User friendUser = userRepository.findById(Long.parseLong(friendId)).orElseThrow(
+            User friendUser = userRepository.findByKakaoId(Long.parseLong(friendKakaoId)).orElseThrow(
                     () -> new NullPointerException("등록된 사용자가 없습니다.")
             );
             friendRepository.save(new Friend(currentUser, friendUser, true));

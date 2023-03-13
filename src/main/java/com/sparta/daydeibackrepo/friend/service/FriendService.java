@@ -111,4 +111,14 @@ public class FriendService {
         }
         return friendResponseList;
     }
+
+/*    public Object getRecommendList(String category, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        user.getCategoryEnum();
+        User responseUser = userRepository.findAllByCategory(category).orElseThrow(
+                () -> new UsernameNotFoundException("유저가 존재하지 않습니다.")
+        );
+    }*/
 }

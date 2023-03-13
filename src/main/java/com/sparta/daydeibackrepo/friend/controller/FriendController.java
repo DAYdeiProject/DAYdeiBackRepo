@@ -29,16 +29,15 @@ public class FriendController {
 
     @DeleteMapping("/{userId}")
     public StatusResponseDto<String> deleteFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        friendService.deleteFriend(userId, userDetails);
-        return StatusResponseDto.success("친구 삭제가 완료되었습니다.");
+        return StatusResponseDto.success(friendService.deleteFriend(userId, userDetails));
     }
 
     @GetMapping("/list")
     public StatusResponseDto<List<UserResponseDto>> getFriendList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.getFriendList(userDetails));
     }
-/*    @GetMapping("/recommend")
+    @GetMapping("/recommend")
     public StatusResponseDto<List<UserResponseDto>> getRecommendList(@RequestParam String category, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.getRecommendList(category,userDetails));
-    }*/
+    }
 }

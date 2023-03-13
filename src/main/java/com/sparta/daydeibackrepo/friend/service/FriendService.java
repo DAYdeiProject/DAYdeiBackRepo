@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -27,7 +28,7 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final UserSubscribeRepository userSubscribeRepository;
     public FriendResponseDto requestFriend(Long userId, UserDetailsImpl userDetails) {
-        User requestUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+        User requestUser = userRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
         User responseUser = userRepository.findById(userId).orElseThrow(
@@ -60,7 +61,7 @@ public class FriendService {
         return new FriendResponseDto(friend);
     }
 
-    public void deleteFriend(Long userId, UserDetailsImpl userDetails) {
+    public String deleteFriend(Long userId, UserDetailsImpl userDetails) {
         User requestUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
@@ -69,11 +70,24 @@ public class FriendService {
         );
         Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(requestUser, responseUser);
         Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(responseUser, requestUser);
-        if(friend1 != null){
-            friendRepository.deleteById(friend1.getId());
+        if (friend1 != null && friend2 != null){
+            throw new IllegalArgumentException("친구 상태가 올바르지 않습니다.");
         }
-        else if(friend2 != null){
+        if (friend1.getFriendCheck()){
+            friendRepository.deleteById(friend1.getId());
+            return "친구를 삭제했습니다.";
+        }
+        else if (friend2.getFriendCheck()){
             friendRepository.deleteById(friend2.getId());
+            return "친구를 삭제했습니다.";
+        }
+        else if (!friend1.getFriendCheck()){
+            friendRepository.deleteById(friend1.getId());
+            return "친구 신청을 취소하였습니다.";
+        }
+        else if(!friend2.getFriendCheck()){
+            friendRepository.deleteById(friend2.getId());
+            return "친구 신청을 거절하였습니다.";
         }
         else {
             throw new IllegalArgumentException("삭제 요청이 올바르지 않습니다.");
@@ -98,12 +112,12 @@ public class FriendService {
         for(User user1 : friendList){
             Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(user, user1);
             Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(user1, user);
+            UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
             boolean friendCheck = false;
             boolean userSubscribeCheck = false;
             if (friend1 != null || friend2 != null){
                 friendCheck = true;
             }
-            UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
             if (userSubscribe != null){
                 userSubscribeCheck = true;
             }
@@ -112,13 +126,31 @@ public class FriendService {
         return friendResponseList;
     }
 
-/*    public Object getRecommendList(String category, UserDetailsImpl userDetails) {
+    public List<UserResponseDto> getRecommendList(String category, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        user.getCategoryEnum();
-        User responseUser = userRepository.findAllByCategory(category).orElseThrow(
-                () -> new UsernameNotFoundException("유저가 존재하지 않습니다.")
-        );
-    }*/
+        List<User> recommendList = userRepository.findAllByCategoryEnum(category);
+        List<UserResponseDto> recommendResponseList = new ArrayList<>();
+        if (recommendList == null){
+            return null;
+        }
+        for (User user1 : recommendList){
+            Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(user, user1);
+            Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(user1, user);
+            UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
+            boolean friendCheck = false;
+            boolean userSubscribeCheck = false;
+            if (friend1 != null || friend2 != null){
+                friendCheck = true;
+            }
+            if (userSubscribe != null){
+                userSubscribeCheck = true;
+            }
+            // 친구 + 구독을 둘다 한 경우가 아니라면 다 추천에 뜨게끔?
+            if (!friendCheck || !userSubscribeCheck){
+            recommendResponseList.add(new UserResponseDto(user1,friendCheck,userSubscribeCheck));}
+        }
+        return recommendResponseList;
+    }
 }

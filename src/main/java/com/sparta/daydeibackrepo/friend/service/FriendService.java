@@ -134,7 +134,7 @@ public class FriendService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        CategoryEnum categoryEnum = CategoryEnum.valueOf(category);
+        CategoryEnum categoryEnum = CategoryEnum.valueOf(category.toUpperCase());
         List<User> recommendList = userRepository.findAllByCategoryEnum(categoryEnum);
         List<UserResponseDto> recommendResponseList = new ArrayList<>();
         if (recommendList == null){
@@ -151,7 +151,6 @@ public class FriendService {
             if (userSubscribe != null){
                 userSubscribeCheck = true;
             }
-            // 친구 / 구독을 둘다 한 경우가 아니라면 추천 목록에 뜹니다.
             if (!friendCheck || !userSubscribeCheck){
             recommendResponseList.add(new UserResponseDto(user1,friendCheck,userSubscribeCheck));}
         }

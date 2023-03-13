@@ -28,9 +28,9 @@ public class Friend {
     private Boolean friendCheck;
 
 
-    public Friend(User loggedUser, User friend) {
-        this.friendRequestId = loggedUser;
-        this.friendResponseId = friend;
-//        this.friendCheck = istrue;
-    }
+//    public Friend(User loggedUser, User friend) {
+//        this.friendRequestId = loggedUser;
+//        this.friendResponseId = friend;
+////        this.friendCheck = istrue;
+//    }
 }

@@ -72,6 +72,11 @@ public class UserController {
         return StatusResponseDto.success(userService.setCategory(categoryRequestDto, userDetails));
     }
 
+    @PutMapping("/users/profile")
+    public StatusResponseDto<UserInfoResponseDto> updateUser(@RequestBody UserInfoRequestDto userInfoRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(userService.updateUser(userInfoRequestDto, userDetails));
+    }
+
 
 
 }

@@ -2,10 +2,13 @@ package com.sparta.daydeibackrepo.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
+import com.sparta.daydeibackrepo.user.dto.UserInfoRequestDto;
+import com.sparta.daydeibackrepo.user.dto.UserInfoResponseDto;
 import lombok.*;
 import org.hibernate.boot.model.relational.SqlStringGenerationContext;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +22,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Email
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -73,19 +77,20 @@ public class User {
         this.role = UserRoleEnum.USER;
     }
 
-//    public User(Long id, String email, String nickName, String password) {
-//        this.id = id;
-//        this.email = email;
-//        this.password = password;
-//        this.nickName = nickName;
-//        this.role = UserRoleEnum.USER;
-//    }
-
     public User kakaoIdUpdate(Long kakaoId) {
         this.kakaoId = kakaoId;
         return this;
     }
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    public void update(UserInfoRequestDto requestDto){
+        this.email = requestDto.getEmail();
+        this.nickName = requestDto.getNickName();
+        this.password = requestDto.getNewPassword();
+        this.profileImage = requestDto.getProfileImage();
+        this.introduction = requestDto.getIntroduction();
+        this.birthday = requestDto.getBirthday();
     }
 }

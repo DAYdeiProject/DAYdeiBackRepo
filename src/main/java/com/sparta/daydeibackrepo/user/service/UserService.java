@@ -111,4 +111,22 @@ public class UserService {
         userRepository.save(user);
         return "카테고리 등록 완료";
     }
+
+    @Transactional
+    public UserInfoResponseDto updateUser(UserInfoRequestDto userInfoRequestDto, UserDetailsImpl userDetails){
+        User user = userDetails.getUser();
+
+//        String passwordCheck = passwordEncoder.encode(userInfoRequestDto.getNewPasswordConfirm());
+//        if (!passwordEncoder.matches(password, passwordCheck)) {
+//            throw new IllegalArgumentException("비밀번호가 다릅니다.");
+//        }
+        if (!userInfoRequestDto.getNewPassword().equals(userInfoRequestDto.getNewPasswordConfirm())){
+            throw new IllegalArgumentException("비밀번호가 다릅니다.");
+        }
+        String password = passwordEncoder.encode(userInfoRequestDto.getNewPassword());
+        userInfoRequestDto.setNewPassword(password);
+        user.update(userInfoRequestDto);
+        userRepository.save(user);
+        return new UserInfoResponseDto(user);
+    }
 }

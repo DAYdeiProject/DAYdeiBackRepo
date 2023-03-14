@@ -1,8 +1,11 @@
 package com.sparta.daydeibackrepo.friend.service;
 
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
+import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
+import com.sparta.daydeibackrepo.notification.entity.NotificationType;
+import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
@@ -29,6 +32,7 @@ public class FriendService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final UserSubscribeRepository userSubscribeRepository;
+    private final NotificationService notificationService;
     @Transactional
     public FriendResponseDto requestFriend(Long userId, UserDetailsImpl userDetails) {
         User requestUser = userRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
@@ -47,6 +51,7 @@ public class FriendService {
         }
         Friend friend = new Friend(requestUser, responseUser, false);
         friendRepository.save(friend);
+        notificationService.send(responseUser.getId() , NotificationType.FRIEND_REQUEST, NotificationType.FRIEND_REQUEST.makeContent(requestUser.getNickName()), NotificationType.FRIEND_REQUEST.makeUrl(requestUser.getId()));
         return new FriendResponseDto(friend);
     }
     @Transactional
@@ -65,6 +70,7 @@ public class FriendService {
             throw new IllegalArgumentException("승인 가능한 친구 요청이 없습니다.");
         }
         friend.update(requestUser, responseUser, true);
+        notificationService.send(requestUser.getId() , NotificationType.FRIEND_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(responseUser.getNickName()), NotificationType.FRIEND_ACCEPT.makeUrl(responseUser.getId()));
         return new FriendResponseDto(friend);
     }
     @Transactional
@@ -103,31 +109,33 @@ public class FriendService {
         }
     }
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getFriendList(UserDetailsImpl userDetails) {
+    public RelationResponseDto getRelationList(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        // 친구 리스트에 true
+        //친구 리스트
         List<Friend> friends = friendRepository.findFriends(user);
         List<User> friendList = new ArrayList<>();
         List<UserResponseDto> friendResponseList = new ArrayList<>();
+        User user1 = null;
         for(Friend friend : friends){
             if (friend.getFriendResponseId() != user){
                 friendList.add(friend.getFriendResponseId());
+                user1 = friend.getFriendResponseId();
             }
             else if (friend.getFriendRequestId() != user){
                 friendList.add(friend.getFriendRequestId());
+                user1 = friend.getFriendRequestId();
             }
+            friendResponseList.add( new UserResponseDto(user1, true));
         }
-        for(User user1 : friendList){
-            UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
-            boolean userSubscribeCheck = false;
-            if (userSubscribe != null){
-                userSubscribeCheck = true;
-            }
-            friendResponseList.add( new UserResponseDto(user1, true, userSubscribeCheck));
+        // 구독 리스트
+        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
+        List<UserResponseDto> userSubscribeResponseList = new ArrayList<>();
+        for(UserSubscribe userSubscribe : userSubscribes){
+            userSubscribeResponseList.add(new UserResponseDto(userSubscribe, true));
         }
-        return friendResponseList;
+        return new RelationResponseDto(friendResponseList, userSubscribeResponseList);
     }
     @Transactional(readOnly = true)
     public List<UserResponseDto> getRecommendList(String category, UserDetailsImpl userDetails) {

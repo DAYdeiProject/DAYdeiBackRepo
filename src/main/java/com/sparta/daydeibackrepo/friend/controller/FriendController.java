@@ -1,6 +1,7 @@
 package com.sparta.daydeibackrepo.friend.controller;
 
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
+import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
 import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
@@ -34,8 +35,8 @@ public class FriendController {
     }
 
     @GetMapping("/list")
-    public StatusResponseDto<List<UserResponseDto>> getFriendList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getFriendList(userDetails));
+    public StatusResponseDto<RelationResponseDto> getRelationList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(friendService.getRelationList(userDetails));
     }
     @GetMapping("/recommend")
     public StatusResponseDto<List<UserResponseDto>> getRecommendList(@RequestParam String category, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){

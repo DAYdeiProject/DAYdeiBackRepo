@@ -40,4 +40,9 @@ public class FriendController {
     public StatusResponseDto<List<UserResponseDto>> getRecommendList(@RequestParam String category, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.getRecommendList(category,userDetails));
     }
+
+    @GetMapping("/find/{searchWord}")
+    public StatusResponseDto<List<UserResponseDto>> getFriendTagList(@PathVariable String searchWord, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return StatusResponseDto.success(friendService.getFriendTagList(searchWord, userDetails));
+    }
 }

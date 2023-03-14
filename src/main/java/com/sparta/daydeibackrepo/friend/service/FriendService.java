@@ -156,4 +156,8 @@ public class FriendService {
         }
         return recommendResponseList;
     }
+
+    public Object getFriendTagList(String searchWord, UserDetailsImpl userDetails) {
+
+    }
 }

@@ -30,6 +30,9 @@ public class Post extends TimeStamped {
     private String endTime;     //추후 Time 타입으로 변경해야함
 
     @Column
+    private String content;
+
+    @Column
     private String image; //s3 연동 후 multipart로 변경해야함
 
     @Column

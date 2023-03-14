@@ -7,6 +7,8 @@ public enum ColorEnum {
     BLUE,
     RED,
     YELLOW,
-    GRAY
+    GRAY,
+
+    E68E8E
 
 }

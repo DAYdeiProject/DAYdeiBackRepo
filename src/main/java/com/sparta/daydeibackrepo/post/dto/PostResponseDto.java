@@ -33,7 +33,7 @@ public class PostResponseDto {
 
     private String location; //위치
 
-    private List<Friend> participent = new ArrayList<>();
+    private List<Friend> participent;
 
     private ScopeEnum scope;
 

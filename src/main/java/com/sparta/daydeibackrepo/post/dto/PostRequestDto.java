@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.post.dto;
 
+import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
@@ -31,7 +32,7 @@ public class PostRequestDto {
 
     private String location; //위치
 
-    private List<Friend> participant = new ArrayList<>();
+    private List<FriendTagResponseDto> participant = new ArrayList<>();
 
 //    private User participent;
 

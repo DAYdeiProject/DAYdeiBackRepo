@@ -1,8 +1,7 @@
 package com.sparta.daydeibackrepo.friend.dto;
 
-import com.sparta.daydeibackrepo.user.entity.User;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.Builder;
 
 @Getter
 @Builder

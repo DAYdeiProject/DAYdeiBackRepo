@@ -2,6 +2,7 @@ package com.sparta.daydeibackrepo.friend.controller;
 
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
+import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
 import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
@@ -28,22 +29,24 @@ public class FriendController {
         return StatusResponseDto.success(friendService.setFriend(userId, userDetails));
     }
 
+
     @DeleteMapping("/{userId}")
     public StatusResponseDto<String> deleteFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.deleteFriend(userId, userDetails));
     }
 
     @GetMapping("/list")
-    public StatusResponseDto<List<UserResponseDto>> getFriendList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getFriendList(userDetails));
+    public StatusResponseDto<RelationResponseDto> getRelationList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(friendService.getRelationList(userDetails));
     }
     @GetMapping("/recommend")
-    public StatusResponseDto<List<UserResponseDto>> getRecommendList(@RequestParam String category, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getRecommendList(category,userDetails));
+    public StatusResponseDto<List<UserResponseDto>> getRecommendList(@RequestParam List<String> category, @RequestParam String searchword, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(friendService.getRecommendList(category,searchword,userDetails));
     }
 
     @GetMapping("/find/{searchWord}")
     public StatusResponseDto<List<FriendTagResponseDto>> getFriendTagList(@PathVariable String searchWord, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(friendService.getFriendTagList(searchWord, userDetails));
     }
+
 }

@@ -1,31 +1,28 @@
 package com.sparta.daydeibackrepo.user.dto;
 
-import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
-public class LoginResponseDto {
+@NoArgsConstructor
+public class UserInfoResponseDto {
     private String email;
-    private String birthday;
     private String nickName;
+    private String password;  // 이걸 왜 넣나요?
     private String profileImage;
     private String introduction;
-    private List<CategoryEnum> categoryList;
-    private Boolean isLogin;
+    private String birthday;
 
-    public LoginResponseDto(User user, Boolean isLogin){
+    public UserInfoResponseDto(User user){
         this.email = user.getEmail();
-        this.birthday = user.getBirthday();
         this.nickName = user.getNickName();
+        this.password = user.getPassword();
         this.profileImage = user.getProfileImage();
         this.introduction = user.getIntroduction();
-        this.categoryList = user.getCategoryEnum();
-        this.isLogin = isLogin;
-
+        this.birthday = user.getBirthday();
     }
+
 }

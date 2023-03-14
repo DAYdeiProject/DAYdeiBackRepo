@@ -57,10 +57,10 @@ public class UserController {
         return kakaoService.kakaoLogin(code, response);
     }
 
+
+    // TODO: 2023/03/14 프론트한테 아이디 받기 ? 
     @GetMapping("/users/kakao_friends/callback")                                                //HttpServletResponse response
     public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         return kakaoService.kakaoFriends(code, response);
     }
-
-
 }

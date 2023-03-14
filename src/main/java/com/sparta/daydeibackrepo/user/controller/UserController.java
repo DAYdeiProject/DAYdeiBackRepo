@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.daydeibackrepo.user.dto.LoginRequestDto;
 import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
 import com.sparta.daydeibackrepo.user.dto.SignupRequestDto;
+import com.sparta.daydeibackrepo.user.dto.UserRequestDto;
 import com.sparta.daydeibackrepo.user.service.KakaoService;
 import com.sparta.daydeibackrepo.user.service.UserService;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
@@ -64,7 +65,10 @@ public class UserController {
     public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         return kakaoService.kakaoFriends(code, response);
     }
-
+    @PostMapping("/users/reset/password")
+    public StatusResponseDto<String> resetPassword(@RequestBody UserRequestDto userRequestDto){
+        return StatusResponseDto.success(userService.resetPassword(userRequestDto));
+    }
 
 
 

@@ -80,5 +80,7 @@ public class User {
         this.kakaoId = kakaoId;
         return this;
     }
-
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }

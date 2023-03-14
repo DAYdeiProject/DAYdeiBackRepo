@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,7 +16,7 @@ public class UserResponseDto {
     String email;
     String nickName;
     String profileImage;
-    CategoryEnum categoryEnum;
+    List<CategoryEnum> categoryList;
     Boolean friendCheck;
     Boolean userSubscribeCheck;
     public UserResponseDto(User user,boolean friendCheck,boolean userSubscribeCheck){
@@ -22,7 +24,7 @@ public class UserResponseDto {
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
-        this.categoryEnum = user.getCategoryEnum();
+        this.categoryList = user.getCategoryEnum();
         this.friendCheck = friendCheck;
         this.userSubscribeCheck = userSubscribeCheck;
     }

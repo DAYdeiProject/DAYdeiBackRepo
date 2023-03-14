@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import lombok.*;
 import org.hibernate.boot.model.relational.SqlStringGenerationContext;
@@ -40,11 +41,15 @@ public class User {
 
     private Long kakaoId;
 
-    @Enumerated(value = EnumType.STRING)
-    private CategoryEnum categoryEnum;
-//
-//    @ElementCollection
-//    private List<String> friendEmailList;
+//    @ElementCollection(fetch = FetchType.EAGER)
+//    @JsonFormat(shape = JsonFormat.Shape.STRING)
+//    private List<CategoryEnum> categoryEnum = new ArrayList<>();
+
+    @Convert(converter = CategoryEnumConverter.class)
+    @ElementCollection(fetch = FetchType.EAGER)
+//    @CollectionTable(name = "users_category_enum", joinColumns = @JoinColumn(name = "user_id"))
+//    @Column(name = "category_enum")
+    private List<CategoryEnum> categoryEnum = new ArrayList<>();
 
 
     //카카오 회원가입

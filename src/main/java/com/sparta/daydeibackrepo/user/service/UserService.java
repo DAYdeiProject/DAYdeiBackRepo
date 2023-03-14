@@ -3,10 +3,9 @@ package com.sparta.daydeibackrepo.user.service;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.mail.dto.MailDto;
 import com.sparta.daydeibackrepo.mail.service.MailService;
-import com.sparta.daydeibackrepo.user.dto.LoginRequestDto;
-import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
-import com.sparta.daydeibackrepo.user.dto.SignupRequestDto;
-import com.sparta.daydeibackrepo.user.dto.UserRequestDto;
+import com.sparta.daydeibackrepo.security.UserDetailsImpl;
+import com.sparta.daydeibackrepo.user.dto.*;
+import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
@@ -20,6 +19,7 @@ import com.sparta.daydeibackrepo.user.entity.User;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +32,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final MailService mailService;
+
+
 
     @Transactional
     public String signup(@Valid SignupRequestDto signupRequestDto){
@@ -91,5 +93,22 @@ public class UserService {
         mailService.sendMail(new MailDto(user, newPassword));
         user.updatePassword(passwordEncoder.encode(newPassword));
         return "임시 비밀번호가 이메일로 전송되었습니다.";
+    }
+
+    @Transactional
+    public String setCategory(CategoryRequestDto categoryRequestDto, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
+        List<CategoryEnum> categoryList = categoryRequestDto.getCategory();
+        for (CategoryEnum category : categoryList) {
+            if (user.getCategoryEnum().contains(category)){
+                return "이미 등록된 카테고리입니다.";
+            }
+            else {
+                user.getCategoryEnum().add(category);
+
+            }
+        }
+        userRepository.save(user);
+        return "카테고리 등록 완료";
     }
 }

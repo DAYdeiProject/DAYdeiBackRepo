@@ -37,6 +37,11 @@ public class UserController {
         return StatusResponseDto.success(userService.signup(signupRequestDto));
     }
 
+    @PostMapping("/users/signup/{email}")
+    public ResponseEntity<StatusResponseDto> checkEmail(@PathVariable String email) {
+        return userService.emailCheck(email);
+    }
+
     @PostMapping("/users/login")
     public StatusResponseDto<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
         return StatusResponseDto.success(userService.login(loginRequestDto, response));
@@ -51,6 +56,8 @@ public class UserController {
     public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         return kakaoService.kakaoFriends(code, response);
     }
+
+
 
 
 }

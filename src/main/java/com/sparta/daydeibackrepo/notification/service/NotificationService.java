@@ -32,7 +32,7 @@ public class NotificationService {
     private final EmitterRepository emitterRepository;
 
 
-    public SseEmitter subscribe(Long userId, String lastEventId) {
+    public SseEmitter connect(Long userId, String lastEventId) {
         String emitterId = makeTimeIncludeId(userId);
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(timeout));
         emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
@@ -63,12 +63,12 @@ public class NotificationService {
                 }
         );
     }
-    //나한테 온 모든 알림 GET
+    //나한테 온 모든 알림 GET + 알림 다 읽은 것으로 변경
     @Transactional
     public List<NotificationDto> findAllNotifications(Long userId) {
         List<Notification> notifications = notificationRepository.findAllByUserId(userId);
         notifications.stream()
-                .forEach(Notification::read);
+                .forEach(notification -> notification.read());
         return notifications.stream()
                 .map(NotificationDto::create)
                 .collect(Collectors.toList());

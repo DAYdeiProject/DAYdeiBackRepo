@@ -41,7 +41,8 @@ public class UserSubscribeService {
         }
         UserSubscribe userSubscribe1 = new UserSubscribe(subscribing, subscriber);
         userSubscribeRepository.save(userSubscribe1);
-        notificationService.send(userid , NotificationType.SUBSCRIBE_ACCEPT, NotificationType.SUBSCRIBE_ACCEPT.makeContent(userDetails.getUser().getNickName()), NotificationType.SUBSCRIBE_ACCEPT.makeUrl(userid));
+        // 반환되는 url은 상대방의 메인페이지
+        notificationService.send(userid , NotificationType.SUBSCRIBE_ACCEPT, NotificationType.SUBSCRIBE_ACCEPT.makeContent(subscribing.getNickName()), NotificationType.SUBSCRIBE_ACCEPT.makeUrl(subscribing.getId()));
         return new UserSubscribeResponseDto(userSubscribe1);
     }
     @Transactional

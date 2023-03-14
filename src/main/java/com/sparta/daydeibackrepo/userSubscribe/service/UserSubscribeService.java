@@ -1,5 +1,7 @@
 package com.sparta.daydeibackrepo.userSubscribe.service;
 
+import com.sparta.daydeibackrepo.notification.entity.NotificationType;
+import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
@@ -18,6 +20,7 @@ import javax.persistence.EntityNotFoundException;
 @Service
 @RequiredArgsConstructor
 public class UserSubscribeService {
+    private final NotificationService notificationService;
     private final UserSubscribeRepository userSubscribeRepository;
     private final UserRepository userRepository;
     @Transactional
@@ -38,6 +41,8 @@ public class UserSubscribeService {
         }
         UserSubscribe userSubscribe1 = new UserSubscribe(subscribing, subscriber);
         userSubscribeRepository.save(userSubscribe1);
+        // 반환되는 url은 상대방의 메인페이지
+        notificationService.send(userid , NotificationType.SUBSCRIBE_ACCEPT, NotificationType.SUBSCRIBE_ACCEPT.makeContent(subscribing.getNickName()), NotificationType.SUBSCRIBE_ACCEPT.makeUrl(subscribing.getId()));
         return new UserSubscribeResponseDto(userSubscribe1);
     }
     @Transactional

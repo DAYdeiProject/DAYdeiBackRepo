@@ -114,7 +114,8 @@ public class KakaoService {
         body.add("grant_type", "authorization_code");
         body.add("client_id", kakaoApiKey);
 //        body.add("redirect_uri", "http://3.34.137.234:8080/api/users/kakao/callback");
-        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao_friends/callback");
+//        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao_friends/callback");
+        body.add("redirect_uri", "http://localhost:3000/home");
         body.add("code", code);
 
         // HTTP 요청 보내기
@@ -149,6 +150,7 @@ public class KakaoService {
 //        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao/callback");
 //        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/home");
         body.add("redirect_uri", "http://localhost:3000/home");
+//        body.add("redirect_uri", "http://localhost:8080/api/users/kakao/callback");
         body.add("code", code);
 
         // HTTP 요청 보내기

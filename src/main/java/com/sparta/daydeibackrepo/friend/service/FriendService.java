@@ -1,6 +1,7 @@
 package com.sparta.daydeibackrepo.friend.service;
 
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
+import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
@@ -157,7 +158,35 @@ public class FriendService {
         return recommendResponseList;
     }
 
-    public Object getFriendTagList(String searchWord, UserDetailsImpl userDetails) {
+    public List<FriendTagResponseDto> getFriendTagList(String searchWord, UserDetailsImpl userDetails) {
+        List<Friend> friends = friendRepository.findFriends(userDetails.getUser());
+        List<FriendTagResponseDto> tagResponseDtos = new ArrayList<>();
 
+
+        for(Friend friend : friends) {
+            if(userRepository.findByNickNameLike(searchWord).isPresent()) {
+                Optional<User> user = userRepository.findByNickName(friend.getFriendResponseId().getNickName());
+                FriendTagResponseDto responseDto = FriendTagResponseDto.builder()
+                        .id(user.get().getId())
+                        .nickName(user.get().getNickName())
+                        .introduction(user.get().getIntroduction())
+                        .profileImage(user.get().getProfileImage())
+                        .email(user.get().getEmail())
+                        .build();
+                tagResponseDtos.add(responseDto);
+            } else if(userRepository.findByEmailLike(searchWord).isPresent()) {
+                Optional<User> user = userRepository.findByEmail(friend.getFriendResponseId().getEmail());
+                FriendTagResponseDto responseDto = FriendTagResponseDto.builder()
+                        .id(user.get().getId())
+                        .nickName(user.get().getNickName())
+                        .introduction(user.get().getIntroduction())
+                        .profileImage(user.get().getProfileImage())
+                        .email(user.get().getEmail())
+                        .build();
+                tagResponseDtos.add(responseDto);
+            }
+
+        }
+        return tagResponseDtos;
     }
 }

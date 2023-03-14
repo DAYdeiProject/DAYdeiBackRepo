@@ -12,6 +12,7 @@ import java.util.List;
 public interface FriendRepository extends JpaRepository<Friend, Long> {
     Friend findByFriendRequestIdAndFriendResponseId(User requestUser, User responseUser);
     Optional<Friend> findById(Long id);
+
     @Query("SELECT f FROM Friend f WHERE (f.friendRequestId = :user "+" OR f.friendResponseId =:user) "+" AND f.friendCheck = true")
     List<Friend> findFriends(User user);
 

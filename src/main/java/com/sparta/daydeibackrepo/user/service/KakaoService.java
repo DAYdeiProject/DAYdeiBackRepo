@@ -62,17 +62,14 @@ public class KakaoService {
         String createToken = jwtUtil.createToken(kakaoUser.getEmail(), UserRoleEnum.USER);
         headers.set("Authorization", createToken);
 
-        //프론트에서 redirect url을 설정해주면  여기에 링크 넣기
-        //백엔드 안 거치고 프론트로 바로 쏘기 redirect 주소를 프론트 주소로 하기
-        response.encodeRedirectURL("http://daydei.s3-website.ap-northeast-2.amazonaws.com/home?token="+createToken);
+//        //프론트에서 redirect url을 설정해주면  여기에 링크 넣기
+//        //백엔드 안 거치고 프론트로 바로 쏘기 redirect 주소를 프론트 주소로 하기
+//        response.encodeRedirectURL("http://daydei.s3-website.ap-northeast-2.amazonaws.com/home?token="+createToken);
         currentUser = kakaoUser;
-
-
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(StatusResponseDto.success("success"));
 //        return createToken;
-
     }
 
     public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpServletResponse response) throws JsonProcessingException {
@@ -105,6 +102,8 @@ public class KakaoService {
                 .body(StatusResponseDto.success("success"));
     }
 
+
+    // 안 건들여
     private String getTokenFriendsList(String code) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
@@ -115,7 +114,8 @@ public class KakaoService {
         body.add("grant_type", "authorization_code");
         body.add("client_id", kakaoApiKey);
 //        body.add("redirect_uri", "http://3.34.137.234:8080/api/users/kakao/callback");
-        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao_friends/callback");
+//        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao_friends/callback");
+        body.add("redirect_uri", "http://localhost:3000/home");
         body.add("code", code);
 
         // HTTP 요청 보내기
@@ -148,7 +148,9 @@ public class KakaoService {
         body.add("client_id", kakaoApiKey);
 //        body.add("redirect_uri", "http://3.34.137.234:8080/api/users/kakao/callback");
 //        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao/callback");
-        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/home");
+//        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/home");
+        body.add("redirect_uri", "http://localhost:3000/home");
+//        body.add("redirect_uri", "http://localhost:8080/api/users/kakao/callback");
         body.add("code", code);
 
         // HTTP 요청 보내기

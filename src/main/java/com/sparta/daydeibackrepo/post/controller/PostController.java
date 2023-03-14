@@ -15,11 +15,11 @@
 //@RequestMapping("/api")
 //public class PostController {
 //
-////    private final PostService postService;
+//    private final PostService postService;
 //
-////    @PostMapping("posts")
-////    public StatusResponseDto<PostResponseDto> createPost(@RequestBody PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-////        return StatusResponseDto.success(postService.createPost(requestDto, userDetails.getUser()));
-////    }
+//    @PostMapping("posts")
+//    public StatusResponseDto<PostResponseDto> createPost(@RequestBody PostRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return StatusResponseDto.success(postService.createPost(requestDto, userDetails));
+//    }
 //
 //}

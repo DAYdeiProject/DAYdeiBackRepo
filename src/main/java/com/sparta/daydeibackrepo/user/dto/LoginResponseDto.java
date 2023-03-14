@@ -5,6 +5,8 @@ import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class LoginResponseDto {
@@ -13,7 +15,7 @@ public class LoginResponseDto {
     private String nickName;
     private String profileImage;
     private String introduction;
-    private CategoryEnum category;
+    private List<CategoryEnum> categoryList;
     private Boolean isLogin;
 
     public LoginResponseDto(User user, Boolean isLogin){
@@ -22,7 +24,7 @@ public class LoginResponseDto {
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
         this.introduction = user.getIntroduction();
-        this.category = user.getCategoryEnum();
+        this.categoryList = user.getCategoryEnum();
         this.isLogin = isLogin;
 
     }

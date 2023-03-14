@@ -44,6 +44,7 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
 
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
 }
 
 //tasks.named('test') {

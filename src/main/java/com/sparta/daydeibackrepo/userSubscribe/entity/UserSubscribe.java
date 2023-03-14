@@ -2,14 +2,19 @@ package com.sparta.daydeibackrepo.userSubscribe.entity;
 
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.util.TimeStamped;
+import jdk.jfr.Timestamp;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Timestamp
 public class UserSubscribe extends TimeStamped {
 
     @Id

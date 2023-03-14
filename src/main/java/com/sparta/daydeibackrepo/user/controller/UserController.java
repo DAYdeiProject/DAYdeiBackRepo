@@ -46,13 +46,21 @@ public class UserController {
     public StatusResponseDto<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
         return StatusResponseDto.success(userService.login(loginRequestDto, response));
     }
-
+//    ResponseEntity<StatusResponseDto<String>>
     @GetMapping("/users/kakao/callback")
     public ResponseEntity<StatusResponseDto<String>> kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+//        String createToken = kakaoService.kakaoLogin(code, response);
+//        // Cookie 생성 및 직접 브라우저에 Set
+//        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
+//        cookie.setPath("/");
+//        response.addCookie(cookie);
+//        return "success";
         return kakaoService.kakaoLogin(code, response);
     }
 
-    @GetMapping("/users/kakao_friends/callback")
+
+    // TODO: 2023/03/14 프론트한테 아이디 받기 ?
+    @GetMapping("/users/kakao_friends/callback")                                                //HttpServletResponse response
     public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         return kakaoService.kakaoFriends(code, response);
     }

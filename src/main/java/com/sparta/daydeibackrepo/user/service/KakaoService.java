@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
+import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.KakaoUserInfoDto;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
@@ -40,11 +41,12 @@ public class KakaoService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final JwtUtil jwtUtil;
-    private static User currentUser;
+    private User currentUser;
 
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
 
+    //ResponseEntity<StatusResponseDto<String>>
     public ResponseEntity<StatusResponseDto<String>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
@@ -57,15 +59,19 @@ public class KakaoService {
 
         // 4. JWT 토큰 반환
         HttpHeaders headers = new HttpHeaders();
-        String createToken = jwtUtil.createToken(kakaoUser.getNickName(), UserRoleEnum.USER);
+        String createToken = jwtUtil.createToken(kakaoUser.getEmail(), UserRoleEnum.USER);
         headers.set("Authorization", createToken);
 
+        //프론트에서 redirect url을 설정해주면  여기에 링크 넣기
+        //백엔드 안 거치고 프론트로 바로 쏘기 redirect 주소를 프론트 주소로 하기
+        response.encodeRedirectURL("http://daydei.s3-website.ap-northeast-2.amazonaws.com/home?token="+createToken);
         currentUser = kakaoUser;
 
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(StatusResponseDto.success("success"));
+//        return createToken;
 
     }
 
@@ -88,9 +94,10 @@ public class KakaoService {
             String friendKakaoId = friendNode.path("id").asText();
 //            String friendNickname = friendNode.path("profile_nickname").asText();
             // friends 테이블에 사용자와 친구를 저장하는 코드
-            User friendUser = userRepository.findByKakaoId(Long.parseLong(friendKakaoId)).orElseThrow(
-                    () -> new NullPointerException("등록된 사용자가 없습니다.")
-            );
+            User friendUser = userRepository.findByKakaoId(Long.parseLong(friendKakaoId)).orElse(null);
+            if (friendUser == null) {
+                return ResponseEntity.ok().body(StatusResponseDto.success("친구없음"));
+            }
             friendRepository.save(new Friend(currentUser, friendUser, true));
         }
 
@@ -140,7 +147,8 @@ public class KakaoService {
         body.add("grant_type", "authorization_code");
         body.add("client_id", kakaoApiKey);
 //        body.add("redirect_uri", "http://3.34.137.234:8080/api/users/kakao/callback");
-        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao/callback");
+//        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao/callback");
+        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/home");
         body.add("code", code);
 
         // HTTP 요청 보내기

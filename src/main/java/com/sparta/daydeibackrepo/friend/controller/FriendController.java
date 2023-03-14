@@ -22,7 +22,6 @@ public class FriendController {
         return StatusResponseDto.success(friendService.requestFriend(userId, userDetails));
     }
 
-
     @PutMapping("/{userId}")
     public StatusResponseDto<FriendResponseDto> setFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.setFriend(userId, userDetails));

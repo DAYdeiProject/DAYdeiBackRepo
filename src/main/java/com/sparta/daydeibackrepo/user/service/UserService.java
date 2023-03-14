@@ -1,9 +1,12 @@
 package com.sparta.daydeibackrepo.user.service;
 
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
+import com.sparta.daydeibackrepo.mail.dto.MailDto;
+import com.sparta.daydeibackrepo.mail.service.MailService;
 import com.sparta.daydeibackrepo.user.dto.LoginRequestDto;
 import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
 import com.sparta.daydeibackrepo.user.dto.SignupRequestDto;
+import com.sparta.daydeibackrepo.user.dto.UserRequestDto;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
@@ -18,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Validated
@@ -27,6 +31,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final MailService mailService;
 
     @Transactional
     public String signup(@Valid SignupRequestDto signupRequestDto){
@@ -74,5 +79,17 @@ public class UserService {
         return new LoginResponseDto(user, isLogin);
     }
 
-
+    @Transactional
+    public String resetPassword(UserRequestDto userRequestDto) {
+        User user = userRepository.findByEmail(userRequestDto.getEmail()).orElseThrow(
+                () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
+        );
+        if (!user.getBirthday().equals(userRequestDto.getBirthday())){
+            throw new IllegalArgumentException("생일이 일치하지 않습니다.");
+        }
+        String newPassword = UUID.randomUUID().toString().substring(0,8);
+        mailService.sendMail(new MailDto(user, newPassword));
+        user.updatePassword(passwordEncoder.encode(newPassword));
+        return "임시 비밀번호가 이메일로 전송되었습니다.";
+    }
 }

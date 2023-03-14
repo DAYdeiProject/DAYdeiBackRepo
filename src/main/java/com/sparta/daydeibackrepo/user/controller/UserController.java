@@ -2,8 +2,6 @@ package com.sparta.daydeibackrepo.user.controller;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sparta.daydeibackrepo.jwt.JwtUtil;
-import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.LoginRequestDto;
 import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
 import com.sparta.daydeibackrepo.user.dto.SignupRequestDto;
@@ -13,12 +11,10 @@ import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
@@ -41,6 +37,11 @@ public class UserController {
         return StatusResponseDto.success(userService.signup(signupRequestDto));
     }
 
+    @PostMapping("/users/signup/{email}")
+    public ResponseEntity<StatusResponseDto> checkEmail(@PathVariable String email) {
+        return userService.emailCheck(email);
+    }
+
     @PostMapping("/users/login")
     public StatusResponseDto<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
         return StatusResponseDto.success(userService.login(loginRequestDto, response));
@@ -57,10 +58,14 @@ public class UserController {
         return kakaoService.kakaoLogin(code, response);
     }
 
+
+    // TODO: 2023/03/14 프론트한테 아이디 받기 ?
     @GetMapping("/users/kakao_friends/callback")                                                //HttpServletResponse response
     public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         return kakaoService.kakaoFriends(code, response);
     }
+
+
 
 
 }

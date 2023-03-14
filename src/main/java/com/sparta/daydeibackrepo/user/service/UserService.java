@@ -6,7 +6,9 @@ import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
 import com.sparta.daydeibackrepo.user.dto.SignupRequestDto;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
+import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,6 +48,13 @@ public class UserService {
         return "회원가입 완료";
     }
 
+    public ResponseEntity<StatusResponseDto> emailCheck(String email) {
+        if(userRepository.findByEmail(email).isPresent()) {
+            return StatusResponseDto.toAllExceptionResponseEntity("중복된 이메일 입니다.");
+        }
+        return StatusResponseDto.toResponseEntity("사용 가능한 이메일입니다.");
+    }
+
     @Transactional
     public LoginResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
         String email = loginRequestDto.getEmail();
@@ -64,4 +73,6 @@ public class UserService {
         isLogin = true;
         return new LoginResponseDto(user, isLogin);
     }
+
+
 }

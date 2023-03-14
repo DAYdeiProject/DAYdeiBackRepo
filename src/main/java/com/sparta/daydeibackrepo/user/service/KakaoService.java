@@ -46,6 +46,7 @@ public class KakaoService {
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
 
+    //ResponseEntity<StatusResponseDto<String>>
     public ResponseEntity<StatusResponseDto<String>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
@@ -61,16 +62,17 @@ public class KakaoService {
         String createToken = jwtUtil.createToken(kakaoUser.getEmail(), UserRoleEnum.USER);
         headers.set("Authorization", createToken);
 
-//        currentUser = kakaoUser;
+        currentUser = kakaoUser;
 
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(StatusResponseDto.success("success"));
+//        return createToken;
 
     }
 
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, UserDetailsImpl userDetails) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpServletResponse response) throws JsonProcessingException {
         String accessToken = getTokenFriendsList(code);
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -93,7 +95,7 @@ public class KakaoService {
             if (friendUser == null) {
                 return ResponseEntity.ok().body(StatusResponseDto.success("친구없음"));
             }
-            friendRepository.save(new Friend(userDetails.getUser(), friendUser, true));
+            friendRepository.save(new Friend(currentUser, friendUser, true));
         }
 
         return ResponseEntity.ok()

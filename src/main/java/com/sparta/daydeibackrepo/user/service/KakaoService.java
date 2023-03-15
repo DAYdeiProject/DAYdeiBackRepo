@@ -88,7 +88,7 @@ public class KakaoService {
         // 사용자의 토큰을 가져오기
         String accessToken = getTokenFriendsList(code);
 //        Claims info = jwtUtil.getUserInfoFromToken(accessToken);
-//        log.warn(info.getSubject()); // info.getSubject() -> email
+        log.warn(accessToken); // info.getSubject() -> email
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);

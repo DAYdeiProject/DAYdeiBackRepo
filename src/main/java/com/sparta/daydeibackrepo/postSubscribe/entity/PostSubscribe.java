@@ -25,4 +25,15 @@ public class PostSubscribe {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Column
+    private Boolean postSubscribeCheck;
+
+    public void update(boolean postSubscribeCheck) {
+        this.postSubscribeCheck=postSubscribeCheck;
+    }
+    public PostSubscribe(Post post, User user, boolean postSubscribeCheck){
+        this.post = post;
+        this.user = user;
+        this.postSubscribeCheck=postSubscribeCheck;
+    }
 }

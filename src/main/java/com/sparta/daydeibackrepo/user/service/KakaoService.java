@@ -68,9 +68,9 @@ public class KakaoService {
 //        //프론트에서 redirect url을 설정해주면  여기에 링크 넣기
 //        //백엔드 안 거치고 프론트로 바로 쏘기 redirect 주소를 프론트 주소로 하기
 //        response.encodeRedirectURL("http://daydei.s3-website.ap-northeast-2.amazonaws.com/home?token="+createToken);
-//        currentUser = kakaoUser;
-        session.setAttribute("userId", kakaoUserInfo.getId());
-        session.setAttribute("nickname", kakaoUserInfo.getNickName());
+        currentUser = kakaoUser;
+//        session.setAttribute("userId", kakaoUserInfo.getId());
+//        session.setAttribute("nickname", kakaoUserInfo.getNickName());
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(StatusResponseDto.success("success"));
@@ -106,13 +106,13 @@ public class KakaoService {
             if (friendUser == null) {
                 return ResponseEntity.ok().body(StatusResponseDto.success("친구없음"));
             }
-            Friend friend = new Friend();
-            friend.setFriendRequestId(userRepository.findByKakaoId(currentUserKakaoId).orElse(null));
-            friend.setFriendResponseId(friendUser);
-            friend.setFriendCheck(true);
-            friendRepository.save(friend);
+//            Friend friend = new Friend();
+//            friend.setFriendRequestId(userRepository.findByKakaoId(currentUserKakaoId).orElse(null));
+//            friend.setFriendResponseId(friendUser);
+//            friend.setFriendCheck(true);
+//            friendRepository.save(friend);
 
-//            friendRepository.save(new Friend(currentUser, friendUser, true));
+            friendRepository.save(new Friend(currentUser, friendUser, true));
         }
 
 //        return ResponseEntity.ok()

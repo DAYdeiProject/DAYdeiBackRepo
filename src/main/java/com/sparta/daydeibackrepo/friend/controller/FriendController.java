@@ -48,5 +48,4 @@ public class FriendController {
     public StatusResponseDto<List<FriendTagResponseDto>> getFriendTagList(@PathVariable String searchWord, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(friendService.getFriendTagList(searchWord, userDetails));
     }
-
 }

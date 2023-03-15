@@ -1,14 +1,19 @@
 package com.sparta.daydeibackrepo.post.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 public enum ColorEnum {
-    BLUE,
-    RED,
-    YELLOW,
     GRAY,
+    RED,
+    ORANGE,
+    YELLOW,
+    GREEN,
+    BLUE,
+    NAVY,
+    PURPLE
 
-    E68E8E
 
 }

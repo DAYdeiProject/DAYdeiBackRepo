@@ -168,34 +168,25 @@ public class FriendService {
     }
 
     public List<FriendTagResponseDto> getFriendTagList(String searchWord, UserDetailsImpl userDetails) {
-        List<Friend> friends = friendRepository.findFriends(userDetails.getUser());
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+//        List<Friend> friends = friendRepository.findFriends(userDetails.getUser());
+        List<Friend> friends = friendRepository.findFriendList("%" + searchWord + "%", user);
         List<FriendTagResponseDto> tagResponseDtos = new ArrayList<>();
 
 
         for(Friend friend : friends) {
-            if(userRepository.findByNickNameLike(searchWord).isPresent()) {
-                Optional<User> user = userRepository.findByNickName(friend.getFriendResponseId().getNickName());
-                FriendTagResponseDto responseDto = FriendTagResponseDto.builder()
-                        .id(user.get().getId())
-                        .nickName(user.get().getNickName())
-                        .introduction(user.get().getIntroduction())
-                        .profileImage(user.get().getProfileImage())
-                        .email(user.get().getEmail())
-                        .build();
-                tagResponseDtos.add(responseDto);
-            } else if(userRepository.findByEmailLike(searchWord).isPresent()) {
-                Optional<User> user = userRepository.findByEmail(friend.getFriendResponseId().getEmail());
-                FriendTagResponseDto responseDto = FriendTagResponseDto.builder()
-                        .id(user.get().getId())
-                        .nickName(user.get().getNickName())
-                        .introduction(user.get().getIntroduction())
-                        .profileImage(user.get().getProfileImage())
-                        .email(user.get().getEmail())
-                        .build();
-                tagResponseDtos.add(responseDto);
-            }
-
+            FriendTagResponseDto responseDto = FriendTagResponseDto.builder()
+                    .id(friend.getFriendResponseId().getId())
+                    .nickName(friend.getFriendResponseId().getNickName())
+                    .introduction(friend.getFriendResponseId().getIntroduction())
+                    .profileImage(friend.getFriendResponseId().getProfileImage())
+                    .email(friend.getFriendResponseId().getEmail())
+                    .build();
+            tagResponseDtos.add(responseDto);
         }
         return tagResponseDtos;
+
     }
 }

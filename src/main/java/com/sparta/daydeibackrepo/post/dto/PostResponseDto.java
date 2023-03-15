@@ -33,7 +33,7 @@ public class PostResponseDto {
 
     private String location; //위치
 
-    private List<Friend> participent;
+    private List<String> participent;
 
     private ScopeEnum scope;
 
@@ -41,7 +41,7 @@ public class PostResponseDto {
 
     private LocalDateTime createdAt;
 
-    public static PostResponseDto of(Post post, List<Friend> friends) {
+    public static PostResponseDto of(Post post, List<String> tagedFriends) {
         return PostResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -52,7 +52,7 @@ public class PostResponseDto {
                 .content(post.getContent())
                 .image(post.getImage())
                 .location(post.getLocation())
-                .participent(friends)
+                .participent(tagedFriends)
                 .scope(post.getScope())
                 .color(post.getColor())
                 .createdAt(post.getCreatedAt())

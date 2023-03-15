@@ -2,6 +2,7 @@ package com.sparta.daydeibackrepo.post.entity;
 
 import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
+import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.util.TimeStamped;
 import lombok.Getter;
@@ -44,16 +45,30 @@ public class Post extends TimeStamped {
     private String location; //위치
 
     @Column(nullable = false)
+    @Convert(converter = ScopeEnumConverter.class)
     private ScopeEnum scope;
 
     @Column
+    @Convert(converter = ColorEnumConverter.class)
     private ColorEnum color;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-
+    public Post(PostRequestDto requestDto, User user) {
+        this.title = requestDto.getTitle();
+        this.startDate = requestDto.getStartDate();
+        this.endDate = requestDto.getEndDate();
+        this.startTime = requestDto.getStartTime();
+        this.endTime = requestDto.getEndTime();
+        this.content = requestDto.getContent();
+        this.image = requestDto.getImage();
+        this.location = requestDto.getLocation();
+        this.scope = requestDto.getScope();
+        this.color = requestDto.getColor();
+        this.user = user;
+    }
 
 
 

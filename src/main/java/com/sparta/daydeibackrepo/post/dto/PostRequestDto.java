@@ -32,9 +32,8 @@ public class PostRequestDto {
 
     private String location; //위치
 
-    private List<FriendTagResponseDto> participant = new ArrayList<>();
+    private List<String> participant;
 
-//    private User participent;
 
     private ScopeEnum scope;
 

@@ -1,10 +1,10 @@
 package com.sparta.daydeibackrepo.friend.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 @Getter
-@NoArgsConstructor
+@Builder
 public class FriendTagResponseDto {
     private Long id;
 

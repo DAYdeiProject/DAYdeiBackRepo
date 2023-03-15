@@ -1,6 +1,7 @@
 package com.sparta.daydeibackrepo.friend.controller;
 
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
+import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
 import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
@@ -43,4 +44,8 @@ public class FriendController {
         return StatusResponseDto.success(friendService.getRecommendList(category,searchword,userDetails));
     }
 
+    @GetMapping("/find/{searchWord}")
+    public StatusResponseDto<List<FriendTagResponseDto>> getFriendTagList(@PathVariable String searchWord, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return StatusResponseDto.success(friendService.getFriendTagList(searchWord, userDetails));
+    }
 }

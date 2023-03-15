@@ -135,33 +135,34 @@ public class FriendService {
         for(UserSubscribe userSubscribe : userSubscribes){
             userSubscribeResponseList.add(new UserResponseDto(userSubscribe, true));
         }
+        // 리스트 믹싱하는 코드 있으면 좋을듯
         return new RelationResponseDto(friendResponseList, userSubscribeResponseList);
     }
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getRecommendList(String category, UserDetailsImpl userDetails) {
+    public List<UserResponseDto> getRecommendList(List<String> categories, String searchWord, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        CategoryEnum categoryEnum = CategoryEnum.valueOf(category.toUpperCase());
-        List<User> recommendList = userRepository.findAllByCategoryEnum(categoryEnum);
         List<UserResponseDto> recommendResponseList = new ArrayList<>();
-        if (recommendList == null){
-            return null;
-        }
-        for (User user1 : recommendList){
-            Friend friend = friendRepository.findFriend(user, user1);
-            UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
-            boolean friendCheck = false;
-            boolean userSubscribeCheck = false;
-            if (friend!= null){
-                friendCheck = true;
+        for (String category : categories){
+            CategoryEnum categoryEnum = CategoryEnum.valueOf(category.toUpperCase());
+            List<User> recommendList = userRepository.findRecommmedList(categoryEnum, "%" + searchWord + "%", user);
+            for (User user1 : recommendList){
+                Friend friend = friendRepository.findFriend(user, user1);
+                UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
+                boolean friendCheck = false;
+                boolean userSubscribeCheck = false;
+                if (friend!= null){
+                    friendCheck = true;
+                }
+                if (userSubscribe != null){
+                    userSubscribeCheck = true;
+                }
+                if (!friendCheck || !userSubscribeCheck){
+                    recommendResponseList.add(new UserResponseDto(user1,friendCheck,userSubscribeCheck));}
             }
-            if (userSubscribe != null){
-                userSubscribeCheck = true;
-            }
-            if (!friendCheck || !userSubscribeCheck){
-            recommendResponseList.add(new UserResponseDto(user1,friendCheck,userSubscribeCheck));}
         }
+        // 리스트 믹싱하는 코드 있으면 좋을듯
         return recommendResponseList;
     }
 }

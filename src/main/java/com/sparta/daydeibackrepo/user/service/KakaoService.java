@@ -13,6 +13,7 @@ import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -82,8 +83,12 @@ public class KakaoService {
 
     @Transactional
     public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpServletResponse response) throws JsonProcessingException {
+
+
         // 사용자의 토큰을 가져오기
         String accessToken = getTokenFriendsList(code);
+        Claims info = jwtUtil.getUserInfoFromToken(accessToken);
+        log.warn(info.getSubject());
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);

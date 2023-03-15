@@ -84,7 +84,7 @@ public class KakaoService {
     @Transactional
     public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpServletResponse response) throws JsonProcessingException {
 
-
+        log.warn(code);
         // 사용자의 토큰을 가져오기
         String accessToken = getTokenFriendsList(code);
 //        Claims info = jwtUtil.getUserInfoFromToken(accessToken);

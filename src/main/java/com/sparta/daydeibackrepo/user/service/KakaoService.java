@@ -82,10 +82,10 @@ public class KakaoService {
     }
 
     @Transactional
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, UserDetailsImpl userDetails) throws JsonProcessingException {
 
+        User user = userDetails.getUser();
         log.warn(code);
-        // 사용자의 토큰을 가져오기
         String accessToken = getTokenFriendsList(code);
 //        Claims info = jwtUtil.getUserInfoFromToken(accessToken);
         log.warn(accessToken); // info.getSubject() -> email
@@ -93,6 +93,7 @@ public class KakaoService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
+
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://kapi.kakao.com/v1/api/talk/friends");
         URI uri = builder.build().encode().toUri();
         ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
@@ -123,7 +124,7 @@ public class KakaoService {
 //                    () -> new NullPointerException("등록된 사용자가 없습니다.")
 //            );
 
-            friendRepository.save(new Friend(currentUser, friendUser, true));
+            friendRepository.save(new Friend(user, friendUser, true));
         }
 
 //        return ResponseEntity.ok()

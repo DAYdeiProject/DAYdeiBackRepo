@@ -31,7 +31,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     private final JwtUtil jwtUtil;
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

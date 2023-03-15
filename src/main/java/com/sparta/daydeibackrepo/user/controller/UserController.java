@@ -51,22 +51,20 @@ public class UserController {
     }
 //    ResponseEntity<StatusResponseDto<String>>
     @GetMapping("/users/kakao/callback")
-    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoCallback(@RequestParam String code, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
 //        String createToken = kakaoService.kakaoLogin(code, response);
 //        // Cookie 생성 및 직접 브라우저에 Set
 //        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
 //        cookie.setPath("/");
 //        response.addCookie(cookie);
 //        return "success";
-//        return kakaoService.kakaoLogin(code, session);
-//        StatusResponseDto<LoginResponseDto> responseDto = kakaoService.kakaoLogin(code, session).getBody();
-//        LoginResponseDto loginResponseDto = responseDto.getData() != null ? new LoginResponseDto(responseDto.getData()) : null;
-        return kakaoService.kakaoLogin(code, session);
+        return kakaoService.kakaoLogin(code, response);
     }
 
-    @GetMapping("/users/kakao_friends/callback")                                                //HttpServletResponse response
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, HttpSession session) throws JsonProcessingException {
-        return kakaoService.kakaoFriends(code, session);
+
+    @GetMapping("/users/kakao_friends/callback/{userId}")                                                //HttpServletResponse response
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, @PathVariable Long UserId) throws JsonProcessingException {
+        return kakaoService.kakaoFriends(code, UserId);
     }
     @PostMapping("/users/reset/password")
     public StatusResponseDto<String> resetPassword(@RequestBody UserRequestDto userRequestDto){

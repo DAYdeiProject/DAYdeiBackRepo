@@ -51,7 +51,7 @@ public class KakaoService {
 
     @Transactional
     //ResponseEntity<StatusResponseDto<String>>
-    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
 
@@ -81,7 +81,7 @@ public class KakaoService {
     }
 
     @Transactional
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, Long userId) throws JsonProcessingException {
         // 사용자의 토큰을 가져오기
         String accessToken = getTokenFriendsList(code);
         RestTemplate restTemplate = new RestTemplate();
@@ -98,7 +98,7 @@ public class KakaoService {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         JsonNode friendsNode = jsonNode.path("elements");
 
-        Long currentUserKakaoId = (Long) session.getAttribute("userId");
+//        Long currentUserKakaoId = (Long) session.getAttribute("userId");
 
         for (JsonNode friendNode : friendsNode) {
             String friendKakaoId = friendNode.path("id").asText();
@@ -114,8 +114,11 @@ public class KakaoService {
 //            friend.setFriendResponseId(friendUser);
 //            friend.setFriendCheck(true);
 //            friendRepository.save(friend);
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new NullPointerException("등록된 사용자가 없습니다.")
+            );
 
-            friendRepository.save(new Friend(currentUser, friendUser, true));
+            friendRepository.save(new Friend(user, friendUser, true));
         }
 
 //        return ResponseEntity.ok()

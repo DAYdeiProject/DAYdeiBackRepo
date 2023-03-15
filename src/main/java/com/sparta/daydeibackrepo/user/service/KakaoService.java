@@ -87,8 +87,8 @@ public class KakaoService {
 
         // 사용자의 토큰을 가져오기
         String accessToken = getTokenFriendsList(code);
-        Claims info = jwtUtil.getUserInfoFromToken(accessToken);
-        log.warn(info.getSubject()); // info.getSubject() -> email
+//        Claims info = jwtUtil.getUserInfoFromToken(accessToken);
+//        log.warn(info.getSubject()); // info.getSubject() -> email
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
@@ -119,11 +119,11 @@ public class KakaoService {
 //            friend.setFriendResponseId(friendUser);
 //            friend.setFriendCheck(true);
 //            friendRepository.save(friend);
-            User user = userRepository.findByEmail(info.getSubject()).orElseThrow(
-                    () -> new NullPointerException("등록된 사용자가 없습니다.")
-            );
+//            User user = userRepository.findByEmail(info.getSubject()).orElseThrow(
+//                    () -> new NullPointerException("등록된 사용자가 없습니다.")
+//            );
 
-            friendRepository.save(new Friend(user, friendUser, true));
+            friendRepository.save(new Friend(currentUser, friendUser, true));
         }
 
 //        return ResponseEntity.ok()

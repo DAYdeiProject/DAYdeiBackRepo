@@ -34,7 +34,7 @@ public class UserResponseDto {
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
-        this.categoryEnum = user.getCategoryEnum();
+        this.categoryList = user.getCategoryEnum();
         this.friendCheck = friendCheck;
     }
 
@@ -43,7 +43,6 @@ public class UserResponseDto {
         this.email = userSubscribe.getSubscriberId().getEmail();
         this.nickName = userSubscribe.getSubscriberId().getNickName();
         this.profileImage = userSubscribe.getSubscriberId().getProfileImage();
-        this.categoryEnum = userSubscribe.getSubscriberId().getCategoryEnum();
         this.userSubscribeCheck = userSubscribeCheck;
     }
 }

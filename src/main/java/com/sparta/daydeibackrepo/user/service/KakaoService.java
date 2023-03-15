@@ -72,7 +72,7 @@ public class KakaoService {
 //        return createToken;
     }
 
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, UserDetailsImpl userDetails) throws JsonProcessingException {
         String accessToken = getTokenFriendsList(code);
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -95,7 +95,7 @@ public class KakaoService {
             if (friendUser == null) {
                 return ResponseEntity.ok().body(StatusResponseDto.success("친구없음"));
             }
-            friendRepository.save(new Friend(currentUser, friendUser, true));
+            friendRepository.save(new Friend(userDetails.getUser(), friendUser, true));
         }
 
 //        return ResponseEntity.ok()

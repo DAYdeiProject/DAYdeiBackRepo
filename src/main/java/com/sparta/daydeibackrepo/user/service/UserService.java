@@ -129,4 +129,12 @@ public class UserService {
         userRepository.save(user);
         return new UserInfoResponseDto(user);
     }
+
+    @Transactional
+    public UserInfoResponseDto getUser(Long userId){
+        User user = userRepository.findById(userId).orElseThrow(
+                ()-> new NullPointerException("등록된 사용자가 없습니다.")
+        );
+        return new UserInfoResponseDto(user);
+    }
 }

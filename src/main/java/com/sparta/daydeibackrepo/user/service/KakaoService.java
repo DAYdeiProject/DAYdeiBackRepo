@@ -204,38 +204,6 @@ public class KakaoService {
         if (kakaoAccount != null && kakaoAccount.has("birthday")) {
             birthday = jsonNode.get("kakao_account").get("birthday").asText();
         }
-//        JsonNode friendsNode = jsonNode.get("elements");
-//        if (friendsNode != null){
-//            for (JsonNode friendNode : friendsNode) {
-//                String friendKakaoId = friendNode.get("id").asText(); // kakao에서 발급하는 아이디 (Long)
-//                String friendImage = friendsNode.get("profile_thumbnail_image_url").asText();
-//            }
-//        }
-
-
-                  /*  //----나중에 추가하기----
-        //친구 목록 불러오기
-        ResponseEntity<String> friendsResponse = rt.exchange(
-                "https://kapi.kakao.com/v1/api/talk/friends",
-                HttpMethod.GET,
-                kakaoUserInfoRequest,
-                String.class
-        );
-
-
-        // 친구 이메일 목록 추출
-        String friendsResponseBody = friendsResponse.getBody();
-        JsonNode friendsJsonNode = objectMapper.readTree(friendsResponseBody);
-        JsonNode friendsElementsNode = friendsJsonNode.get("elements");
-
-        List<String> friendEmailList = new ArrayList<>();
-        if (friendsElementsNode != null) {
-            for (JsonNode friendNode : friendsElementsNode) {
-                String friendEmail = friendNode.get("profile")
-                        .get("account_email").asText();
-                friendEmailList.add(friendEmail);
-            }
-        }*/
 
         List<String> friendEmailList = new ArrayList<>();
         log.info("카카오 사용자 정보: " + id + ", " + nickName + ", " + email + ", ");

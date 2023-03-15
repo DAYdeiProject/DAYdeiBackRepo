@@ -166,6 +166,21 @@ public class FriendService {
                         }
                     }
                 }
+                if(categories.isEmpty()){
+                    Friend friend = friendRepository.findFriend(user, user1);
+                    UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
+                    boolean friendCheck = false;
+                    boolean userSubscribeCheck = false;
+                    if (friend != null) {
+                        friendCheck = true;
+                    }
+                    if (userSubscribe != null) {
+                        userSubscribeCheck = true;
+                    }
+                    if (!friendCheck || !userSubscribeCheck) {
+                        recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
+                    }
+                }
                 }
         Collections.shuffle(recommendResponseList);
         return recommendResponseList;

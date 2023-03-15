@@ -18,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
         Optional<User> findByNickNameLike(String searchWord);
         Optional<User> findByEmailLike(String searchWord);
         Optional<User> findByKakaoId(Long id);
-        @Query("SELECT u FROM users u WHERE (u.email Like :searchWord "+" OR u.nickName Like :searchWord) "+" AND u.categoryEnum =:categoryEnum "+" AND u !=:user")
-        List<User> findRecommmedList(CategoryEnum categoryEnum, String searchWord, User user);
+        @Query("SELECT u FROM users u WHERE (u.email Like :searchWord "+" OR u.nickName Like :searchWord) "+" AND u !=:user")
+        List<User> findRecommmedList(String searchWord, User user);
+
+        /*@Query("SELECT u FROM users u WHERE (u.email Like :searchWord "+" OR u.nickName Like :searchWord) "+" AND :categoryEnum in u.categoryEnum "+" AND u !=:user")
+        List<User> findRecommmedList(CategoryEnum categoryEnum, String searchWord, User user);*/
 }

@@ -4,6 +4,7 @@ package com.sparta.daydeibackrepo.user.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.*;
+import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.service.KakaoService;
 import com.sparta.daydeibackrepo.user.service.UserService;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
@@ -60,8 +61,8 @@ public class UserController {
     }
 
     @GetMapping("/users/kakao_friends/callback")                                                //HttpServletResponse response
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
-        return kakaoService.kakaoFriends(code, userDetails);
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, User currentUser) throws JsonProcessingException {
+        return kakaoService.kakaoFriends(code, currentUser);
     }
     @PostMapping("/users/reset/password")
     public StatusResponseDto<String> resetPassword(@RequestBody UserRequestDto userRequestDto){

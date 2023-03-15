@@ -27,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.net.URI;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class KakaoService {
 
     @Transactional
     //ResponseEntity<StatusResponseDto<String>>
-    public ResponseEntity<StatusResponseDto<String>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<String>> kakaoLogin(String code, HttpSession session) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
 
@@ -67,7 +68,9 @@ public class KakaoService {
 //        //프론트에서 redirect url을 설정해주면  여기에 링크 넣기
 //        //백엔드 안 거치고 프론트로 바로 쏘기 redirect 주소를 프론트 주소로 하기
 //        response.encodeRedirectURL("http://daydei.s3-website.ap-northeast-2.amazonaws.com/home?token="+createToken);
-        currentUser = kakaoUser;
+//        currentUser = kakaoUser;
+        session.setAttribute("userId", kakaoUserInfo.getId());
+        session.setAttribute("nickname", kakaoUserInfo.getNickName());
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(StatusResponseDto.success("success"));
@@ -75,7 +78,7 @@ public class KakaoService {
     }
 
     @Transactional
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpSession session) throws JsonProcessingException {
         // 사용자의 토큰을 가져오기
         String accessToken = getTokenFriendsList(code);
         RestTemplate restTemplate = new RestTemplate();
@@ -92,6 +95,7 @@ public class KakaoService {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         JsonNode friendsNode = jsonNode.path("elements");
 
+        Long currentUserKakaoId = (Long) session.getAttribute("userId");
 
         for (JsonNode friendNode : friendsNode) {
             String friendKakaoId = friendNode.path("id").asText();
@@ -102,7 +106,13 @@ public class KakaoService {
             if (friendUser == null) {
                 return ResponseEntity.ok().body(StatusResponseDto.success("친구없음"));
             }
-            friendRepository.save(new Friend(currentUser, friendUser, true));
+            Friend friend = new Friend();
+            friend.setFriendRequestId(userRepository.findByKakaoId(currentUserKakaoId).orElse(null));
+            friend.setFriendResponseId(friendUser);
+            friend.setFriendCheck(true);
+            friendRepository.save(friend);
+
+//            friendRepository.save(new Friend(currentUser, friendUser, true));
         }
 
 //        return ResponseEntity.ok()

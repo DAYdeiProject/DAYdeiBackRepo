@@ -85,10 +85,7 @@ public class KakaoService {
     public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, UserDetailsImpl userDetails) throws JsonProcessingException {
 
         User user = userDetails.getUser();
-        log.warn(code);
         String accessToken = getTokenFriendsList(code);
-//        Claims info = jwtUtil.getUserInfoFromToken(accessToken);
-        log.warn(accessToken); // info.getSubject() -> email
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
@@ -115,20 +112,10 @@ public class KakaoService {
             if (friendUser == null) {
                 return ResponseEntity.ok().body(StatusResponseDto.success("친구없음"));
             }
-//            Friend friend = new Friend();
-//            friend.setFriendRequestId(userRepository.findByKakaoId(currentUserKakaoId).orElse(null));
-//            friend.setFriendResponseId(friendUser);
-//            friend.setFriendCheck(true);
-//            friendRepository.save(friend);
-//            User user = userRepository.findByEmail(info.getSubject()).orElseThrow(
-//                    () -> new NullPointerException("등록된 사용자가 없습니다.")
-//            );
-
             friendRepository.save(new Friend(user, friendUser, true));
         }
 
-//        return ResponseEntity.ok()
-//                .body(StatusResponseDto.success("success"));
+
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(StatusResponseDto.success("success"));
@@ -149,8 +136,8 @@ public class KakaoService {
         body.add("client_id", kakaoApiKey);
 //        body.add("redirect_uri", "http://3.34.137.234:8080/api/users/kakao/callback");
 //        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao_friends/callback");
-//        body.add("redirect_uri", "http://localhost:3000/kakao");
-        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/kakao");
+        body.add("redirect_uri", "http://localhost:3000/friends");
+//        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/kakao");
         body.add("code", code);
 
         // HTTP 요청 보내기
@@ -183,8 +170,8 @@ public class KakaoService {
         body.add("client_id", kakaoApiKey);
 //        body.add("redirect_uri", "http://3.34.137.234:8080/api/users/kakao/callback");
 //        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao/callback");
-        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/kakao");
-//        body.add("redirect_uri", "http://localhost:3000/kakao");
+//        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/kakao");
+        body.add("redirect_uri", "http://localhost:3000/kakao");
 //        body.add("redirect_uri", "http://localhost:8080/api/users/kakao/callback");
         body.add("code", code);
 

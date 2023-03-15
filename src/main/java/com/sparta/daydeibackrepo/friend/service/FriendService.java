@@ -20,10 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -135,7 +132,8 @@ public class FriendService {
         for(UserSubscribe userSubscribe : userSubscribes){
             userSubscribeResponseList.add(new UserResponseDto(userSubscribe, true));
         }
-        // 리스트 믹싱하는 코드 있으면 좋을듯
+        Collections.shuffle(friendResponseList);
+        Collections.shuffle(userSubscribeResponseList);
         return new RelationResponseDto(friendResponseList, userSubscribeResponseList);
     }
     @Transactional(readOnly = true)
@@ -162,7 +160,7 @@ public class FriendService {
                     recommendResponseList.add(new UserResponseDto(user1,friendCheck,userSubscribeCheck));}
             }
         }
-        // 리스트 믹싱하는 코드 있으면 좋을듯
+        Collections.shuffle(recommendResponseList);
         return recommendResponseList;
     }
 }

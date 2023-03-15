@@ -7,6 +7,7 @@ import com.sparta.daydeibackrepo.user.dto.*;
 import com.sparta.daydeibackrepo.user.service.KakaoService;
 import com.sparta.daydeibackrepo.user.service.UserService;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
+import jdk.jshell.Snippet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -75,6 +76,11 @@ public class UserController {
     @PutMapping("/users/profile")
     public StatusResponseDto<UserInfoResponseDto> updateUser(@RequestBody UserInfoRequestDto userInfoRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(userService.updateUser(userInfoRequestDto, userDetails));
+    }
+
+    @GetMapping("/home/profile/{userId}")
+    public StatusResponseDto<UserInfoResponseDto> getUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(userService.getUser(userId));
     }
 
 

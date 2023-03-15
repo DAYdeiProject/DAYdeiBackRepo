@@ -81,7 +81,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         // 사전에 약속된 출처를 명시
 //        config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("*");
+//        config.addAllowedOrigin("*");
+        config.addAllowedOriginPattern("*");
 //        config.addAllowedOrigin("http://localhost:3001");
 //        config.addAllowedOrigin("http://daydei.s3-website.ap-northeast-2.amazonaws.com");
 //        //채팅 테스트용 origin

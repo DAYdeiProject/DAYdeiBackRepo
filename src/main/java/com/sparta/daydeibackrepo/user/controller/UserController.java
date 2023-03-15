@@ -63,7 +63,7 @@ public class UserController {
 
 
     @GetMapping("/users/kakao_friends/callback")                                                //HttpServletResponse response
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoFriendsCallback(@RequestParam String code, @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
         return kakaoService.kakaoFriends(code, userDetails);
     }
     @PostMapping("/users/reset/password")

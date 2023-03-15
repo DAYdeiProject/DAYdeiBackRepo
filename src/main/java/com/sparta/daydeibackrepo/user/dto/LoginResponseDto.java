@@ -10,6 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class LoginResponseDto {
+    private Long userId;
     private String email;
     private String birthday;
     private String nickName;
@@ -19,6 +20,7 @@ public class LoginResponseDto {
     private Boolean isLogin;
 
     public LoginResponseDto(User user, Boolean isLogin){
+        this.userId = user.getId();
         this.email = user.getEmail();
         this.birthday = user.getBirthday();
         this.nickName = user.getNickName();

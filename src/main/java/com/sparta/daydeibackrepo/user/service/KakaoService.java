@@ -27,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ public class KakaoService {
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
 
+    @Transactional
     //ResponseEntity<StatusResponseDto<String>>
     public ResponseEntity<StatusResponseDto<String>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
@@ -72,7 +74,9 @@ public class KakaoService {
 //        return createToken;
     }
 
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, User currentUser) throws JsonProcessingException {
+    @Transactional
+    public ResponseEntity<StatusResponseDto<String>> kakaoFriends(String code, HttpServletResponse response) throws JsonProcessingException {
+        // 사용자의 토큰을 가져오기
         String accessToken = getTokenFriendsList(code);
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -87,9 +91,12 @@ public class KakaoService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         JsonNode friendsNode = jsonNode.path("elements");
+
+
         for (JsonNode friendNode : friendsNode) {
             String friendKakaoId = friendNode.path("id").asText();
 //            String friendNickname = friendNode.path("profile_nickname").asText();
+
             // friends 테이블에 사용자와 친구를 저장하는 코드
             User friendUser = userRepository.findByKakaoId(Long.parseLong(friendKakaoId)).orElse(null);
             if (friendUser == null) {
@@ -106,7 +113,9 @@ public class KakaoService {
     }
 
 
-    // 안 건들여
+
+
+
     private String getTokenFriendsList(String code) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();

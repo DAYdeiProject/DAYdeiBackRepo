@@ -105,7 +105,6 @@ public class UserService {
             }
             else {
                 user.getCategoryEnum().add(category);
-
             }
         }
         userRepository.save(user);

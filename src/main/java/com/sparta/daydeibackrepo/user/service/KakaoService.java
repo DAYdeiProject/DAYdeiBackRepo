@@ -8,6 +8,7 @@ import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.KakaoUserInfoDto;
+import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
@@ -50,7 +51,7 @@ public class KakaoService {
 
     @Transactional
     //ResponseEntity<StatusResponseDto<String>>
-    public ResponseEntity<StatusResponseDto<String>> kakaoLogin(String code, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, HttpSession session) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
 
@@ -64,6 +65,7 @@ public class KakaoService {
         HttpHeaders headers = new HttpHeaders();
         String createToken = jwtUtil.createToken(kakaoUser.getEmail(), UserRoleEnum.USER);
         headers.set("Authorization", createToken);
+        LoginResponseDto loginResponseDto = new LoginResponseDto(kakaoUser, true);
 
 //        //프론트에서 redirect url을 설정해주면  여기에 링크 넣기
 //        //백엔드 안 거치고 프론트로 바로 쏘기 redirect 주소를 프론트 주소로 하기
@@ -71,9 +73,10 @@ public class KakaoService {
         currentUser = kakaoUser;
 //        session.setAttribute("userId", kakaoUserInfo.getId());
 //        session.setAttribute("nickname", kakaoUserInfo.getNickName());
+        StatusResponseDto<LoginResponseDto> responseDto = StatusResponseDto.success(loginResponseDto);
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(StatusResponseDto.success("success"));
+                .body(responseDto);
 //        return createToken;
     }
 

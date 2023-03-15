@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -46,6 +47,23 @@ public class PostService {
 
         return PostResponseDto.of(savePost, requestDto.getParticipant());
 
+
+    }
+
+    public PostResponseDto getPostOne(Long postId, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new NullPointerException("존재하지 않는 게시물입니다.")
+        );
+        List<UserPost> userPosts = userPostRepository.findAllByPostId(postId);
+        List<String> participants = new ArrayList<>();
+        for(UserPost userPost : userPosts) {
+            participants.add(userPost.getUser().getNickName());
+        }
+
+        return PostResponseDto.of(post, participants);
 
     }
 }

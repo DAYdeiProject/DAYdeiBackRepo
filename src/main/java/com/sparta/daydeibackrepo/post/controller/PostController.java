@@ -22,4 +22,9 @@ public class PostController {
         return StatusResponseDto.success(postService.createPost(requestDto, userDetails));
     }
 
+    @GetMapping("posts/{postId}")
+    public StatusResponseDto<PostResponseDto> getPostOne(@PathVariable Long postId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return StatusResponseDto.success(postService.getPostOne(postId, userDetails));
+    }
+
 }

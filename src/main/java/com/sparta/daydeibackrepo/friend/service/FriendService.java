@@ -142,24 +142,31 @@ public class FriendService {
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
         List<UserResponseDto> recommendResponseList = new ArrayList<>();
-        for (String category : categories){
-            CategoryEnum categoryEnum = CategoryEnum.valueOf(category.toUpperCase());
-            List<User> recommendList = userRepository.findRecommmedList(categoryEnum, "%" + searchWord + "%", user);
+        List<Long> duplicationCheck =new ArrayList<>();
+        List<User> recommendList = userRepository.findRecommmedList("%" + searchWord + "%", user);
             for (User user1 : recommendList){
-                Friend friend = friendRepository.findFriend(user, user1);
-                UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
-                boolean friendCheck = false;
-                boolean userSubscribeCheck = false;
-                if (friend!= null){
-                    friendCheck = true;
+                for(CategoryEnum  categoryEnum1: user1.getCategoryEnum()) {
+                    for (String category : categories) {
+                        CategoryEnum categoryEnum = CategoryEnum.valueOf(category.toUpperCase());
+                        if (categoryEnum.equals(categoryEnum1)) {
+                            Friend friend = friendRepository.findFriend(user, user1);
+                            UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
+                            boolean friendCheck = false;
+                            boolean userSubscribeCheck = false;
+                            if (friend != null) {
+                                friendCheck = true;
+                            }
+                            if (userSubscribe != null) {
+                                userSubscribeCheck = true;
+                            }
+                            if ((!friendCheck || !userSubscribeCheck) && !duplicationCheck.contains(user1.getId())) {
+                                duplicationCheck.add(user1.getId());
+                                recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
+                            }
+                        }
+                    }
                 }
-                if (userSubscribe != null){
-                    userSubscribeCheck = true;
                 }
-                if (!friendCheck || !userSubscribeCheck){
-                    recommendResponseList.add(new UserResponseDto(user1,friendCheck,userSubscribeCheck));}
-            }
-        }
         Collections.shuffle(recommendResponseList);
         return recommendResponseList;
     }

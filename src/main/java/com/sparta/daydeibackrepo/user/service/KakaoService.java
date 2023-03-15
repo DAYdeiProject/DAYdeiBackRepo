@@ -98,7 +98,10 @@ public class KakaoService {
             friendRepository.save(new Friend(currentUser, friendUser, true));
         }
 
+//        return ResponseEntity.ok()
+//                .body(StatusResponseDto.success("success"));
         return ResponseEntity.ok()
+                .headers(headers)
                 .body(StatusResponseDto.success("success"));
     }
 

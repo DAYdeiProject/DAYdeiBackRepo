@@ -9,5 +9,5 @@ import java.util.List;
 public interface PostSubscribeRepository extends JpaRepository<PostSubscribe, Long> {
     PostSubscribe findByPostIdAndUserId(Long postId, Long userId);
 
-    List<PostSubscribe> findAllByUserId(User user);
+    List<PostSubscribe> findAllByUserId(Long userId);
 }

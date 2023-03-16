@@ -4,6 +4,7 @@ import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.user.entity.User;
+import com.sparta.daydeibackrepo.user.entity.UserPost;
 import com.sparta.daydeibackrepo.util.TimeStamped;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,6 +58,9 @@ public class Post extends TimeStamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<UserPost> userPost;
 
     public Post(PostRequestDto requestDto, User user) {
         this.title = requestDto.getTitle();

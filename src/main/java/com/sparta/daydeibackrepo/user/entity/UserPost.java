@@ -3,6 +3,7 @@ package com.sparta.daydeibackrepo.user.entity;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 

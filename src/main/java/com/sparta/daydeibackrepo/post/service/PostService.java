@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -166,9 +167,7 @@ public class PostService {
             // 내가 구독하는 일정 : UserSubscribePosts
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
-                if (friendRepository.findFriend(master, userSubscribe.getSubscriberId()) == null) {
                     AllPosts.addAll(postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.valueOf("SUBSCRIBE")));
-                }
             }
             // 나를 태그한 공유일정 : PostSubscribePosts
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
@@ -195,9 +194,7 @@ public class PostService {
         // Master가 구독하는 일정
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
-                if (friendRepository.findFriend(master, userSubscribe.getSubscriberId()) == null) {
                     AllPosts.addAll(postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.valueOf("SUBSCRIBE")));
-                }
             }
             // Master를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
@@ -210,7 +207,8 @@ public class PostService {
                 homeResponseDtos.add(new HomeResponseDto(post));
             }
         }
-        //Collections.sort(homeResponseDtos, ((o1, o2) -> (int)(Integer.parseInt(o2.getStartDate().toString()) - Integer.parseInt(o1.getStartDate().toString()))));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        Collections.sort(homeResponseDtos, ((o2, o1) -> Integer.parseInt(o1.getStartDate().format(formatter)) - Integer.parseInt(o2.getStartDate().format(formatter))));
         return homeResponseDtos;
     }
 

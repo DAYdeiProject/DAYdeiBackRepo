@@ -79,7 +79,9 @@ public class KakaoService {
         String accessToken = getTokenFriendsList(code);
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
+//        headers.set("Authorization", "Bearer " + accessToken);
+        String createToken = jwtUtil.createToken(user.getEmail(), UserRoleEnum.USER);
+        headers.set("Authorization", createToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://kapi.kakao.com/v1/api/talk/friends");

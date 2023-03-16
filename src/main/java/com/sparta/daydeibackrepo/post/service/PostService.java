@@ -138,7 +138,7 @@ public class PostService {
         // 내가 초대 수락한 일정
         // 1. 내가 초대 수락한 일정 리스트를 다 뽑는다.
         List<Post> postSubscribePosts= new ArrayList<>();
-        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user);
+        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
         // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
         for(PostSubscribe postSubscribe : postSubscribes){
             if (postSubscribe.getPost().getEndDate().isBefore(today.getChronology().dateNow()) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){

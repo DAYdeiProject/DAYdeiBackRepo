@@ -34,7 +34,7 @@ public class PostRequestDto {
 
     private String location; //위치
 
-    private List<String> participant;
+    private List<Long> participant;
 
 
     private ScopeEnum scope;

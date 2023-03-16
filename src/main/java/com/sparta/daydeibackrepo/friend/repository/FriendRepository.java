@@ -27,7 +27,7 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
 //    @Query("SELECT f FROM Friend f WHERE ((f.friendResponseId.email Like :searchWord "+" OR f.friendResponseId.nickName Like :searchWord) "+" AND f.friendRequestId = :user "+" AND f.friendResponseId !=:user) " + " OR ((f.friendRequestId.email Like :searchWord "+" OR f.friendRequestId.nickName Like :searchWord) "+" AND f.friendResponseId = :user "+" AND f.friendRequestId !=:user) ")
 //    List<Friend> findFriendList(String searchWord, User user);
 
-    @Query("SELECT f FROM Friend f WHERE (f.friendResponseId.nickName Like :nickName) "+" AND f.friendRequestId = :user "+" AND f.friendResponseId !=:user")
-    List<Friend> findnickNameFriendList(String nickName, User user);
+    @Query("SELECT f FROM Friend f WHERE (f.friendResponseId.id = :id) "+" AND f.friendRequestId = :user "+" AND f.friendResponseId !=:user")
+    List<Friend> findidFriendList(Long id, User user);
 
 }

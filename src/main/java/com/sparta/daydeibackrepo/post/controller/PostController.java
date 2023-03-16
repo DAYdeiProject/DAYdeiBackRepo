@@ -18,7 +18,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("posts")
-    public StatusResponseDto<PostResponseDto> createPost(@RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> createPost(@RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.createPost(requestDto, userDetails));
     }
 

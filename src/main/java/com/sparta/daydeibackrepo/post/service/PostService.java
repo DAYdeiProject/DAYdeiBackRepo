@@ -132,10 +132,13 @@ public class PostService {
         List<Post> userSubscribePosts = new ArrayList<>();
         List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
         // 2. UserSubscribe 객체에서 구독한 유저 객체를 뽑아주고 그 객체로 오늘의 일정을 뽑아주기
+//        for (UserSubscribe userSubscribe : userSubscribes) {
+////            //스코프 상관 없이 post 전부 다.
+//            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now()));//구독당한사람
+//            userSubscribePosts.removeIf(post -> post.getScope() != ScopeEnum.SUBSCRIBE);
+//        }
         for (UserSubscribe userSubscribe : userSubscribes) {
-//            //스코프 상관 없이 post 전부 다.
-            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now()));//구독당한사람
-            userSubscribePosts.removeIf(post -> post.getScope() != ScopeEnum.SUBSCRIBE);
+            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now(), ScopeEnum.SUBSCRIBE));
         }
 
 

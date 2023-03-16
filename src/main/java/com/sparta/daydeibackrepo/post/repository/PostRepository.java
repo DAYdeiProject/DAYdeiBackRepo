@@ -22,8 +22,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //            "AND  p.scope = :SUBSCRIBE order by p.startTime desc")
 //    List<Post> findSubscribeTodayPost(User subscriberId, LocalDate now);
 
-    @Query("SELECT p FROM Post p WHERE p.user = :subscriberId AND p.startDate <= :now AND p.endDate >= :now ORDER BY p.startTime DESC")
-    List<Post> findSubscribeTodayPost(User subscriberId, LocalDate now);
+    @Query("SELECT p FROM Post p WHERE p.user = :subscriberId AND p.startDate <= :now AND p.endDate >= :now AND p.scope = :scope ORDER BY p.startTime DESC")
+    List<Post> findSubscribeTodayPost(User subscriberId, LocalDate now, ScopeEnum scope);
 
 
 

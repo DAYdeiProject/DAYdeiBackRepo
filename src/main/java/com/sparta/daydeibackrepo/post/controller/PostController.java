@@ -21,7 +21,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("posts")
-    public StatusResponseDto<PostResponseDto> createPost(@RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> createPost(@RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.createPost(requestDto, userDetails));
     }
 
@@ -30,10 +30,15 @@ public class PostController {
         return StatusResponseDto.success(postService.getPostOne(postId, userDetails));
     }
 
-/*    @GetMapping("home/today")
+    @PutMapping("posts/{postId}")
+    public StatusResponseDto<PostResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
+        return StatusResponseDto.success(postService.updatePost(postId, requestDto, userDetails));
+    }
+
+    @GetMapping("home/today")
     public StatusResponseDto<?> getTodayPost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.getTodayPost(userDetails));
-    }*/
+    }
 
     @GetMapping("home/posts/{userId}")
     public StatusResponseDto<List<HomeResponseDto>> getHomePost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long userId) {

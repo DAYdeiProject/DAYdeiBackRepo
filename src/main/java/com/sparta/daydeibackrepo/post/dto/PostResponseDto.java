@@ -5,6 +5,7 @@ import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
 
+import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 

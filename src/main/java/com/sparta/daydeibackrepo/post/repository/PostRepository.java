@@ -12,13 +12,12 @@ import java.util.Collection;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-  /*  @Query("Select p From Post p Where  p.user = :user "+" AND p.startDate <= :now "+" AND p.endDate >= :now order by p.startTime desc")
+    @Query("Select p From Post p Where  p.user = :user "+" AND p.startDate <= :now "+" AND p.endDate >= :now order by p.startTime desc")
     List<Post> findMyTodayPost(LocalDate now, User user);
     @Query("Select p From Post p Where p.user = :subscriberId "+" AND p.startDate <= :now "+" AND p.endDate >= :now "+" AND (p.scope = :ALL OR "+" p.scope = :SUBSCRIBE) order by p.startTime desc")
     List<Post> findSubscribeTodayPost(User subscriberId, LocalDate now);
     @Query("Select p From Post p Where p.user = :subscriberId "+" AND p.startDate <= :now "+" AND p.endDate >= :now "+" AND (p.scope = :ALL OR "+" p.scope = :SUBSCRIBE OR "+" p.scope = :FRIEND) order by p.startTime desc")
     List<Post> findFriendTodayPost(User subscriberId, LocalDate now);
-*/
 
 
     @Query(value = "Select p From Post p Where p.user = :user "+" AND "+" p.scope = :SUBSCRIBE ")
@@ -30,4 +29,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findNotFriendPost(User master, ScopeEnum ALL, ScopeEnum SUBSCRIBE);
 
 
+    @Query("Select p From Post p Where p.user = :subscriberId "+" AND p.startDate <= :now "+" AND p.endDate >= :now "+" AND (p.scope = 'ALL' OR "+" p.scope = 'SUBSCRIBE') order by p.startTime desc")
+    List<Post> findSubscribeTodayPost(@Param("subscriberId") User subscriberId, @Param("now") LocalDate now);
+    @Query("Select p From Post p Where p.user = :subscriberId "+" AND p.startDate <= :now "+" AND p.endDate >= :now "+" AND (p.scope = 'ALL' OR "+" p.scope = 'SUBSCRIBE' OR "+" p.scope = 'FRIEND') order by p.startTime desc")
+    List<Post> findFriendTodayPost(@Param("subscriberId") User subscriberId, @Param("now") LocalDate now);
 }

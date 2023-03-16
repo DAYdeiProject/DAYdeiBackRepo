@@ -17,6 +17,7 @@ import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.entity.UserPost;
+import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserPostRepository;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
@@ -26,6 +27,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.TimeOfDay;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
@@ -44,7 +46,11 @@ public class PostService {
     private final UserSubscribeRepository userSubscribeRepository;
     private final PostSubscribeRepository postSubscribeRepository;
 
-    public PostResponseDto createPost(PostRequestDto requestDto, UserDetailsImpl userDetails) {
+    private boolean hasAuthority(User user, Post post) {
+        return user.getId().equals(post.getUser().getId()) || user.getRole().equals(UserRoleEnum.ADMIN);
+    }
+
+    public Object createPost(PostRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
@@ -52,15 +58,17 @@ public class PostService {
         Post post = new Post(requestDto, user);
         Post savePost = postRepository.save(post);
 
-        for(String participant : requestDto.getParticipant()) {
-            List<Friend> friends = friendRepository.findnickNameFriendList(participant, user);
+
+
+        for(Long participant : requestDto.getParticipant()) {
+            List<Friend> friends = friendRepository.findidFriendList(participant, user);
             for(Friend friend : friends) {
                 UserPost userPost = new UserPost(friend.getFriendResponseId(), savePost);
                 userPostRepository.save(userPost);
             }
         }
 
-        return PostResponseDto.of(savePost, requestDto.getParticipant());
+        return "일정 작성을 완료하였습니다.";
 
 
     }
@@ -81,8 +89,32 @@ public class PostService {
         return PostResponseDto.of(post, participants);
 
     }
+
+    @Transactional
+    public PostResponseDto updatePost(Long postId, PostRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new NullPointerException("존재하지 않는 게시물입니다.")
+        );
+
+        List<UserPost> userPosts = userPostRepository.findAllByPostId(postId);
+        List<String> participants = new ArrayList<>();
+        for(UserPost userPost : userPosts) {
+            participants.add(userPost.getUser().getNickName());
+        }
+
+        if (hasAuthority(user, post)) {
+            post.update(requestDto);
+            return PostResponseDto.of(post, participants);
+        }
+        throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
+
+    }
+
     //미완성 코드입니다.
-/*    public Object getTodayPost(UserDetailsImpl userDetails){
+    public Object getTodayPost(UserDetailsImpl userDetails){
 
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
@@ -92,32 +124,32 @@ public class PostService {
         //List<Post> MyPosts = postRepository.findMyTodayPost(LocalDate.now(), user);
         // 내가 구독한 유저의 일정
         // 1. 내가 구독한 유저의 리스트를 다 뽑는다.
-        List<Post> UserSubscribePosts= new ArrayList<>();
+        List<Post> userSubscribePosts= new ArrayList<>();
         List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
         // 2. UserSubscribe 객체에서 구독한 유저 객체를 뽑아주고 그 객체로 오늘의 일정을 뽑아주기
         for(UserSubscribe userSubscribe : userSubscribes) {
             if (friendRepository.findFriend(user, userSubscribe.getSubscriberId()) == null) {
-                UserSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now()));
+                userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now()));
             }
             else {
-                UserSubscribePosts.addAll(postRepository.findFriendTodayPost(userSubscribe.getSubscriberId(), LocalDate.now()));
+                userSubscribePosts.addAll(postRepository.findFriendTodayPost(userSubscribe.getSubscriberId(), LocalDate.now()));
             }
         }
         // 내가 초대 수락한 일정
         // 1. 내가 초대 수락한 일정 리스트를 다 뽑는다.
-        List<Post> PostSubscribePosts= new ArrayList<>();
+        List<Post> postSubscribePosts= new ArrayList<>();
         List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user);
         // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
         for(PostSubscribe postSubscribe : postSubscribes){
             if (postSubscribe.getPost().getEndDate().isBefore(today.getChronology().dateNow()) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){
-                PostSubscribePosts.add(postSubscribe.getPost());
+                postSubscribePosts.add(postSubscribe.getPost());
             }
         }
 
         List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
 
         return todayPostResponseDtos;
-    }*/
+    }
 
     public List<HomeResponseDto> getHomePost(Long userId, UserDetailsImpl userDetails) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -181,4 +213,6 @@ public class PostService {
         //Collections.sort(homeResponseDtos, ((o1, o2) -> (int)(Integer.parseInt(o2.getStartDate().toString()) - Integer.parseInt(o1.getStartDate().toString()))));
         return homeResponseDtos;
     }
+
+
 }

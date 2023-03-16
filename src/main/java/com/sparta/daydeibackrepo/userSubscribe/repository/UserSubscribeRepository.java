@@ -2,7 +2,9 @@ package com.sparta.daydeibackrepo.userSubscribe.repository;
 
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
+import org.joda.time.LocalDate;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 

@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,16 +26,16 @@ public class Post extends TimeStamped {
     private String title;
 
     @Column(nullable = false)
-    private String startDate;   //추후 Date 타입으로 변경해야함
+    private LocalDate startDate;   //추후 Date 타입으로 변경해야함
 
     @Column(nullable = false)
-    private String endDate;     //추후 Date 타입으로 변경해야함
+    private LocalDate endDate;     //추후 Date 타입으로 변경해야함
 
     @Column
-    private String startTime;   //추후 Time 타입으로 변경해야함
+    private LocalTime startTime;   //추후 Time 타입으로 변경해야함
 
     @Column
-    private String endTime;     //추후 Time 타입으로 변경해야함
+    private LocalTime endTime;     //추후 Time 타입으로 변경해야함
 
     @Column
     private String content;

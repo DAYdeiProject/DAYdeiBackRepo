@@ -26,6 +26,11 @@ public class PostController {
     public StatusResponseDto<PostResponseDto> getPostOne(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.getPostOne(postId, userDetails));
     }
+
+    @GetMapping("home/today")
+    public StatusResponseDto<?> getTodayPost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return StatusResponseDto.success(postService.getTodayPost(userDetails));
+    }
 //    @PutMapping("posts/{postId}")
 //    public StatusResponseDto<PostResponseDto>
 }

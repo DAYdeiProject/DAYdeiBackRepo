@@ -19,6 +19,7 @@ public class FriendTagResponseDto {
     private String email;
 
     public FriendTagResponseDto(User user){
+        this.id = user.getId();
         this.nickName = user.getNickName();
         this.introduction = user.getIntroduction();
         this.profileImage = user.getProfileImage();

@@ -86,7 +86,7 @@ public class PostService {
         );
         LocalDateTime today = LocalDateTime.now();
         // 내 일정
-        List<Post> MyPosts = postRepository.findMyTodayPost(LocalDate.now(), user);
+        //List<Post> MyPosts = postRepository.findMyTodayPost(LocalDate.now(), user);
         // 내가 구독한 유저의 일정
         // 1. 내가 구독한 유저의 리스트를 다 뽑는다.
         List<Post> UserSubscribePosts= new ArrayList<>();
@@ -106,7 +106,7 @@ public class PostService {
         List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user);
         // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
         for(PostSubscribe postSubscribe : postSubscribes){
-            if (postSubscribe.getPost().getEndDate().isBefore(ChronoLocalDate.from(today)) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){
+            if (postSubscribe.getPost().getEndDate().isBefore(today.getChronology().dateNow()) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){
                 PostSubscribePosts.add(postSubscribe.getPost());
             }
         }

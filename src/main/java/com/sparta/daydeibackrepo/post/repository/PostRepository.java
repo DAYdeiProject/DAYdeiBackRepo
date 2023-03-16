@@ -1,12 +1,12 @@
 package com.sparta.daydeibackrepo.post.repository;
 
 import com.sparta.daydeibackrepo.post.entity.Post;
-import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import org.joda.time.LocalDate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;

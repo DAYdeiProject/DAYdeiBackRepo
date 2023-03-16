@@ -27,6 +27,11 @@ public class PostController {
         return StatusResponseDto.success(postService.getPostOne(postId, userDetails));
     }
 
+    @PutMapping("posts/{postId}")
+    public StatusResponseDto<PostResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
+        return StatusResponseDto.success(postService.updatePost(postId, requestDto, userDetails));
+    }
+
     @GetMapping("home/today")
     public StatusResponseDto<?> getTodayPost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.getTodayPost(userDetails));

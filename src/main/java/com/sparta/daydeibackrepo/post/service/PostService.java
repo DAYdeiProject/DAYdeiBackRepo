@@ -15,6 +15,7 @@ import com.sparta.daydeibackrepo.postSubscribe.repository.PostSubscribeRepositor
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.entity.UserPost;
+import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserPostRepository;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
@@ -24,6 +25,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.TimeOfDay;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
@@ -41,6 +43,10 @@ public class PostService {
     private final UserSubscribeRepository userSubscribeRepository;
     private final PostSubscribeRepository postSubscribeRepository;
 
+    private boolean hasAuthority(User user, Post post) {
+        return user.getId().equals(post.getUser().getId()) || user.getRole().equals(UserRoleEnum.ADMIN);
+    }
+
     public Object createPost(PostRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
@@ -48,6 +54,8 @@ public class PostService {
 
         Post post = new Post(requestDto, user);
         Post savePost = postRepository.save(post);
+
+
 
         for(Long porticipant : requestDto.getParticipant()) {
             List<Friend> friends = friendRepository.findidFriendList(porticipant, user);
@@ -78,6 +86,30 @@ public class PostService {
         return PostResponseDto.of(post, participants);
 
     }
+
+    @Transactional
+    public PostResponseDto updatePost(Long postId, PostRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new NullPointerException("존재하지 않는 게시물입니다.")
+        );
+
+        List<UserPost> userPosts = userPostRepository.findAllByPostId(postId);
+        List<String> participants = new ArrayList<>();
+        for(UserPost userPost : userPosts) {
+            participants.add(userPost.getUser().getNickName());
+        }
+
+        if (hasAuthority(user, post)) {
+            post.update(requestDto);
+            return PostResponseDto.of(post, participants);
+        }
+        throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
+
+    }
+
     //미완성 코드입니다.
     public Object getTodayPost(UserDetailsImpl userDetails){
 
@@ -115,4 +147,6 @@ public class PostService {
 
         return todayPostResponseDtos;
     }
+
+
 }

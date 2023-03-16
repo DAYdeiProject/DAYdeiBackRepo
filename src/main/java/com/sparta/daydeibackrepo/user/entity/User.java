@@ -33,7 +33,7 @@ public class User {
     private String nickName;
 
     @Column
-    private String birthday; //추후 Date 타입으로 바꿔야 함
+    private String birthday;
 
     private String profileImage; //추후 s3 Multipart 로 타입 변경해야 함
 

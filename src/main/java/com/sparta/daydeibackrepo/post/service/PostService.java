@@ -23,17 +23,21 @@ import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.LocalDate;
+//import org.joda.time.LocalDate;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.joda.time.TimeOfDay;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -130,40 +134,41 @@ public class PostService {
     }
 
     //미완성 코드입니다.
-    public Object getTodayPost(UserDetailsImpl userDetails){
+    public Object getTodayPost(UserDetailsImpl userDetails) {
 
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        LocalDateTime today = LocalDateTime.now();
+//        LocalDateTime today = LocalDateTime.now();
         // 내 일정
         //List<Post> MyPosts = postRepository.findMyTodayPost(LocalDate.now(), user);
         // 내가 구독한 유저의 일정
         // 1. 내가 구독한 유저의 리스트를 다 뽑는다.
-        List<Post> userSubscribePosts= new ArrayList<>();
+        List<Post> userSubscribePosts = new ArrayList<>();
         List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
         // 2. UserSubscribe 객체에서 구독한 유저 객체를 뽑아주고 그 객체로 오늘의 일정을 뽑아주기
-        for(UserSubscribe userSubscribe : userSubscribes) {
-            if (friendRepository.findFriend(user, userSubscribe.getSubscriberId()) == null) {
-                userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now()));
-            }
-            else {
-                userSubscribePosts.addAll(postRepository.findFriendTodayPost(userSubscribe.getSubscriberId(), LocalDate.now()));
-            }
+//        for (UserSubscribe userSubscribe : userSubscribes) {
+////            //스코프 상관 없이 post 전부 다.
+//            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now()));//구독당한사람
+//            userSubscribePosts.removeIf(post -> post.getScope() != ScopeEnum.SUBSCRIBE);
+//        }
+        for (UserSubscribe userSubscribe : userSubscribes) {
+            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now(), ScopeEnum.SUBSCRIBE));
         }
-        // 내가 초대 수락한 일정
-        // 1. 내가 초대 수락한 일정 리스트를 다 뽑는다.
-        List<Post> postSubscribePosts= new ArrayList<>();
-        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
-        // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
-        for(PostSubscribe postSubscribe : postSubscribes){
-            if (postSubscribe.getPost().getEndDate().isBefore(today.getChronology().dateNow()) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){
-                postSubscribePosts.add(postSubscribe.getPost());
-            }
-        }
+
+
+//        // 내가 초대 수락한 일정
+//        // 1. 내가 초대 수락한 일정 리스트를 다 뽑는다.
+//        List<Post> postSubscribePosts= new ArrayList<>();
+//        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
+//        // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
+//        for(PostSubscribe postSubscribe : postSubscribes){
+//            if (postSubscribe.getPost().getEndDate().isBefore(today.getChronology().dateNow()) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){
+//                postSubscribePosts.add(postSubscribe.getPost());
+//            }
+//        }
 
         List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
-
         return todayPostResponseDtos;
     }
 

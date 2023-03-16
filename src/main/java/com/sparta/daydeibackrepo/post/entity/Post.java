@@ -72,6 +72,19 @@ public class Post extends TimeStamped {
         this.user = user;
     }
 
+    public void update(PostRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.startDate = requestDto.getStartDate();
+        this.endDate = requestDto.getEndDate();
+        this.startTime = requestDto.getStartTime();
+        this.endTime = requestDto.getEndTime();
+        this.content = requestDto.getContent();
+        this.image = requestDto.getImage();
+        this.location = requestDto.getLocation();
+        this.scope = requestDto.getScope();
+        this.color = requestDto.getColor();
+    }
+
 
 
 }

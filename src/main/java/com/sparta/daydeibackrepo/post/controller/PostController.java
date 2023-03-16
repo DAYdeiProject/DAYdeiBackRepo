@@ -35,6 +35,11 @@ public class PostController {
         return StatusResponseDto.success(postService.updatePost(postId, requestDto, userDetails));
     }
 
+    @DeleteMapping("posts/{postId}")
+    public StatusResponseDto<?> deletePost(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
+        return StatusResponseDto.success(postService.deletePost(postId, userDetails));
+    }
+
     @GetMapping("home/today")
     public StatusResponseDto<?> getTodayPost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.getTodayPost(userDetails));
@@ -44,6 +49,5 @@ public class PostController {
     public StatusResponseDto<List<HomeResponseDto>> getHomePost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long userId) {
         return StatusResponseDto.success(postService.getHomePost(userId, userDetails));
     }
-//    @PutMapping("posts/{postId}")
-//    public StatusResponseDto<PostResponseDto>
+
 }

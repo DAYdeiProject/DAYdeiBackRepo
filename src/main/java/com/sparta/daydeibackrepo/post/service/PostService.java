@@ -114,6 +114,21 @@ public class PostService {
 
     }
 
+    public Object deletePost(Long postId, UserDetailsImpl userDetails) throws IllegalAccessException {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new NullPointerException("존재하지 않는 게시물입니다.")
+        );
+
+        if (hasAuthority(user, post)) {
+            postRepository.delete(post);
+            return "일정이 삭제되었습니다.";
+        }
+        throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
+    }
+
     //미완성 코드입니다.
     public Object getTodayPost(UserDetailsImpl userDetails){
 
@@ -211,6 +226,7 @@ public class PostService {
         Collections.sort(homeResponseDtos, ((o2, o1) -> Integer.parseInt(o1.getStartDate().format(formatter)) - Integer.parseInt(o2.getStartDate().format(formatter))));
         return homeResponseDtos;
     }
+
 
 
 }

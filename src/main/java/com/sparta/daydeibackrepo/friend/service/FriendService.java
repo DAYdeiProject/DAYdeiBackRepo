@@ -214,12 +214,24 @@ public class FriendService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        User user1 = null;
         List<Friend> friends = friendRepository.findFriends(user);
+        List<FriendTagResponseDto> tagResponseDtos = new ArrayList<>();
+        for(Friend friend : friends){
+            if (friend.getFriendResponseId() != user &&
+            (friend.getFriendResponseId().getEmail().contains(searchWord) || friend.getFriendResponseId().getNickName().contains(searchWord)))
+            {
+                tagResponseDtos.add(new FriendTagResponseDto(friend.getFriendResponseId()));
+            }
+            else if (friend.getFriendRequestId() != user  &&
+                    (friend.getFriendRequestId().getEmail().contains(searchWord) || friend.getFriendRequestId().getNickName().contains(searchWord))){
+                tagResponseDtos.add(new FriendTagResponseDto(friend.getFriendRequestId()));
+            }
+        }
+        return tagResponseDtos;
+
+/*        //기존 코드
 //        List<Friend> friends = friendRepository.findFriends(userDetails.getUser());
 //        List<Friend> friends = friendRepository.findFriendList("%" + searchWord + "%", user);
-        List<FriendTagResponseDto> tagResponseDtos = new ArrayList<>();
-
 //        List<User> friendList = new ArrayList<>();
 
         List<Friend> tagFriends = new ArrayList<>();
@@ -253,21 +265,19 @@ public class FriendService {
                     tagResponseDtos.add(responseDto);
                 }
             }
-//            List<Friend> tagFriends = friendRepository.findFriendList("%" + searchWord + "%", user, user1);
-//            for(Friend friend : tagFriends) {
-//                FriendTagResponseDto responseDto = FriendTagResponseDto.builder()
-//                        .id(friend.getFriendResponseId().getId())
-//                        .nickName(friend.getFriendResponseId().getNickName())
-//                        .introduction(friend.getFriendResponseId().getIntroduction())
-//                        .profileImage(friend.getFriendResponseId().getProfileImage())
-//                        .email(friend.getFriendResponseId().getEmail())
-//                        .build();
-//                tagResponseDtos.add(responseDto);
-//            }
-
+            List<Friend> tagFriends = friendRepository.findFriendList("%" + searchWord + "%", user, user1);
+            for(Friend friend : tagFriends) {
+                FriendTagResponseDto responseDto = FriendTagResponseDto.builder()
+                        .id(friend.getFriendResponseId().getId())
+                        .nickName(friend.getFriendResponseId().getNickName())
+                        .introduction(friend.getFriendResponseId().getIntroduction())
+                        .profileImage(friend.getFriendResponseId().getProfileImage())
+                        .email(friend.getFriendResponseId().getEmail())
+                        .build();
+                tagResponseDtos.add(responseDto);
+            }
         }
-
-        return tagResponseDtos;
+*/
 
     }
 }

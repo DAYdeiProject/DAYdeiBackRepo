@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.post.controller;
 
+import com.sparta.daydeibackrepo.post.dto.HomeResponseDto;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.post.dto.PostResponseDto;
 import com.sparta.daydeibackrepo.post.service.PostService;
@@ -9,6 +10,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,9 +30,14 @@ public class PostController {
         return StatusResponseDto.success(postService.getPostOne(postId, userDetails));
     }
 
-    @GetMapping("home/today")
+/*    @GetMapping("home/today")
     public StatusResponseDto<?> getTodayPost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.getTodayPost(userDetails));
+    }*/
+
+    @GetMapping("home/posts/{userId}")
+    public StatusResponseDto<List<HomeResponseDto>> getHomePost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long userId) {
+        return StatusResponseDto.success(postService.getHomePost(userId, userDetails));
     }
 //    @PutMapping("posts/{postId}")
 //    public StatusResponseDto<PostResponseDto>

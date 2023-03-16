@@ -70,9 +70,9 @@ public class PostService {
                 () -> new NullPointerException("존재하지 않는 게시물입니다.")
         );
         List<UserPost> userPosts = userPostRepository.findAllByPostId(postId);
-        List<Long> participants = new ArrayList<>();
+        List<String> participants = new ArrayList<>();
         for(UserPost userPost : userPosts) {
-            participants.add(userPost.getUser().getId());
+            participants.add(userPost.getUser().getNickName());
         }
 
         return PostResponseDto.of(post, participants);

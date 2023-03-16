@@ -5,6 +5,7 @@ import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
 
+import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -35,7 +36,7 @@ public class PostResponseDto {
 
     private String location; //위치
 
-    private List<String> participent;
+    private List<Long> participent;
 
     private ScopeEnum scope;
 
@@ -43,7 +44,7 @@ public class PostResponseDto {
 
     private LocalDateTime createdAt;
 
-    public static PostResponseDto of(Post post, List<String> tagedFriends) {
+    public static PostResponseDto of(Post post, List<Long> tagedFriends) {
         return PostResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())

@@ -191,22 +191,20 @@ public class FriendService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-//        List<Friend> friends = friendRepository.findFriends(userDetails.getUser());
-        List<Friend> friends = friendRepository.findFriendList("%" + searchWord + "%", user);
+        List<Friend> friends = friendRepository.findFriends(user);
         List<FriendTagResponseDto> tagResponseDtos = new ArrayList<>();
-
-
-        for(Friend friend : friends) {
-            FriendTagResponseDto responseDto = FriendTagResponseDto.builder()
-                    .id(friend.getFriendResponseId().getId())
-                    .nickName(friend.getFriendResponseId().getNickName())
-                    .introduction(friend.getFriendResponseId().getIntroduction())
-                    .profileImage(friend.getFriendResponseId().getProfileImage())
-                    .email(friend.getFriendResponseId().getEmail())
-                    .build();
-            tagResponseDtos.add(responseDto);
+        for(Friend friend : friends){
+            if (friend.getFriendResponseId() != user &&
+            (friend.getFriendResponseId().getEmail().contains(searchWord) || friend.getFriendResponseId().getNickName().contains(searchWord)))
+            {
+                tagResponseDtos.add(new FriendTagResponseDto(friend.getFriendResponseId()));
+            }
+            else if (friend.getFriendRequestId() != user  &&
+                    (friend.getFriendRequestId().getEmail().contains(searchWord) || friend.getFriendRequestId().getNickName().contains(searchWord))){
+                tagResponseDtos.add(new FriendTagResponseDto(friend.getFriendRequestId()));
+            }
         }
+        Collections.shuffle(tagResponseDtos);
         return tagResponseDtos;
-
     }
 }

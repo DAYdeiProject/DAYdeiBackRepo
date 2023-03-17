@@ -19,8 +19,19 @@ public class UserResponseDto {
     String profileImage;
     List<CategoryEnum> categoryList;
     Boolean friendCheck;
+    Boolean isRequestFriend;
     Boolean userSubscribeCheck;
-    public UserResponseDto(User user, boolean friendCheck,boolean userSubscribeCheck){
+    public UserResponseDto(User user, boolean friendCheck,boolean isRequestFriend, boolean userSubscribeCheck){
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.nickName = user.getNickName();
+        this.profileImage = user.getProfileImage();
+        this.categoryList = user.getCategoryEnum();
+        this.friendCheck = friendCheck;
+        this.isRequestFriend = isRequestFriend;
+        this.userSubscribeCheck = userSubscribeCheck;
+    }
+    public UserResponseDto(User user, boolean friendCheck, boolean userSubscribeCheck){
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();

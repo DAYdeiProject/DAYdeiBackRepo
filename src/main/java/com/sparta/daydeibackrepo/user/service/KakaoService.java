@@ -78,8 +78,14 @@ public class KakaoService {
         User user = userDetails.getUser();
         String accessToken = getTokenFriendsList(code);
         RestTemplate restTemplate = new RestTemplate();
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
+
+//        HttpHeaders headers = new HttpHeaders();
+//        String createToken = jwtUtil.createToken(user.getEmail(), UserRoleEnum.USER);
+//        headers.set("Authorization", createToken);
+
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl("https://kapi.kakao.com/v1/api/talk/friends");
@@ -142,7 +148,7 @@ public class KakaoService {
 //        body.add("redirect_uri", "http://13.209.49.202/api/users/kakao_friends/callback");
         body.add("redirect_uri", "http://localhost:3000/friends");
 //        body.add("redirect_uri", "http://localhost:8080/api/users/kakao_friends/callback");
-//        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/kakao");
+//        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/friends");
         body.add("code", code);
 
         // HTTP 요청 보내기

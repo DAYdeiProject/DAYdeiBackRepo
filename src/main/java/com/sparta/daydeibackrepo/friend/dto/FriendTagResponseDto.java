@@ -2,7 +2,6 @@ package com.sparta.daydeibackrepo.friend.dto;
 
 import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.Getter;
-import lombok.Builder;
 import lombok.Setter;
 
 @Getter
@@ -25,5 +24,4 @@ public class FriendTagResponseDto {
         this.profileImage = user.getProfileImage();
         this.email = user.getEmail();
     }
-
 }

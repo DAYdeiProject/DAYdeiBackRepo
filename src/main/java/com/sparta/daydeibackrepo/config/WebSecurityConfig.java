@@ -19,7 +19,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
@@ -59,7 +58,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 //                .antMatchers("/docs").permitAll()
 //                .antMatchers("/api/users/signup").permitAll()
 //                .antMatchers("/api/users/login").permitAll()
-               // .antMatchers(HttpMethod.GET, "/api/studies/**").permitAll()
                 .anyRequest().authenticated()
 
                 // JWT 인증/인가를 사용하기 위한 설정

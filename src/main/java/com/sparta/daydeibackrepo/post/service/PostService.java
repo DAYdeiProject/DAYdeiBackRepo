@@ -136,19 +136,12 @@ public class PostService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-//        LocalDateTime today = LocalDateTime.now();
-        // 내 일정
-        //List<Post> MyPosts = postRepository.findMyTodayPost(LocalDate.now(), user);
         // 내가 구독한 유저의 일정
         // 1. 내가 구독한 유저의 리스트를 다 뽑는다.
         List<Post> userSubscribePosts = new ArrayList<>();
         List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
         // 2. UserSubscribe 객체에서 구독한 유저 객체를 뽑아주고 그 객체로 오늘의 일정을 뽑아주기
-//        for (UserSubscribe userSubscribe : userSubscribes) {
-////            //스코프 상관 없이 post 전부 다.
-//            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now()));//구독당한사람
-//            userSubscribePosts.removeIf(post -> post.getScope() != ScopeEnum.SUBSCRIBE);
-//        }
+
         for (UserSubscribe userSubscribe : userSubscribes) {
             userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now(), ScopeEnum.SUBSCRIBE));
         }
@@ -167,20 +160,18 @@ public class PostService {
         }
 
         List<Post> myPosts = postRepository.findAllPostByUserId(user.getId());
-//        myPosts.removeIf(post -> post.getStartDate().isAfter(LocalDate.now()) || post.getEndDate().isBefore(LocalDate.now()));
-        myPosts.removeIf(post -> post.getStartDate().isAfter(today.getChronology().dateNow()) || post.getEndDate().isBefore(today.getChronology().dateNow()));
-
-
-
+        myPosts.removeIf(post -> post.getStartDate().isAfter(LocalDate.now()) || post.getEndDate().isBefore(LocalDate.now()));
 
 
         // dto 타입으로 변경하고 todayPostResponseDtos 리스트에 추가
         List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
         for (Post post : userSubscribePosts) {
+            post.setColor(ColorEnum.GRAY);
             TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
             todayPostResponseDtos.add(responseDto);
         }
         for (Post post : postSubscribePosts) {
+            post.setColor(ColorEnum.GRAY);
             TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
             todayPostResponseDtos.add(responseDto);
         }
@@ -188,6 +179,13 @@ public class PostService {
             TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
             todayPostResponseDtos.add(responseDto);
         }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHH");
+        Collections.sort(todayPostResponseDtos, (o1, o2) -> {
+            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(), o1.getStartTime() != null ? o1.getStartTime() : LocalTime.MIN);
+            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(), o2.getStartTime() != null ? o2.getStartTime() : LocalTime.MIN);
+            return o1DateTime.format(formatter).compareTo(o2DateTime.format(formatter));
+        });
 
 
         return todayPostResponseDtos;

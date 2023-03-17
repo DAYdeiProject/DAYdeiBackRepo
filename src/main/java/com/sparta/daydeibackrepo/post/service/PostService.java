@@ -1,9 +1,7 @@
 package com.sparta.daydeibackrepo.post.service;
 
-import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
-import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.post.dto.HomeResponseDto;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.post.dto.PostResponseDto;
@@ -23,11 +21,8 @@ import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import lombok.RequiredArgsConstructor;
-//import org.joda.time.LocalDate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import org.joda.time.TimeOfDay;
-import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +32,6 @@ import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -206,14 +200,14 @@ public class PostService {
         List<HomeResponseDto> homeResponseDtos = new ArrayList<>();
         // 홈페이지 주인이 본인인경우 (작성한 일정 : 다 보이게 / 구독하는 일정 : 다 보이게 / 공유 일정 : 다 보이게)
         if (master == visitor) {
-            // 내가 작성한 일정 : MyPosts
+            // 내가 작성한 일정
             List<Post> AllPosts = postRepository.findAllPostByUserId(master.getId());
-            // 내가 구독하는 일정 : UserSubscribePosts
+            // 내가 구독하는 일정
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
-                    AllPosts.addAll(postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.valueOf("SUBSCRIBE")));
+                    AllPosts.addAll(postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE));
             }
-            // 나를 태그한 공유일정 : PostSubscribePosts
+            // 나를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if (postSubscribe.getPostSubscribeCheck()) {
@@ -230,15 +224,15 @@ public class PostService {
             List<Post> AllPosts;
         // Master가 작성한 일정
             if (friendRepository.findFriend(master, visitor) != null) {
-            AllPosts = postRepository.findFriendPost(master, ScopeEnum.valueOf("ALL"), ScopeEnum.valueOf("SUBSCRIBE"), ScopeEnum.valueOf("FRIEND"));
+            AllPosts = postRepository.findFriendPost(master, ScopeEnum.ALL, ScopeEnum.SUBSCRIBE, ScopeEnum.FRIEND);
         }
             else{
-            AllPosts = postRepository.findNotFriendPost(master, ScopeEnum.valueOf("ALL"), ScopeEnum.valueOf("SUBSCRIBE"));
+            AllPosts = postRepository.findNotFriendPost(master, ScopeEnum.ALL, ScopeEnum.SUBSCRIBE);
         }
         // Master가 구독하는 일정
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
-                    AllPosts.addAll(postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.valueOf("SUBSCRIBE")));
+                    AllPosts.addAll(postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE));
             }
             // Master를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());

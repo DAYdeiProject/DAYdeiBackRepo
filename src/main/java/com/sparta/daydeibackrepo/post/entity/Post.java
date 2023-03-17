@@ -8,6 +8,7 @@ import com.sparta.daydeibackrepo.user.entity.UserPost;
 import com.sparta.daydeibackrepo.util.TimeStamped;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 public class Post extends TimeStamped {
     @Id

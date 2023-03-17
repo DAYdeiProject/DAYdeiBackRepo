@@ -6,6 +6,7 @@ import com.sparta.daydeibackrepo.post.dto.HomeResponseDto;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.post.dto.PostResponseDto;
 import com.sparta.daydeibackrepo.post.dto.TodayPostResponseDto;
+import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
 import com.sparta.daydeibackrepo.post.repository.PostRepository;
@@ -205,12 +206,17 @@ public class PostService {
             // 내가 구독하는 일정
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
-                    AllPosts.addAll(postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE));
+                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE);
+                for (Post post: subscribePost){
+                    post.setColor(ColorEnum.GRAY);
+                    AllPosts.add(post);
+                }
             }
             // 나를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if (postSubscribe.getPostSubscribeCheck()) {
+                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
                     AllPosts.add(postSubscribe.getPost());
                 }
             }
@@ -232,12 +238,17 @@ public class PostService {
         // Master가 구독하는 일정
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
-                    AllPosts.addAll(postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE));
+                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE);
+                for (Post post: subscribePost){
+                    post.setColor(ColorEnum.GRAY);
+                    AllPosts.add(post);
+                }
             }
             // Master를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if (postSubscribe.getPostSubscribeCheck() && friendRepository.findFriend(postSubscribe.getPost().getUser(), visitor) != null) {
+                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
                     AllPosts.add(postSubscribe.getPost());
                 }
             }

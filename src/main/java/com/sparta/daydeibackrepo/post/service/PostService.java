@@ -157,18 +157,42 @@ public class PostService {
         }
 
 
-//        // 내가 초대 수락한 일정
-//        // 1. 내가 초대 수락한 일정 리스트를 다 뽑는다.
-//        List<Post> postSubscribePosts= new ArrayList<>();
-//        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
-//        // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
-//        for(PostSubscribe postSubscribe : postSubscribes){
-//            if (postSubscribe.getPost().getEndDate().isBefore(today.getChronology().dateNow()) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){
-//                postSubscribePosts.add(postSubscribe.getPost());
-//            }
-//        }
+        // 내가 초대 수락한 일정
+        // 1. 내가 초대 수락한 일정 리스트를 다 뽑는다.
+        List<Post> postSubscribePosts= new ArrayList<>();
+        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
+        // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
+        LocalDateTime today = LocalDateTime.now();
+        for(PostSubscribe postSubscribe : postSubscribes){
+            if (postSubscribe.getPost().getEndDate().isBefore(today.getChronology().dateNow()) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){
+                postSubscribePosts.add(postSubscribe.getPost());
+            }
+        }
 
+        List<Post> myPosts = postRepository.findAllPostByUserId(user.getId());
+//        myPosts.removeIf(post -> post.getStartDate().isAfter(LocalDate.now()) || post.getEndDate().isBefore(LocalDate.now()));
+        myPosts.removeIf(post -> post.getStartDate().isAfter(today.getChronology().dateNow()) || post.getEndDate().isBefore(today.getChronology().dateNow()));
+
+
+
+
+
+        // dto 타입으로 변경하고 todayPostResponseDtos 리스트에 추가
         List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
+        for (Post post : userSubscribePosts) {
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+            todayPostResponseDtos.add(responseDto);
+        }
+        for (Post post : postSubscribePosts) {
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+            todayPostResponseDtos.add(responseDto);
+        }
+        for (Post post : myPosts) {
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+            todayPostResponseDtos.add(responseDto);
+        }
+
+
         return todayPostResponseDtos;
     }
 

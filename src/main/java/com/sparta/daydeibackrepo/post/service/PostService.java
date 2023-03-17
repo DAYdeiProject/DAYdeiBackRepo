@@ -1,13 +1,12 @@
 package com.sparta.daydeibackrepo.post.service;
 
-import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
-import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.post.dto.HomeResponseDto;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.post.dto.PostResponseDto;
 import com.sparta.daydeibackrepo.post.dto.TodayPostResponseDto;
+import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
 import com.sparta.daydeibackrepo.post.repository.PostRepository;
@@ -23,21 +22,19 @@ import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import lombok.RequiredArgsConstructor;
-//import org.joda.time.LocalDate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import org.joda.time.TimeOfDay;
-import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.time.LocalTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -157,18 +154,42 @@ public class PostService {
         }
 
 
-//        // 내가 초대 수락한 일정
-//        // 1. 내가 초대 수락한 일정 리스트를 다 뽑는다.
-//        List<Post> postSubscribePosts= new ArrayList<>();
-//        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
-//        // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
-//        for(PostSubscribe postSubscribe : postSubscribes){
-//            if (postSubscribe.getPost().getEndDate().isBefore(today.getChronology().dateNow()) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){
-//                postSubscribePosts.add(postSubscribe.getPost());
-//            }
-//        }
+        // 내가 초대 수락한 일정
+        // 1. 내가 초대 수락한 일정 리스트를 다 뽑는다.
+        List<Post> postSubscribePosts= new ArrayList<>();
+        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
+        // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
+        LocalDateTime today = LocalDateTime.now();
+        for(PostSubscribe postSubscribe : postSubscribes){
+            if (postSubscribe.getPost().getEndDate().isBefore(today.getChronology().dateNow()) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){
+                postSubscribePosts.add(postSubscribe.getPost());
+            }
+        }
 
+        List<Post> myPosts = postRepository.findAllPostByUserId(user.getId());
+//        myPosts.removeIf(post -> post.getStartDate().isAfter(LocalDate.now()) || post.getEndDate().isBefore(LocalDate.now()));
+        myPosts.removeIf(post -> post.getStartDate().isAfter(today.getChronology().dateNow()) || post.getEndDate().isBefore(today.getChronology().dateNow()));
+
+
+
+
+
+        // dto 타입으로 변경하고 todayPostResponseDtos 리스트에 추가
         List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
+        for (Post post : userSubscribePosts) {
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+            todayPostResponseDtos.add(responseDto);
+        }
+        for (Post post : postSubscribePosts) {
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+            todayPostResponseDtos.add(responseDto);
+        }
+        for (Post post : myPosts) {
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+            todayPostResponseDtos.add(responseDto);
+        }
+
+
         return todayPostResponseDtos;
     }
 
@@ -182,17 +203,22 @@ public class PostService {
         List<HomeResponseDto> homeResponseDtos = new ArrayList<>();
         // 홈페이지 주인이 본인인경우 (작성한 일정 : 다 보이게 / 구독하는 일정 : 다 보이게 / 공유 일정 : 다 보이게)
         if (master == visitor) {
-            // 내가 작성한 일정 : MyPosts
+            // 내가 작성한 일정
             List<Post> AllPosts = postRepository.findAllPostByUserId(master.getId());
-            // 내가 구독하는 일정 : UserSubscribePosts
+            // 내가 구독하는 일정
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
-                    AllPosts.addAll(postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.valueOf("SUBSCRIBE")));
+                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE);
+                for (Post post: subscribePost){
+                    post.setColor(ColorEnum.GRAY);
+                    AllPosts.add(post);
+                }
             }
-            // 나를 태그한 공유일정 : PostSubscribePosts
+            // 나를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if (postSubscribe.getPostSubscribeCheck()) {
+                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
                     AllPosts.add(postSubscribe.getPost());
                 }
             }
@@ -206,20 +232,25 @@ public class PostService {
             List<Post> AllPosts;
         // Master가 작성한 일정
             if (friendRepository.findFriend(master, visitor) != null) {
-            AllPosts = postRepository.findFriendPost(master, ScopeEnum.valueOf("ALL"), ScopeEnum.valueOf("SUBSCRIBE"), ScopeEnum.valueOf("FRIEND"));
+            AllPosts = postRepository.findFriendPost(master, ScopeEnum.ALL, ScopeEnum.SUBSCRIBE, ScopeEnum.FRIEND);
         }
             else{
-            AllPosts = postRepository.findNotFriendPost(master, ScopeEnum.valueOf("ALL"), ScopeEnum.valueOf("SUBSCRIBE"));
+            AllPosts = postRepository.findNotFriendPost(master, ScopeEnum.ALL, ScopeEnum.SUBSCRIBE);
         }
         // Master가 구독하는 일정
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
-                    AllPosts.addAll(postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.valueOf("SUBSCRIBE")));
+                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE);
+                for (Post post: subscribePost){
+                    post.setColor(ColorEnum.GRAY);
+                    AllPosts.add(post);
+                }
             }
             // Master를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if (postSubscribe.getPostSubscribeCheck() && friendRepository.findFriend(postSubscribe.getPost().getUser(), visitor) != null) {
+                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
                     AllPosts.add(postSubscribe.getPost());
                 }
             }
@@ -227,9 +258,12 @@ public class PostService {
                 homeResponseDtos.add(new HomeResponseDto(post));
             }
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        // 배열 섞는게 지금은 안먹는듯 > 추후에 Fix 예정
-        Collections.sort(homeResponseDtos, ((o1, o2) -> o2.getStartDate().format(formatter).compareTo(o1.getStartDate().format(formatter))));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHH");
+        Collections.sort(homeResponseDtos, (o1, o2) -> {
+            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(), o1.getStartTime() != null ? o1.getStartTime() : LocalTime.MIN);
+            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(), o2.getStartTime() != null ? o2.getStartTime() : LocalTime.MIN);
+            return o1DateTime.format(formatter).compareTo(o2DateTime.format(formatter));
+        });
         return homeResponseDtos;
     }
 

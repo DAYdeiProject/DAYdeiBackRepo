@@ -257,6 +257,7 @@ public class PostService {
             // Master를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {
+                // friendRepository.findFriend(postSubscribe.getPost().getUser(), visitor 이게 아니라 원 포스트의 공개 범위를 체크해봐야함
                 if (postSubscribe.getPostSubscribeCheck() && friendRepository.findFriend(postSubscribe.getPost().getUser(), visitor) != null) {
                     postSubscribe.getPost().setColor(ColorEnum.GRAY);
                     AllPosts.add(postSubscribe.getPost());

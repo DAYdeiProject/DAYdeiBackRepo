@@ -14,7 +14,6 @@ import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
-import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -113,16 +112,13 @@ public class FriendService {
         );
         //친구 리스트
         List<Friend> friends = friendRepository.findFriends(user);
-        List<User> friendList = new ArrayList<>();
         List<UserResponseDto> friendResponseList = new ArrayList<>();
         User user1 = null;
         for(Friend friend : friends){
             if (friend.getFriendResponseId() != user){
-                friendList.add(friend.getFriendResponseId());
                 user1 = friend.getFriendResponseId();
             }
             else if (friend.getFriendRequestId() != user){
-                friendList.add(friend.getFriendRequestId());
                 user1 = friend.getFriendRequestId();
             }
             friendResponseList.add( new UserResponseDto(user1, true));

@@ -239,7 +239,6 @@ public class KakaoService {
         }
 
         List<String> friendEmailList = new ArrayList<>();
-        log.info("카카오 사용자 정보: " + id + ", " + nickName + ", " + email + ", ");
         return new KakaoUserInfoDto(id, nickName, email, img, birthday);
 
 

@@ -11,6 +11,7 @@ import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -97,7 +98,11 @@ public class UserService {
 
     @Transactional
     public String setCategory(CategoryRequestDto categoryRequestDto, UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();
+
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new NullPointerException("인증된 유저가 아닙니다")
+        );
+
         List<CategoryEnum> categoryList = categoryRequestDto.getCategory();
         for (CategoryEnum category : categoryList) {
             if (user.getCategoryEnum().contains(category)){
@@ -113,12 +118,10 @@ public class UserService {
 
     @Transactional
     public UserInfoResponseDto updateUser(UserInfoRequestDto userInfoRequestDto, UserDetailsImpl userDetails){
-        User user = userDetails.getUser();
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new NullPointerException("인증된 유저가 아닙니다")
+        );
 
-//        String passwordCheck = passwordEncoder.encode(userInfoRequestDto.getNewPasswordConfirm());
-//        if (!passwordEncoder.matches(password, passwordCheck)) {
-//            throw new IllegalArgumentException("비밀번호가 다릅니다.");
-//        }
         if (!userInfoRequestDto.getNewPassword().equals(userInfoRequestDto.getNewPasswordConfirm())){
             throw new IllegalArgumentException("비밀번호가 다릅니다.");
         }

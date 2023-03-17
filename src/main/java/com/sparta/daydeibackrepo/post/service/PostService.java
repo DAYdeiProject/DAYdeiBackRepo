@@ -60,14 +60,22 @@ public class PostService {
         Post post = new Post(requestDto, user);
         Post savePost = postRepository.save(post);
 
+        //시간에 대한
+        //공유일정 삽입
 
 
         for(Long participant : requestDto.getParticipant()) {
-            List<Friend> friends = friendRepository.findidFriendList(participant, user);
-            for(Friend friend : friends) {
-                UserPost userPost = new UserPost(friend.getFriendResponseId(), savePost);
-                userPostRepository.save(userPost);
-            }
+//            List<Friend> friends = friendRepository.findidFriendList(participant, user);
+            User joiner = userRepository.findById(participant).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+            UserPost userPost = new UserPost(joiner, savePost);
+            userPostRepository.save(userPost);
+
+//            for(Friend friend : friends) {
+//                UserPost userPost = new UserPost(friend.getFriendResponseId(), savePost);
+//                userPostRepository.save(userPost);
+//            }
         }
 
         return "일정 작성을 완료하였습니다.";
@@ -107,6 +115,8 @@ public class PostService {
             participants.add(userPost.getUser().getNickName());
         }
 
+        //태그당한 친구에게 알림
+
         if (hasAuthority(user, post)) {
             post.update(requestDto);
             return PostResponseDto.of(post, participants);
@@ -122,7 +132,7 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시물입니다.")
         );
-
+        //태그당한 친구에게 알림
         if (hasAuthority(user, post)) {
             postRepository.delete(post);
             return "일정이 삭제되었습니다.";

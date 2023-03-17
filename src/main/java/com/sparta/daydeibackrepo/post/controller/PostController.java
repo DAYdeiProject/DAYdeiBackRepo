@@ -20,31 +20,37 @@ public class PostController {
 
     private final PostService postService;
 
+    //일정 작성
     @PostMapping("posts")
     public StatusResponseDto<?> createPost(@RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.createPost(requestDto, userDetails));
     }
 
+    //일정 상세 조회
     @GetMapping("posts/{postId}")
     public StatusResponseDto<PostResponseDto> getPostOne(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.getPostOne(postId, userDetails));
     }
 
+    //일정 수정
     @PutMapping("posts/{postId}")
     public StatusResponseDto<PostResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
         return StatusResponseDto.success(postService.updatePost(postId, requestDto, userDetails));
     }
 
+    //일정 삭제
     @DeleteMapping("posts/{postId}")
     public StatusResponseDto<?> deletePost(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
         return StatusResponseDto.success(postService.deletePost(postId, userDetails));
     }
 
+    //오늘의 일정
     @GetMapping("home/today")
     public StatusResponseDto<?> getTodayPost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.getTodayPost(userDetails));
     }
 
+    //전체일정 홈화면
     @GetMapping("home/posts/{userId}")
     public StatusResponseDto<List<HomeResponseDto>> getHomePost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long userId) {
         return StatusResponseDto.success(postService.getHomePost(userId, userDetails));

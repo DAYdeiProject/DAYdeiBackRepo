@@ -29,6 +29,7 @@ public class TodayPostResponseDto {
     private ColorEnum color;
 
     public TodayPostResponseDto(Post post) {
+        this.id = post.getId();
         this.title = post.getTitle();
         this.startDate = post.getStartDate();
         this.endDate = post.getEndDate();

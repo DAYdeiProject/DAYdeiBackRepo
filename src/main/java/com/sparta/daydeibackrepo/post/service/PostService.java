@@ -228,7 +228,8 @@ public class PostService {
             }
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        Collections.sort(homeResponseDtos, ((o2, o1) -> Integer.parseInt(o1.getStartDate().format(formatter)) - Integer.parseInt(o2.getStartDate().format(formatter))));
+        // 배열 섞는게 지금은 안먹는듯 > 추후에 Fix 예정
+        Collections.sort(homeResponseDtos, ((o1, o2) -> o2.getStartDate().format(formatter).compareTo(o1.getStartDate().format(formatter))));
         return homeResponseDtos;
     }
 

@@ -4,9 +4,11 @@ package com.sparta.daydeibackrepo.user.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.*;
+import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.service.KakaoService;
 import com.sparta.daydeibackrepo.user.service.UserService;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
+import jdk.jshell.Snippet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 
@@ -48,7 +51,7 @@ public class UserController {
     }
 //    ResponseEntity<StatusResponseDto<String>>
     @GetMapping("/users/kakao/callback")
-    public ResponseEntity<StatusResponseDto<String>> kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
 //        String createToken = kakaoService.kakaoLogin(code, response);
 //        // Cookie 생성 및 직접 브라우저에 Set
 //        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
@@ -58,9 +61,10 @@ public class UserController {
         return kakaoService.kakaoLogin(code, response);
     }
 
+
     @GetMapping("/users/kakao_friends/callback")                                                //HttpServletResponse response
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
-        return kakaoService.kakaoFriends(code, response);
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoFriendsCallback(@RequestParam String code, @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
+        return kakaoService.kakaoFriends(code, userDetails);
     }
     @PostMapping("/users/reset/password")
     public StatusResponseDto<String> resetPassword(@RequestBody UserRequestDto userRequestDto){
@@ -75,6 +79,11 @@ public class UserController {
     @PutMapping("/users/profile")
     public StatusResponseDto<UserInfoResponseDto> updateUser(@RequestBody UserInfoRequestDto userInfoRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(userService.updateUser(userInfoRequestDto, userDetails));
+    }
+
+    @GetMapping("/home/profile/{userId}")
+    public StatusResponseDto<UserInfoResponseDto> getUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(userService.getUser(userId));
     }
 
 

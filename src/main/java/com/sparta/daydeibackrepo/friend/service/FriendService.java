@@ -2,6 +2,7 @@ package com.sparta.daydeibackrepo.friend.service;
 
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
+import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
@@ -205,5 +206,26 @@ public class FriendService {
                 }
         Collections.shuffle(recommendResponseList);
         return recommendResponseList;
+    }
+
+    public List<FriendTagResponseDto> getFriendTagList(String searchWord, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        List<Friend> friends = friendRepository.findFriends(user);
+        List<FriendTagResponseDto> tagResponseDtos = new ArrayList<>();
+        for(Friend friend : friends){
+            if (friend.getFriendResponseId() != user &&
+            (friend.getFriendResponseId().getEmail().contains(searchWord) || friend.getFriendResponseId().getNickName().contains(searchWord)))
+            {
+                tagResponseDtos.add(new FriendTagResponseDto(friend.getFriendResponseId()));
+            }
+            else if (friend.getFriendRequestId() != user  &&
+                    (friend.getFriendRequestId().getEmail().contains(searchWord) || friend.getFriendRequestId().getNickName().contains(searchWord))){
+                tagResponseDtos.add(new FriendTagResponseDto(friend.getFriendRequestId()));
+            }
+        }
+        Collections.shuffle(tagResponseDtos);
+        return tagResponseDtos;
     }
 }

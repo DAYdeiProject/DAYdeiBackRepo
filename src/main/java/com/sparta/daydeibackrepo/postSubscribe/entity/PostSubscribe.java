@@ -21,8 +21,19 @@ public class PostSubscribe {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Column
+    private Boolean postSubscribeCheck;
+
+    public void update(boolean postSubscribeCheck) {
+        this.postSubscribeCheck=postSubscribeCheck;
+    }
+    public PostSubscribe(Post post, User user, boolean postSubscribeCheck){
+        this.post = post;
+        this.user = user;
+        this.postSubscribeCheck=postSubscribeCheck;
+    }
 }

@@ -13,6 +13,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
         Optional<User> findById(Long id);
         Optional<User> findByNickName(String nickName);
+
+//        Optional<User> findByNickNameLikeAndEmailLike(String nickName, String Email);
+        Optional<User> findByNickNameLike(String searchWord);
+        Optional<User> findByEmailLike(String searchWord);
         Optional<User> findByKakaoId(Long id);
         @Query("SELECT u FROM users u WHERE (u.email Like :searchWord "+" OR u.nickName Like :searchWord) "+" AND u !=:user")
         List<User> findRecommmedList(String searchWord, User user);

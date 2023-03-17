@@ -105,7 +105,6 @@ public class UserService {
             }
             else {
                 user.getCategoryEnum().add(category);
-
             }
         }
         userRepository.save(user);
@@ -127,6 +126,14 @@ public class UserService {
         userInfoRequestDto.setNewPassword(password);
         user.update(userInfoRequestDto);
         userRepository.save(user);
+        return new UserInfoResponseDto(user);
+    }
+
+    @Transactional
+    public UserInfoResponseDto getUser(Long userId){
+        User user = userRepository.findById(userId).orElseThrow(
+                ()-> new NullPointerException("등록된 사용자가 없습니다.")
+        );
         return new UserInfoResponseDto(user);
     }
 }

@@ -12,7 +12,9 @@ public enum CategoryEnum {
 
     ECONOMY,
 
-    ENTERTAINMENT
+    ENTERTAINMENT,
+
+    OTT
 
 
 }

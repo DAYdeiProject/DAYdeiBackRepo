@@ -11,7 +11,6 @@ import lombok.Setter;
 public class UserInfoResponseDto {
     private String email;
     private String nickName;
-    private String password;  // 이걸 왜 넣나요?
     private String profileImage;
     private String introduction;
     private String birthday;
@@ -19,7 +18,6 @@ public class UserInfoResponseDto {
     public UserInfoResponseDto(User user){
         this.email = user.getEmail();
         this.nickName = user.getNickName();
-        this.password = user.getPassword();
         this.profileImage = user.getProfileImage();
         this.introduction = user.getIntroduction();
         this.birthday = user.getBirthday();

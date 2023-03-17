@@ -29,10 +29,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.time.LocalTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -256,9 +258,12 @@ public class PostService {
                 homeResponseDtos.add(new HomeResponseDto(post));
             }
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        // 배열 섞는게 지금은 안먹는듯 > 추후에 Fix 예정
-        Collections.sort(homeResponseDtos, ((o1, o2) -> o2.getStartDate().format(formatter).compareTo(o1.getStartDate().format(formatter))));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHH");
+        Collections.sort(homeResponseDtos, (o1, o2) -> {
+            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(), o1.getStartTime() != null ? o1.getStartTime() : LocalTime.MIN);
+            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(), o2.getStartTime() != null ? o2.getStartTime() : LocalTime.MIN);
+            return o1DateTime.format(formatter).compareTo(o2DateTime.format(formatter));
+        });
         return homeResponseDtos;
     }
 

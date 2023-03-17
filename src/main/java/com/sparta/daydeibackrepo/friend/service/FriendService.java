@@ -161,7 +161,17 @@ public class FriendService {
                             }
                             if ((!friendCheck || !userSubscribeCheck) && !duplicationCheck.contains(user1.getId())) {
                                 duplicationCheck.add(user1.getId());
-                                recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
+                                if (friendRepository.findFirstOneRequest(user1,user) != null){
+                                    boolean isRequestFriend = true;
+                                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck));
+                                }
+                                else if(friendRepository.findFirstOneRequest(user,user1) != null){
+                                    boolean isRequestFriend = false;
+                                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck));
+                                }
+                                else{
+                                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
+                                }
                             }
                         }
                     }
@@ -177,8 +187,19 @@ public class FriendService {
                     if (userSubscribe != null) {
                         userSubscribeCheck = true;
                     }
-                    if (!friendCheck || !userSubscribeCheck) {
-                        recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
+                    if ((!friendCheck || !userSubscribeCheck) && !duplicationCheck.contains(user1.getId())) {
+                        duplicationCheck.add(user1.getId());
+                        if (friendRepository.findFirstOneRequest(user1,user) != null){
+                            boolean isRequestFriend = true;
+                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck));
+                        }
+                        else if(friendRepository.findFirstOneRequest(user,user1) != null){
+                            boolean isRequestFriend = false;
+                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck));
+                        }
+                        else{
+                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
+                        }
                     }
                 }
                 }

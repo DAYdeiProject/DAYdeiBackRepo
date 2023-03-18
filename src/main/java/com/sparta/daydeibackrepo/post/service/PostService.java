@@ -103,12 +103,12 @@ public class PostService {
 
     }
 
-    public List<String> createPostImages(MultipartListRequestDto requestDto, UserDetailsImpl userDetails) throws IOException {
+    public List<String> createPostImages(List<MultipartFile> multipartFiles, UserDetailsImpl userDetails) throws IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
 
-        List<String> imageUrl = s3Service.uploadFiles(requestDto.getImages(), "images");
+        List<String> imageUrl = s3Service.uploadFiles(multipartFiles, "images");
         return imageUrl;
 
     }

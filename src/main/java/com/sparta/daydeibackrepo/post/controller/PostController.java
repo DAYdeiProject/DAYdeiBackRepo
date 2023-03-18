@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -39,9 +40,9 @@ public class PostController {
         return StatusResponseDto.success(postService.createPost(requestDto, userDetails));
     }
 
-    @PostMapping(value = "/posts/images", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public StatusResponseDto<?> createPostImages(@RequestParam(value = "images") List<MultipartFile> requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        return StatusResponseDto.success(postService.createPostImages(requestDto, userDetails));
+    @PostMapping(value = "/posts/images", consumes = "multipart/form-data")
+    public StatusResponseDto<List<String>> createPostImages(@RequestParam(value = "images") List<MultipartFile> multipartFiles, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        return StatusResponseDto.success(postService.createPostImages(multipartFiles, userDetails));
     }
 
     //일정 상세 조회

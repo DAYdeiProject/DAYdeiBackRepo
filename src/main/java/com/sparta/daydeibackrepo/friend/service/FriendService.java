@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
@@ -141,43 +143,17 @@ public class FriendService {
         List<UserResponseDto> recommendResponseList = new ArrayList<>();
         List<Long> duplicationCheck =new ArrayList<>();
         List<User> recommendList = userRepository.findRecommmedList("%" + searchWord + "%", user);
-            for (User user1 : recommendList){
-                for(CategoryEnum  categoryEnum1: user1.getCategoryEnum()) {
-                    for (String category : categories) {
-                        CategoryEnum categoryEnum = CategoryEnum.valueOf(category.toUpperCase());
-                        if (categoryEnum.equals(categoryEnum1)) {
-                            Friend friend = friendRepository.findFriend(user, user1);
-                            UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
-                            boolean friendCheck = false;
-                            boolean userSubscribeCheck = false;
-                            if (friend != null) {
-                                friendCheck = true;
-                            }
-                            if (userSubscribe != null) {
-                                userSubscribeCheck = true;
-                            }
-                            if ((!friendCheck || !userSubscribeCheck) && !duplicationCheck.contains(user1.getId())) {
-                                duplicationCheck.add(user1.getId());
-                                if (friendRepository.findFirstOneRequest(user1,user) != null){
-                                    boolean isRequestFriend = true;
-                                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck));
-                                }
-                                else if(friendRepository.findFirstOneRequest(user,user1) != null){
-                                    boolean isRequestFriend = false;
-                                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck));
-                                }
-                                else{
-                                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
-                                }
-                            }
-                        }
-                    }
-                }
-                if(categories.isEmpty()){
+        for (User user1 : recommendList) {
+            for (String category : categories) {
+                CategoryEnum categoryEnum = CategoryEnum.valueOf(category.toUpperCase());
+                if (user1.getCategoryEnum().contains(categoryEnum)) {
                     Friend friend = friendRepository.findFriend(user, user1);
                     UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
                     boolean friendCheck = false;
                     boolean userSubscribeCheck = false;
+                    int friendCount = friendRepository.findFriends(user1).size();
+                    int subscribingCount = userSubscribeRepository.findAllBySubscribingId(user1).size();
+                    int subscriberCount = userSubscribeRepository.findAllBySubscriberId(user1).size();
                     if (friend != null) {
                         friendCheck = true;
                     }
@@ -186,21 +162,55 @@ public class FriendService {
                     }
                     if ((!friendCheck || !userSubscribeCheck) && !duplicationCheck.contains(user1.getId())) {
                         duplicationCheck.add(user1.getId());
-                        if (friendRepository.findFirstOneRequest(user1,user) != null){
+                        if (friendRepository.findFirstOneRequest(user1, user) != null) {
                             boolean isRequestFriend = true;
-                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck));
-                        }
-                        else if(friendRepository.findFirstOneRequest(user,user1) != null){
+                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
+                        } else if (friendRepository.findFirstOneRequest(user, user1) != null) {
                             boolean isRequestFriend = false;
-                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck));
-                        }
-                        else{
-                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
+                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
+                        } else {
+                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
                         }
                     }
                 }
+            }
+            if (categories.isEmpty()) {
+                Friend friend = friendRepository.findFriend(user, user1);
+                UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
+                boolean friendCheck = false;
+                boolean userSubscribeCheck = false;
+                int friendCount = friendRepository.findFriends(user1).size();
+                int subscribingCount = userSubscribeRepository.findAllBySubscribingId(user1).size();
+                int subscriberCount = userSubscribeRepository.findAllBySubscriberId(user1).size();
+                if (friend != null) {
+                    friendCheck = true;
                 }
-        Collections.shuffle(recommendResponseList);
+                if (userSubscribe != null) {
+                    userSubscribeCheck = true;
+                }
+                if ((!friendCheck || !userSubscribeCheck) && !duplicationCheck.contains(user1.getId())) {
+                    duplicationCheck.add(user1.getId());
+                    if (friendRepository.findFirstOneRequest(user1, user) != null) {
+                        boolean isRequestFriend = true;
+                        recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
+                    } else if (friendRepository.findFirstOneRequest(user, user1) != null) {
+                        boolean isRequestFriend = false;
+                        recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
+                    } else {
+                        recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
+                    }
+                }
+            }
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
+        if (isEven){
+            Collections.sort(recommendResponseList, (o1, o2) -> o2.getFriendCount() - o1.getFriendCount());
+        }
+        else {
+            Collections.sort(recommendResponseList, (o1, o2) -> o2.getSubscriberCount() - o1.getSubscriberCount());
+        }
         return recommendResponseList;
+        // 유저를 넣었을때 친구 숫자 보여주는 함수 + 유저를 넣었을때 구독자 수 / 구독하는 수 보여주는 함수
     }
 }

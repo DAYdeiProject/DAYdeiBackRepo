@@ -27,7 +27,7 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository  {
     public List<Friend> findFriends(User user){
         return jpaQueryFactory
                 .selectFrom(friend)
-                .where(friend.friendRequestId.eq(user).or(friend.friendResponseId.eq(user)).and(friend.friendCheck.eq(true)))
+                .where((friend.friendRequestId.eq(user).or(friend.friendResponseId.eq(user))).and(friend.friendCheck.eq(true)))
                 .fetch();
     }
     //@Query("SELECT f FROM Friend f WHERE (f.friendRequestId = :user1 "+" AND f.friendResponseId =:user2 "+" AND f.friendCheck = true) "+" OR (f.friendRequestId = :user2 "+" AND f.friendResponseId =:user1 "+" AND f.friendCheck = true)")

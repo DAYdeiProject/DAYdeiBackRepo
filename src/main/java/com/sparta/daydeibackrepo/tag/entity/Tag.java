@@ -1,16 +1,16 @@
-package com.sparta.daydeibackrepo.user.entity;
+package com.sparta.daydeibackrepo.tag.entity;
 
 import com.sparta.daydeibackrepo.post.entity.Post;
+import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class UserPost {
+public class Tag {
 
     @Id
     @Column
@@ -25,7 +25,7 @@ public class UserPost {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public UserPost(User user, Post post) {
+    public Tag(User user, Post post) {
         this.user = user;
         this.post = post;
     }

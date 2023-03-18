@@ -1,0 +1,25 @@
+package com.sparta.daydeibackrepo.tag.controller;
+
+import com.sparta.daydeibackrepo.security.UserDetailsImpl;
+import com.sparta.daydeibackrepo.tag.dto.TagResponseDto;
+import com.sparta.daydeibackrepo.tag.service.TagService;
+import com.sparta.daydeibackrepo.util.StatusResponseDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/tags")
+public class TagController {
+    private final TagService tagService;
+    @GetMapping("/find/{searchWord}")
+    public StatusResponseDto<List<TagResponseDto>> getFriendTagList(@PathVariable String searchWord, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return StatusResponseDto.success(tagService.getFriendTagList(searchWord, userDetails));
+    }
+}

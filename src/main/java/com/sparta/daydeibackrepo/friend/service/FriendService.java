@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.friend.service;
 
+import com.sparta.daydeibackrepo.friend.dto.FriendListResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
@@ -212,5 +213,48 @@ public class FriendService {
         }
         return recommendResponseList;
         // 유저를 넣었을때 친구 숫자 보여주는 함수 + 유저를 넣었을때 구독자 수 / 구독하는 수 보여주는 함수
+    }
+
+    @Transactional
+    public List<FriendListResponseDto> getFriendList(UserDetailsImpl userDetails){
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("사용자를 찾을 수 없습니다")
+        );
+
+//        List<Friend> friends = friendRepository.findFriends(user);
+//        List<FriendListResponseDto> friendList = new ArrayList<>();
+//        for (Friend friend : friends){
+//            friendList.add(FriendListResponseDto(friend));
+//        }
+
+//        //친구 리스트
+//        List<Friend> friends = friendRepository.findFriends(user); // user랑 친구인 friend를 찾기
+//        List<User> friendList = new ArrayList<>();  //
+//        List<FriendListResponseDto> friendResponseList = new ArrayList<>();
+//        User friendUser = null;
+//        for(Friend friend : friends){
+//            if (friend.getFriendResponseId() != user){
+//                friendUser = friend.getFriendResponseId();
+//            }
+//            else if (friend.getFriendRequestId() != user){
+//                friendUser = friend.getFriendRequestId();
+//            }
+//            friendResponseList.add( new FriendListResponseDto(friendUser));
+//        }
+//        return friendResponseList;
+
+        List<Friend> friends = friendRepository.findFriends(user);
+        List<FriendListResponseDto> friendResponseList = new ArrayList<>();
+        for(Friend friend : friends) {
+            User friendUser = null; // friendUser 변수 초기화
+            if (friend.getFriendResponseId() != user){
+                friendUser = friend.getFriendResponseId();
+            }
+            else if (friend.getFriendRequestId() != user){
+                friendUser = friend.getFriendRequestId();
+            }
+            friendResponseList.add(new FriendListResponseDto(friendUser));
+        }
+        return friendResponseList;
     }
 }

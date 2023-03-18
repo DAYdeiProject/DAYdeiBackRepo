@@ -68,8 +68,8 @@ public class PostService {
 
         LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
         LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
-        LocalTime startTime = LocalTime.parse(requestDto.getStartTime(), DateTimeFormatter.ISO_DATE_TIME);
-        LocalTime endTime = LocalTime.parse(requestDto.getEndTime(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalTime startTime = LocalTime.parse(requestDto.getStartTime());
+        LocalTime endTime = LocalTime.parse(requestDto.getEndTime());
 
         Post post = new Post(requestDto, startDate, endDate, startTime, endTime, user);
         Post savePost = postRepository.save(post);
@@ -150,8 +150,8 @@ public class PostService {
 //        List<String> imageUrl = s3Service.uploadFiles(requestDto.getImage(), "images");
         LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
         LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
-        LocalTime startTime = LocalTime.parse(requestDto.getStartTime(), DateTimeFormatter.ISO_DATE_TIME);
-        LocalTime endTime = LocalTime.parse(requestDto.getEndTime(), DateTimeFormatter.ISO_DATE_TIME);
+        LocalTime startTime = LocalTime.parse(requestDto.getStartTime());
+        LocalTime endTime = LocalTime.parse(requestDto.getEndTime());
 
         //태그당한 친구에게 알림
 

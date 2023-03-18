@@ -41,7 +41,7 @@ public class PostController {
     }
 
     @PostMapping(value = "/posts/images", consumes = "multipart/form-data")
-    public StatusResponseDto<List<String>> createPostImages(@RequestParam(value = "images") List<MultipartFile> multipartFiles, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+    public StatusResponseDto<List<String>> uploadImages(@RequestParam(value = "images") List<MultipartFile> multipartFiles, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
         return StatusResponseDto.success(postService.createPostImages(multipartFiles, userDetails));
     }
 
@@ -52,8 +52,8 @@ public class PostController {
     }
 
     //일정 수정
-    @PutMapping(value = "/posts/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public StatusResponseDto<PostResponseDto> updatePost(@PathVariable Long postId, @ModelAttribute PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException, IOException {
+    @PutMapping("/posts/{postId}")
+    public StatusResponseDto<PostResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException, IOException {
         return StatusResponseDto.success(postService.updatePost(postId, requestDto, userDetails));
     }
 

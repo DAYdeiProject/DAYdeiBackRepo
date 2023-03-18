@@ -3,6 +3,7 @@ package com.sparta.daydeibackrepo.post.entity;
 import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
+import com.sparta.daydeibackrepo.postSubscribe.entity.PostSubscribe;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.entity.UserPost;
 import com.sparta.daydeibackrepo.util.TimeStamped;
@@ -44,7 +45,8 @@ public class Post extends TimeStamped {
     private String content;
 
     @Column
-    private String image; //s3 연동 후 multipart로 변경해야함
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> image; //s3 연동 후 multipart로 변경해야함
 
     @Column
     private String location; //위치
@@ -53,7 +55,7 @@ public class Post extends TimeStamped {
     @Convert(converter = ScopeEnumConverter.class)
     private ScopeEnum scope;
 
-    @Column
+    @Column //not null 처리?
     @Convert(converter = ColorEnumConverter.class)
     private ColorEnum color;
 
@@ -64,12 +66,15 @@ public class Post extends TimeStamped {
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<UserPost> userPost;
 
-    public Post(PostRequestDto requestDto, User user) {
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<PostSubscribe> PostSubscribe;
+
+    public Post(PostRequestDto requestDto, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, User user) {
         this.title = requestDto.getTitle();
-        this.startDate = requestDto.getStartDate();
-        this.endDate = requestDto.getEndDate();
-        this.startTime = requestDto.getStartTime();
-        this.endTime = requestDto.getEndTime();
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.content = requestDto.getContent();
         this.image = requestDto.getImage();
         this.location = requestDto.getLocation();
@@ -78,12 +83,16 @@ public class Post extends TimeStamped {
         this.user = user;
     }
 
-    public void update(PostRequestDto requestDto) {
+    public Post(List<String> imageUrl) {
+        this.image = imageUrl;
+    }
+
+    public void update(PostRequestDto requestDto, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
         this.title = requestDto.getTitle();
-        this.startDate = requestDto.getStartDate();
-        this.endDate = requestDto.getEndDate();
-        this.startTime = requestDto.getStartTime();
-        this.endTime = requestDto.getEndTime();
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.content = requestDto.getContent();
         this.image = requestDto.getImage();
         this.location = requestDto.getLocation();

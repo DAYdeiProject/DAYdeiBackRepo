@@ -2,16 +2,15 @@ package com.sparta.daydeibackrepo.post.service;
 
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
-import com.sparta.daydeibackrepo.post.dto.HomeResponseDto;
-import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
-import com.sparta.daydeibackrepo.post.dto.PostResponseDto;
-import com.sparta.daydeibackrepo.post.dto.TodayPostResponseDto;
+import com.sparta.daydeibackrepo.post.dto.*;
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
 import com.sparta.daydeibackrepo.post.repository.PostRepository;
 import com.sparta.daydeibackrepo.postSubscribe.entity.PostSubscribe;
 import com.sparta.daydeibackrepo.postSubscribe.repository.PostSubscribeRepository;
+import com.sparta.daydeibackrepo.postSubscribe.service.PostSubscribeService;
+import com.sparta.daydeibackrepo.s3.service.S3Service;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.User;
@@ -22,11 +21,14 @@ import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.time.LocalTime;
@@ -48,33 +50,70 @@ public class PostService {
     private final UserSubscribeRepository userSubscribeRepository;
     private final PostSubscribeRepository postSubscribeRepository;
 
+    private final PostSubscribeService postSubscribeService;
+
+    private final S3Service s3Service;
+
     private boolean hasAuthority(User user, Post post) {
         return user.getId().equals(post.getUser().getId()) || user.getRole().equals(UserRoleEnum.ADMIN);
     }
 
+    @Transactional
     public Object createPost(PostRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
 
-        Post post = new Post(requestDto, user);
+//        List<String> imageUrl = s3Service.uploadFiles(requestDto.getImage(), "images");
+
+        LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
+        LocalTime startTime = LocalTime.parse(requestDto.getStartTime());
+        LocalTime endTime = LocalTime.parse(requestDto.getEndTime());
+
+        Post post = new Post(requestDto, startDate, endDate, startTime, endTime, user);
         Post savePost = postRepository.save(post);
 
-
+        //시간에 대한    //TODO: startDate는 EndDate보다 작게, 그게 아니면 예외처리
+        //공유일정 삽입
 
         for(Long participant : requestDto.getParticipant()) {
-            List<Friend> friends = friendRepository.findidFriendList(participant, user);
-            for(Friend friend : friends) {
-                UserPost userPost = new UserPost(friend.getFriendResponseId(), savePost);
-                userPostRepository.save(userPost);
-            }
+//            List<Friend> friends = friendRepository.findidFriendList(participant, user);
+            User joiner = userRepository.findById(participant).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+            UserPost userPost = new UserPost(joiner, savePost);
+            userPostRepository.save(userPost);
+
+//            for(Friend friend : friends) {
+//                UserPost userPost = new UserPost(friend.getFriendResponseId(), savePost);
+//                userPostRepository.save(userPost);
+//            }
         }
+        List<User> joiners = new ArrayList<>();
+        List<UserPost> userPosts= userPostRepository.findAllByPostId(savePost.getId());
+
+        for(UserPost userPost : userPosts) {
+            joiners.add(userPost.getUser());
+        }
+        postSubscribeService.createJoin(savePost.getId(), joiners, userDetails);
 
         return "일정 작성을 완료하였습니다.";
 
 
     }
 
+    public List<String> createPostImages(List<MultipartFile> multipartFiles, UserDetailsImpl userDetails) throws IOException {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+
+        List<String> imageUrl = s3Service.uploadFiles(multipartFiles, "images");
+        return imageUrl;
+
+    }
+
+    @Transactional(readOnly = true)
     public PostResponseDto getPostOne(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
@@ -93,13 +132,14 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponseDto updatePost(Long postId, PostRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
+    public PostResponseDto updatePost(Long postId, PostRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException, IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시물입니다.")
         );
+
 
         List<UserPost> userPosts = userPostRepository.findAllByPostId(postId);
         List<String> participants = new ArrayList<>();
@@ -107,14 +147,23 @@ public class PostService {
             participants.add(userPost.getUser().getNickName());
         }
 
+//        List<String> imageUrl = s3Service.uploadFiles(requestDto.getImage(), "images");
+        LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
+        LocalTime startTime = LocalTime.parse(requestDto.getStartTime());
+        LocalTime endTime = LocalTime.parse(requestDto.getEndTime());
+
+        //태그당한 친구에게 알림
+
         if (hasAuthority(user, post)) {
-            post.update(requestDto);
+            post.update(requestDto, startDate, endDate, startTime, endTime);
             return PostResponseDto.of(post, participants);
         }
         throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
 
     }
 
+    @Transactional
     public Object deletePost(Long postId, UserDetailsImpl userDetails) throws IllegalAccessException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
@@ -122,7 +171,7 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시물입니다.")
         );
-
+        //태그당한 친구에게 알림
         if (hasAuthority(user, post)) {
             postRepository.delete(post);
             return "일정이 삭제되었습니다.";
@@ -252,6 +301,8 @@ public class PostService {
                     AllPosts.add(postSubscribe.getPost());
                 }
                 else if (postSubscribe.getPostSubscribeCheck() && postSubscribe.getPost().getScope() == ScopeEnum.FRIEND && friendRepository.findFriend(master, visitor) != null) {
+                // friendRepository.findFriend(postSubscribe.getPost().getUser(), visitor 이게 아니라 원 포스트의 공개 범위를 체크해봐야함
+                if (postSubscribe.getPostSubscribeCheck() && friendRepository.findFriend(postSubscribe.getPost().getUser(), visitor) != null) {
                     postSubscribe.getPost().setColor(ColorEnum.GRAY);
                     AllPosts.add(postSubscribe.getPost());
                 }
@@ -268,4 +319,7 @@ public class PostService {
         });
         return homeResponseDtos;
     }
+
+
+
 }

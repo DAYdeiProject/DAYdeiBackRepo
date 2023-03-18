@@ -1,21 +1,11 @@
 package com.sparta.daydeibackrepo.post.dto;
 
-import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
-import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
-import com.sparta.daydeibackrepo.user.entity.User;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.Column;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter

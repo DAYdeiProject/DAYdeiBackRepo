@@ -1,6 +1,5 @@
 package com.sparta.daydeibackrepo.post.service;
 
-import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.post.dto.*;
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
@@ -12,11 +11,10 @@ import com.sparta.daydeibackrepo.postSubscribe.repository.PostSubscribeRepositor
 import com.sparta.daydeibackrepo.postSubscribe.service.PostSubscribeService;
 import com.sparta.daydeibackrepo.s3.service.S3Service;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
-import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
+import com.sparta.daydeibackrepo.tag.entity.Tag;
 import com.sparta.daydeibackrepo.user.entity.User;
-import com.sparta.daydeibackrepo.user.entity.UserPost;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
-import com.sparta.daydeibackrepo.user.repository.UserPostRepository;
+import com.sparta.daydeibackrepo.tag.repository.TagRepository;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
@@ -36,7 +34,6 @@ import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -46,7 +43,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
-    private final UserPostRepository userPostRepository;
+    private final TagRepository tagRepository;
     private final UserSubscribeRepository userSubscribeRepository;
     private final PostSubscribeRepository postSubscribeRepository;
 
@@ -82,8 +79,8 @@ public class PostService {
             User joiner = userRepository.findById(participant).orElseThrow(
                     () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
             );
-            UserPost userPost = new UserPost(joiner, savePost);
-            userPostRepository.save(userPost);
+            Tag tag = new Tag(joiner, savePost);
+            tagRepository.save(tag);
 
 //            for(Friend friend : friends) {
 //                UserPost userPost = new UserPost(friend.getFriendResponseId(), savePost);
@@ -91,10 +88,10 @@ public class PostService {
 //            }
         }
         List<User> joiners = new ArrayList<>();
-        List<UserPost> userPosts= userPostRepository.findAllByPostId(savePost.getId());
+        List<Tag> tags = tagRepository.findAllByPostId(savePost.getId());
 
-        for(UserPost userPost : userPosts) {
-            joiners.add(userPost.getUser());
+        for(Tag tag : tags) {
+            joiners.add(tag.getUser());
         }
         postSubscribeService.createJoin(savePost.getId(), joiners, userDetails);
 
@@ -121,10 +118,10 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시물입니다.")
         );
-        List<UserPost> userPosts = userPostRepository.findAllByPostId(postId);
+        List<Tag> tags = tagRepository.findAllByPostId(postId);
         List<String> participants = new ArrayList<>();
-        for(UserPost userPost : userPosts) {
-            participants.add(userPost.getUser().getNickName());
+        for(Tag tag : tags) {
+            participants.add(tag.getUser().getNickName());
         }
 
         return PostResponseDto.of(post, participants);
@@ -141,10 +138,10 @@ public class PostService {
         );
 
 
-        List<UserPost> userPosts = userPostRepository.findAllByPostId(postId);
+        List<Tag> tags = tagRepository.findAllByPostId(postId);
         List<String> participants = new ArrayList<>();
-        for(UserPost userPost : userPosts) {
-            participants.add(userPost.getUser().getNickName());
+        for(Tag tag : tags) {
+            participants.add(tag.getUser().getNickName());
         }
 
 //        List<String> imageUrl = s3Service.uploadFiles(requestDto.getImage(), "images");

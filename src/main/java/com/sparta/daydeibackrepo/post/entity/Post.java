@@ -1,11 +1,9 @@
 package com.sparta.daydeibackrepo.post.entity;
 
-import com.sparta.daydeibackrepo.friend.dto.FriendTagResponseDto;
-import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.postSubscribe.entity.PostSubscribe;
+import com.sparta.daydeibackrepo.tag.entity.Tag;
 import com.sparta.daydeibackrepo.user.entity.User;
-import com.sparta.daydeibackrepo.user.entity.UserPost;
 import com.sparta.daydeibackrepo.util.TimeStamped;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +12,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -64,7 +61,7 @@ public class Post extends TimeStamped {
     private User user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
-    private List<UserPost> userPost;
+    private List<Tag> tag;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<PostSubscribe> PostSubscribe;

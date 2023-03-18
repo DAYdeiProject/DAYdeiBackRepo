@@ -24,6 +24,7 @@ public class TodayPostResponseDto {
     private LocalTime startTime;
 
     private LocalTime endTime;
+    private String location;
 
     private String content;
     private ColorEnum color;
@@ -35,6 +36,7 @@ public class TodayPostResponseDto {
         this.endDate = post.getEndDate();
         this.startTime = post.getStartTime();
         this.endTime = post.getEndTime();
+        this.location = post.getLocation();
         this.content = post.getContent();
         this.color = post.getColor();
     }

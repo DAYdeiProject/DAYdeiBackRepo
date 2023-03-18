@@ -32,7 +32,7 @@ public class PostResponseDto {
 
     private String content;
 
-    private String image; //s3 연동 후 multipart로 변경해야함
+    private List<String> image;
 
     private String location; //위치
 

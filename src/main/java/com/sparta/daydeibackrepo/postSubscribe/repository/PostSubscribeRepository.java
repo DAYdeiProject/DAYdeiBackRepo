@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface PostSubscribeRepository extends JpaRepository<PostSubscribe, Long> {
+public interface PostSubscribeRepository extends JpaRepository<PostSubscribe, Long>, PostSubscribeCustomRepository {
     PostSubscribe findByPostIdAndUserId(Long postId, Long userId);
 
     List<PostSubscribe> findAllByUserId(Long userId);

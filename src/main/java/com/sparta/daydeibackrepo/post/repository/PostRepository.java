@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Collection;
 import java.util.List;
 
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends JpaRepository<Post, Long>, PostCustomRepository {
     @Query("Select p From Post p Where  p.user = :user "+" AND p.startDate <= :now "+" AND p.endDate >= :now order by p.startTime desc")
     List<Post> findMyTodayPost(LocalDate now, User user);
 

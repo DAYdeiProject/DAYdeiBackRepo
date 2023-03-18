@@ -159,7 +159,7 @@ public class PostService {
             }
         }
 
-        List<Post> myPosts = postRepository.findAllPostByUserId(user.getId());
+        List<Post> myPosts = postRepository.findAllPostByUser(user);
         myPosts.removeIf(post -> post.getStartDate().isAfter(LocalDate.now()) || post.getEndDate().isBefore(LocalDate.now()));
 
 
@@ -202,11 +202,11 @@ public class PostService {
         // 홈페이지 주인이 본인인경우 (작성한 일정 : 다 보이게 / 구독하는 일정 : 다 보이게 / 공유 일정 : 다 보이게)
         if (master == visitor) {
             // 내가 작성한 일정
-            List<Post> AllPosts = postRepository.findAllPostByUserId(master.getId());
+            List<Post> AllPosts = postRepository.findAllPostByUser(master);
             // 내가 구독하는 일정
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
-                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE);
+                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId());
                 for (Post post: subscribePost){
                     post.setColor(ColorEnum.GRAY);
                     AllPosts.add(post);
@@ -230,15 +230,15 @@ public class PostService {
             List<Post> AllPosts;
         // Master가 작성한 일정
             if (friendRepository.findFriend(master, visitor) != null) {
-            AllPosts = postRepository.findFriendPost(master, ScopeEnum.ALL, ScopeEnum.SUBSCRIBE, ScopeEnum.FRIEND);
+            AllPosts = postRepository.findFriendPost(master);
         }
             else{
-            AllPosts = postRepository.findNotFriendPost(master, ScopeEnum.ALL, ScopeEnum.SUBSCRIBE);
+            AllPosts = postRepository.findNotFriendPost(master);
         }
         // Master가 구독하는 일정
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
-                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE);
+                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId());
                 for (Post post: subscribePost){
                     post.setColor(ColorEnum.GRAY);
                     AllPosts.add(post);

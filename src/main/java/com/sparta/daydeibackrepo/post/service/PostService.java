@@ -277,14 +277,14 @@ public class PostService {
         // 구독하는 일정 : 다 보이게 / 공유 일정 : 포스트 주인의 공개범위에 따라 결정)
         else {
             List<Post> AllPosts;
-        // Master가 작성한 일정
+            // Master가 작성한 일정
             if (friendRepository.findFriend(master, visitor) != null) {
-            AllPosts = postRepository.findFriendPost(master);
-        }
+                AllPosts = postRepository.findFriendPost(master);
+            }
             else{
-            AllPosts = postRepository.findNotFriendPost(master);
-        }
-        // Master가 구독하는 일정
+                AllPosts = postRepository.findNotFriendPost(master);
+            }
+            // Master가 구독하는 일정
             List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
             for (UserSubscribe userSubscribe : userSubscribes) {
                 List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId());
@@ -301,8 +301,6 @@ public class PostService {
                     AllPosts.add(postSubscribe.getPost());
                 }
                 else if (postSubscribe.getPostSubscribeCheck() && postSubscribe.getPost().getScope() == ScopeEnum.FRIEND && friendRepository.findFriend(master, visitor) != null) {
-                // friendRepository.findFriend(postSubscribe.getPost().getUser(), visitor 이게 아니라 원 포스트의 공개 범위를 체크해봐야함
-                if (postSubscribe.getPostSubscribeCheck() && friendRepository.findFriend(postSubscribe.getPost().getUser(), visitor) != null) {
                     postSubscribe.getPost().setColor(ColorEnum.GRAY);
                     AllPosts.add(postSubscribe.getPost());
                 }
@@ -319,7 +317,4 @@ public class PostService {
         });
         return homeResponseDtos;
     }
-
-
-
 }

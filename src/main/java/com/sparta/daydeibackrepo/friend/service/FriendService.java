@@ -277,27 +277,29 @@ public class FriendService {
 
 
         // 구독한 유저 객체를 userSubscribers 리스트로 뽑아줍니다.
-        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
-        List<User> userSubscribers = userSubscribes.stream()
-                .map(UserSubscribe::getSubscriberId)
-                .collect(Collectors.toList());
+        List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(user);
 
-/*        // 친구를 맺은 유저 객체를 friends 리스트로 뽑아줄 예정
-        List<Friend> friends = friendRepository.findFriends(u)*/
+        // 나와 친구를 맺은 유저 객체를 user 리스트로 뽑아줍니다.
+        List<User> friends = friendRepository.findAllFriends(user);
+
 
         for (User user1 : users){
-            Friend friend = friendRepository.findFriend(user, user1);
             boolean friendCheck = false;
             boolean userSubscribeCheck = false;
+
+            //얘네 3개는 유저 entity안에 붙여서 꺼내보자.
             int friendCount = friendRepository.findFriends(user1).size();
             int subscribingCount = userSubscribeRepository.findAllBySubscribingId(user1).size();
             int subscriberCount = userSubscribeRepository.findAllBySubscriberId(user1).size();
-            if (friend != null) {
+
+
+            if (friends.contains(user1)) {
                 friendCheck = true;
             }
             if (userSubscribers.contains(user1)) {
                 userSubscribeCheck = true;
             }
+
             if ((!friendCheck || !userSubscribeCheck)) {
                 if (friendRepository.findFirstOneRequest(user1, user) != null) {
                     boolean isRequestFriend = true;

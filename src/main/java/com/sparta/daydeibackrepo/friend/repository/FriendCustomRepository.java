@@ -11,4 +11,5 @@ public interface FriendCustomRepository {
     List<Friend> findFriends(User user);
     Friend findFriend(User user1, User user2);
     Friend findFirstOneRequest(User user1, User user2);
+    List<User> findAllFriends(User user);
 }

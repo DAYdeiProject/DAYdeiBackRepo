@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -114,10 +116,9 @@ public class FriendService {
         );
         //친구 리스트
         List<Friend> friends = friendRepository.findFriends(user);
-        List<User> friendList = new ArrayList<>();
         List<UserResponseDto> friendResponseList = new ArrayList<>();
-        User user1 = null;
         for(Friend friend : friends){
+            User user1 = null;
             if (friend.getFriendResponseId() != user){
                 user1 = friend.getFriendResponseId();
             }
@@ -132,8 +133,17 @@ public class FriendService {
         for(UserSubscribe userSubscribe : userSubscribes){
             userSubscribeResponseList.add(new UserResponseDto(userSubscribe, true));
         }
-        Collections.shuffle(friendResponseList);
-        Collections.shuffle(userSubscribeResponseList);
+        // 일단위로 sorting 방법 변경 > 일단은 간단하게 구현
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
+        if (isEven){
+            Collections.sort(friendResponseList, Comparator.comparing(UserResponseDto::getEmail));
+            Collections.sort(userSubscribeResponseList, Comparator.comparing(UserResponseDto::getEmail));
+        }
+        else {
+            Collections.sort(friendResponseList, Comparator.comparing(UserResponseDto::getNickName));
+            Collections.sort(userSubscribeResponseList, Comparator.comparing(UserResponseDto::getNickName));
+        }
         return new RelationResponseDto(friendResponseList, userSubscribeResponseList);
     }
     @Transactional(readOnly = true)
@@ -256,5 +266,51 @@ public class FriendService {
             friendResponseList.add(new FriendListResponseDto(friendUser));
         }
         return friendResponseList;
+    }
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getRandomList(UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        List<UserResponseDto> randomList = new ArrayList<>();
+        List<User> users = userRepository.findAll();
+
+
+        // 구독한 유저 객체를 userSubscribers 리스트로 뽑아줍니다.
+        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
+        List<User> userSubscribers = userSubscribes.stream()
+                .map(UserSubscribe::getSubscriberId)
+                .collect(Collectors.toList());
+
+/*        // 친구를 맺은 유저 객체를 friends 리스트로 뽑아줄 예정
+        List<Friend> friends = friendRepository.findFriends(u)*/
+
+        for (User user1 : users){
+            Friend friend = friendRepository.findFriend(user, user1);
+            boolean friendCheck = false;
+            boolean userSubscribeCheck = false;
+            int friendCount = friendRepository.findFriends(user1).size();
+            int subscribingCount = userSubscribeRepository.findAllBySubscribingId(user1).size();
+            int subscriberCount = userSubscribeRepository.findAllBySubscriberId(user1).size();
+            if (friend != null) {
+                friendCheck = true;
+            }
+            if (userSubscribers.contains(user1)) {
+                userSubscribeCheck = true;
+            }
+            if ((!friendCheck || !userSubscribeCheck)) {
+                if (friendRepository.findFirstOneRequest(user1, user) != null) {
+                    boolean isRequestFriend = true;
+                    randomList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
+                } else if (friendRepository.findFirstOneRequest(user, user1) != null) {
+                    boolean isRequestFriend = false;
+                    randomList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
+                } else {
+                    randomList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
+                }
+            }
+        }
+        Collections.shuffle(randomList);
+        return randomList.stream().limit(3).collect(Collectors.toList());
     }
 }

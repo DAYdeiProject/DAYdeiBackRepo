@@ -1,6 +1,5 @@
 package com.sparta.daydeibackrepo.userSubscribe.controller;
 
-import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.userSubscribe.dto.UserSubscribeResponseDto;
 import com.sparta.daydeibackrepo.userSubscribe.service.UserSubscribeService;

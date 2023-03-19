@@ -3,12 +3,14 @@ package com.sparta.daydeibackrepo.user.service;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.mail.dto.MailDto;
 import com.sparta.daydeibackrepo.mail.service.MailService;
+import com.sparta.daydeibackrepo.s3.service.S3Service;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.*;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
+import com.sun.xml.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,10 +18,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.sparta.daydeibackrepo.user.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +37,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final MailService mailService;
+    private final S3Service s3Service;
 
 
 
@@ -117,7 +122,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfoResponseDto updateUser(UserInfoRequestDto userInfoRequestDto, UserDetailsImpl userDetails){
+    public UserInfoResponseDto updateUser(UserInfoRequestDto userInfoRequestDto, MultipartFile multipartFile, UserDetailsImpl userDetails) throws IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new NullPointerException("인증된 유저가 아닙니다")
         );
@@ -125,9 +130,21 @@ public class UserService {
         if (!userInfoRequestDto.getNewPassword().equals(userInfoRequestDto.getNewPasswordConfirm())){
             throw new IllegalArgumentException("비밀번호가 다릅니다.");
         }
+
+//        String imageUrl = s3Service.uploadFile(multipartFile, "image");
+        String imageUrl = null;
+        if (multipartFile != null) {
+            imageUrl = s3Service.uploadFile(multipartFile, "image");
+        } else {
+            imageUrl = user.getProfileImage(); // 이전 이미지 URL 사용
+        }
+
+        // TODO: 2023/03/19 이미지 삭제버튼도 ?
+
+
         String password = passwordEncoder.encode(userInfoRequestDto.getNewPassword());
         userInfoRequestDto.setNewPassword(password);
-        user.update(userInfoRequestDto);
+        user.update(userInfoRequestDto, imageUrl);
         userRepository.save(user);
         return new UserInfoResponseDto(user);
     }

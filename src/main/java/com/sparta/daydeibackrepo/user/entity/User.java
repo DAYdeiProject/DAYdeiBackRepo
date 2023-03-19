@@ -85,11 +85,20 @@ public class User {
         this.password = newPassword;
     }
 
+    public void update(UserInfoRequestDto requestDto, String imageUrl){
+        this.email = requestDto.getEmail();
+        this.nickName = requestDto.getNickName();
+        this.password = requestDto.getNewPassword();
+        this.profileImage = imageUrl;
+        this.introduction = requestDto.getIntroduction();
+        this.birthday = requestDto.getBirthday();
+    }
+
     public void update(UserInfoRequestDto requestDto){
         this.email = requestDto.getEmail();
         this.nickName = requestDto.getNickName();
         this.password = requestDto.getNewPassword();
-        this.profileImage = requestDto.getProfileImage();
+//        this.profileImage = requestDto.getProfileImage();
         this.introduction = requestDto.getIntroduction();
         this.birthday = requestDto.getBirthday();
     }

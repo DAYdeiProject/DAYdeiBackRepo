@@ -15,11 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 @RestController
@@ -77,8 +79,8 @@ public class UserController {
     }
 
     @PutMapping("/users/profile")
-    public StatusResponseDto<UserInfoResponseDto> updateUser(@RequestBody UserInfoRequestDto userInfoRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(userService.updateUser(userInfoRequestDto, userDetails));
+    public StatusResponseDto<UserInfoResponseDto> updateUser(@RequestPart UserInfoRequestDto userInfoRequestDto, MultipartFile multipartFile, @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        return StatusResponseDto.success(userService.updateUser(userInfoRequestDto, multipartFile, userDetails));
     }
 
     @GetMapping("/home/profile/{userId}")

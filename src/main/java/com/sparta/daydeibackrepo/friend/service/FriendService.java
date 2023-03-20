@@ -203,10 +203,9 @@ public class FriendService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        List<User> users = userRepository.findAllByIdNot(user.getId());
+        List<User> users = userRepository.findFamousList(user);
         List<UserResponseDto> famousList = makeUserResponseDtos(user, users);
-        // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
-        Collections.sort(famousList, Comparator.comparing(UserResponseDto::getSubscriberCount));
+        Collections.sort(famousList, Comparator.comparing(UserResponseDto::getSubscriberCount).reversed());
         return famousList.stream().limit(3).collect(Collectors.toList());
     }
     // 유저 본인(user)과 유저 리스트(users) 사이의 친구 상태, 구독 관계 등을 뽑아서 List<UserResponseDto>로 반환합니다.

@@ -149,9 +149,8 @@ public class FriendService {
             categoryEnums.add(CategoryEnum.valueOf(category.toUpperCase()));
         }
         List<User> recommendList = userRepository.findRecommmedList(searchWord, user, categoryEnums);
-        List<UserResponseDto> recommendResponseList = makeUserResponseDtos(user, recommendList);
-        recommendResponseList.stream()
-                .filter(user1 -> !user1.getFriendCheck() || !user1.getUserSubscribeCheck())
+        List<UserResponseDto> recommendResponseList = makeUserResponseDtos(user, recommendList).stream()
+                .filter(userResponseDto -> !userResponseDto.getFriendCheck() || !userResponseDto.getUserSubscribeCheck())
                 .collect(Collectors.toList());
         // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");

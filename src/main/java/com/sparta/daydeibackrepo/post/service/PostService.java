@@ -298,6 +298,8 @@ public class PostService {
         // 캘린더 주인이 초대 수락한 일정
         // 1. 캘린더 주인이 수락한 일정 리스트를 다 뽑는다.
         List<Post> postSubscribePosts= new ArrayList<>();
+        List<Post> myPosts = postRepository.findAllPostByUser(user); // 캘린더 주인이 작성한 post
+        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
 
         // 캘린더 주인이 visitor와 친구이면 scope가 visitor, all, subscribe를 가지고 오고,
         // 캘린더 주인이 visitor와 친구가 아니면 scope가 all, subscribe인 것을 가지고 온다.
@@ -309,6 +311,12 @@ public class PostService {
                     postSubscribePosts.add(postSubscribe.getPost());
                 }
             }
+            for (Post post : myPosts){
+                if (post.getScope() != ScopeEnum.ME){
+                    TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+                    todayPostResponseDtos.add(responseDto);
+                }
+            }
         } else { //친구가 아니면
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if ((postSubscribe.getPost().getScope() == ScopeEnum.ALL || postSubscribe.getPost().getScope() == ScopeEnum.SUBSCRIBE)
@@ -317,23 +325,12 @@ public class PostService {
                     postSubscribePosts.add(postSubscribe.getPost());
                 }
             }
-
-
-//        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
-
-            // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
-            LocalDateTime today = LocalDateTime.now();
-            System.out.println(localDate);
-
-//        for(PostSubscribe postSubscribe : postSubscribes){ //today.getChronology().dateNow()            //ChronoLocalDate.from(today)
-//            LocalDate startDate = postSubscribe.getPost().getStartDate();
-//            LocalDate endDate = postSubscribe.getPost().getEndDate();
-//            if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate)) && postSubscribe.getPostSubscribeCheck()){
-//                postSubscribePosts.add(postSubscribe.getPost());
-//            }
-//        }
-
-
+            for (Post post : myPosts){
+                if (post.getScope() == ScopeEnum.SUBSCRIBE || post.getScope() == ScopeEnum.ALL){
+                    TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+                    todayPostResponseDtos.add(responseDto);
+                }
+            }
         }
         for(Post post : postSubscribePosts){ //today.getChronology().dateNow()            //ChronoLocalDate.from(today)
             LocalDate startDate = post.getStartDate();
@@ -343,26 +340,13 @@ public class PostService {
                 todayPostResponseDtos.add(responseDto);
             }
         }
-        List<Post> myPosts = postRepository.findAllPostByUser(user);
-        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
-        //LocalDate.now()
 
-        // dto 타입으로 변경하고 todayPostResponseDtos 리스트에 추가
-//        List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
-//        for (Post post : userSubscribePosts) {
-//            post.setColor(ColorEnum.GRAY);
+//        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
+
+//        for (Post post : myPosts) {
 //            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
 //            todayPostResponseDtos.add(responseDto);
 //        }
-//        for (Post post : postSubscribePosts) {
-//            post.setColor(ColorEnum.GRAY);
-//            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
-//            todayPostResponseDtos.add(responseDto);
-//        }
-        for (Post post : myPosts) {
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
-            todayPostResponseDtos.add(responseDto);
-        }
 
         DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyyMMddHH");
         Collections.sort(todayPostResponseDtos, (o1, o2) -> {

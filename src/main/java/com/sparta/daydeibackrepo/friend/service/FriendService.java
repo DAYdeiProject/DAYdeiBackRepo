@@ -84,12 +84,13 @@ public class FriendService {
         if(Objects.equals(user1, user2)){
             throw new IllegalArgumentException("올바르지 않은 친구 요청입니다.");
         }
-
         Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(user1, user2);
         Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(user2, user1);
+
         if (friend1 != null && friend2 != null){
             throw new IllegalArgumentException("친구 상태가 올바르지 않습니다.");
         }
+
         else if (friend1 != null){
             friendRepository.delete(friend1);
             if (friend1.getFriendCheck()){
@@ -191,7 +192,7 @@ public class FriendService {
         return pendingResponseList;
     }
     // 유저 본인(user)과 유저 리스트(users) 사이의 친구 상태, 구독 관계 등을 뽑아서 List<UserResponseDto>로 반환합니다.
-    private List<UserResponseDto> makeUserResponseDtos(User user, List<User> users){
+    public List<UserResponseDto> makeUserResponseDtos(User user, List<User> users){
         List<UserResponseDto> userResponseDtos = new ArrayList<>();
         if (users==null){
             return userResponseDtos;

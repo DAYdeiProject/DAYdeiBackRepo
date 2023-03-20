@@ -47,8 +47,8 @@ public class FriendController {
         return StatusResponseDto.success(friendService.getFriendList(userDetails));
     }
 
-    @GetMapping("/list/random")
-    public StatusResponseDto<?> getRandomList(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getRandomList(userDetails));
+    @GetMapping("/list/famous")
+    public StatusResponseDto<List<UserResponseDto>> getFamousList(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(friendService.getFamousList(userDetails));
     }
 }

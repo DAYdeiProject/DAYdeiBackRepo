@@ -8,8 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.sparta.daydeibackrepo.friend.entity.QFriend.friend;
+import static com.sparta.daydeibackrepo.user.entity.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -77,5 +79,11 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository  {
                 .where(friend.friendRequestId.eq(user)
                         .and(friend.friendCheck.eq(false)))
                 .fetch();
+    }
+    public List<User> findTagUser(User user1, String searchWord){
+        List<User> friends = findAllFriends(user1);
+        return friends.stream()
+                .filter(user -> user.getEmail().contains(searchWord) || user.getNickName().contains(searchWord))
+                .collect(Collectors.toList());
     }
 }

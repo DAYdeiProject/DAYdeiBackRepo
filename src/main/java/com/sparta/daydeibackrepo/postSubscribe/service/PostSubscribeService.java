@@ -51,6 +51,32 @@ public class PostSubscribeService {
     }
 
     @Transactional
+    public void updateJoin(Long postId, List<User> joiners, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new EntityNotFoundException("작성글이 존재하지 않습니다.")
+        );
+        if (!Objects.equals(user.getId(), post.getUser().getId())){
+            throw new IllegalArgumentException("올바르지 않은 공유일정 수정입니다.");
+        }
+
+        for(User joiner : joiners){
+//            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getUser().getId(), joiner.getId());
+//            postSubscribeRepository.deleteByPostAndUser(post, joiner);
+            postSubscribeRepository.deleteByPostAndUser(post, joiner);
+//            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getUser().getId(), joiner.getId());
+//            if(postSubscribe!=null){
+//                throw new IllegalArgumentException("해당 유저는 이미 일정 초대되었습니다.");
+//            }
+            PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
+            postSubscribeRepository.save(postSubscribe1);
+            notificationService.send(joiner.getId() , NotificationType.JOIN_REQUEST, NotificationType.JOIN_REQUEST.makeContent(user.getNickName()), NotificationType.JOIN_REQUEST.makeUrl(post.getId()));
+        }
+    }
+
+    @Transactional
     public void approveJoin(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")

@@ -14,5 +14,6 @@ public interface FriendCustomRepository {
     List<User> findAllFriends(User user);
     boolean isRequestFriend(User user1, User user2);
     public boolean isFriendOrRequest(User user1, User user2);
-
+    List<User> findResponseUser(User user);
+    List<User> findRequestUser(User user);
 }

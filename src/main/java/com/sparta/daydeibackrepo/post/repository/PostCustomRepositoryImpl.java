@@ -1,16 +1,13 @@
 package com.sparta.daydeibackrepo.post.repository;
 
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.daydeibackrepo.friend.repository.FriendCustomRepository;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
-import com.sparta.daydeibackrepo.user.entity.QUser;
 import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import static com.sparta.daydeibackrepo.friend.entity.QFriend.friend;
 import static com.sparta.daydeibackrepo.post.entity.QPost.post;
 
 import java.time.*;

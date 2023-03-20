@@ -160,7 +160,7 @@ public class FriendService {
         return recommendResponseList;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<UserResponseDto> getUpdateFriend(UserDetailsImpl userDetails){
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("사용자를 찾을 수 없습니다")
@@ -180,6 +180,18 @@ public class FriendService {
         Collections.sort(famousList, Comparator.comparing(UserResponseDto::getSubscriberCount).reversed());
         return famousList.stream().limit(3).collect(Collectors.toList());
     }
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getPendingResponseList(UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("사용자를 찾을 수 없습니다")
+        );
+        List<User> pendingResponses = friendRepository.findRequestUser(user);
+        List<UserResponseDto> pendingResponseList = makeUserResponseDtos(user, pendingResponses);
+        Collections.sort(pendingResponseList, Comparator.comparing(UserResponseDto::getId));
+        return pendingResponseList;
+    }
+
+
     // 유저 본인(user)과 유저 리스트(users) 사이의 친구 상태, 구독 관계 등을 뽑아서 List<UserResponseDto>로 반환합니다.
     private List<UserResponseDto> makeUserResponseDtos(User user, List<User> users){
         List<UserResponseDto> userResponseDtos = new ArrayList<>();
@@ -188,6 +200,8 @@ public class FriendService {
         }
         List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(user);
         List<User> friends = friendRepository.findAllFriends(user);
+        List<User> responseUsers = friendRepository.findResponseUser(user);
+        List<User> requestUsers = friendRepository.findRequestUser(user);
         for (User user1 : users){
             boolean friendCheck = false;
             boolean userSubscribeCheck = false;
@@ -199,10 +213,10 @@ public class FriendService {
                 userSubscribeCheck = true;
             }
             if ((!friendCheck || !userSubscribeCheck)) {
-                if (friendRepository.findFirstUserRequest(user1,user) != null) {
+                if (requestUsers.contains(user1)) {
                     userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck, friendCount));
                 }
-                else if (friendRepository.findFirstUserRequest(user,user1) != null) {
+                else if (responseUsers.contains(user1)) {
                     userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck, friendCount));
                 } else {
                     userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount));

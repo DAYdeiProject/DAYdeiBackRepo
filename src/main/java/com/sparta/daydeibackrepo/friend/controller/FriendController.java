@@ -51,4 +51,9 @@ public class FriendController {
     public StatusResponseDto<List<UserResponseDto>> getFamousList(@AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.getFamousList(userDetails));
     }
+
+    @GetMapping("/list/response")
+    public StatusResponseDto<List<UserResponseDto>> getPendingResponseList(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(friendService.getPendingResponseList(userDetails));
+    }
 }

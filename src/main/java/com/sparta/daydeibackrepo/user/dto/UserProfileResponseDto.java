@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserInfoResponseDto {
+public class UserProfileResponseDto {
     private String email;
     private String nickName;
     private String profileImage;
@@ -16,7 +16,7 @@ public class UserInfoResponseDto {
     private String introduction;
     private String birthday;
 
-    public UserInfoResponseDto(User user){
+    public UserProfileResponseDto(User user){
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();

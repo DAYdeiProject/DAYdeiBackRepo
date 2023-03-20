@@ -50,18 +50,7 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository  {
                 .where((friend.friendRequestId.eq(user).or(friend.friendResponseId.eq(user))).and(friend.friendCheck.eq(true)))
                 .fetch();
     }
-    /*public List<User> findAllFriends(User user){
-
-        return jpaQueryFactory.select(
-                new CaseBuilder()
-                        .when(friend.friendRequestId.eq(user)).then(friend.friendResponseId)
-                        .otherwise(friend.friendRequestId)
-                )
-                .from(friend)
-                .where((friend.friendRequestId.eq(user).or(friend.friendResponseId.eq(user))).and(friend.friendCheck.eq(true)))
-                .fetch();
-    }*/
-
+    // 더 간단하게 작성할 방법 고민하기
     public List<User> findAllFriends(User user){
         List<User> requests = jpaQueryFactory
                 .select(friend.friendRequestId)
@@ -92,4 +81,20 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository  {
                         .and(friend.friendResponseId.eq(user2))
                         .and(friend.friendCheck.eq(false)))
                 .fetchFirst() != null;}
+    public List<User> findRequestUser(User user){
+        return jpaQueryFactory
+                .select(friend.friendRequestId)
+                .from(friend)
+                .where(friend.friendResponseId.eq(user)
+                        .and(friend.friendCheck.eq(false)))
+                .fetch();
+    }
+    public List<User> findResponseUser(User user){
+        return jpaQueryFactory
+                .select(friend.friendResponseId)
+                .from(friend)
+                .where(friend.friendRequestId.eq(user)
+                        .and(friend.friendCheck.eq(false)))
+                .fetch();
+    }
 }

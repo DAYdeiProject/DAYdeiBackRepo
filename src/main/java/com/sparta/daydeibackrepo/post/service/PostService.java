@@ -168,10 +168,20 @@ public class PostService {
             throw new IllegalArgumentException("일정의 시작 일자는 끝나는 일자보다 빠른 일자여야 합니다.");
         }
 
+
+
         //태그당한 친구에게 알림
 
         if (hasAuthority(user, post)) {
             post.update(requestDto, startDate, endDate, startTime, endTime);
+            List<User> joiners = new ArrayList<>();
+            List<Tag> newTags = tagRepository.findAllByPostId(post.getId());
+
+            for(Tag tag : newTags) {
+                joiners.add(tag.getUser());
+            }
+            postSubscribeService.updateJoin(postId, joiners, userDetails);
+            
             return PostResponseDto.of(post, participants);
         }
         throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");

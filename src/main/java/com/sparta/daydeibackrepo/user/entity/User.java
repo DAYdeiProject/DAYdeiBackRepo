@@ -1,11 +1,9 @@
 package com.sparta.daydeibackrepo.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sparta.daydeibackrepo.friend.entity.Friend;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.daydeibackrepo.user.dto.UserInfoRequestDto;
-import com.sparta.daydeibackrepo.user.dto.UserInfoResponseDto;
+import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import lombok.*;
-import org.hibernate.boot.model.relational.SqlStringGenerationContext;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -44,6 +42,14 @@ public class User {
     private String introduction;
 
     private Long kakaoId;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscribingId")
+    @JsonIgnore
+    private List<UserSubscribe> subscribing;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscriberId")
+    @JsonIgnore
+    private List<UserSubscribe> subscriber;
 
 //    @ElementCollection(fetch = FetchType.EAGER)
 //    @JsonFormat(shape = JsonFormat.Shape.STRING)

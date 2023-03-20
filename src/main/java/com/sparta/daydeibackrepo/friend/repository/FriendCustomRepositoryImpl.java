@@ -61,4 +61,5 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository  {
                 .where((friend.friendRequestId.eq(user).or(friend.friendResponseId.eq(user))).and(friend.friendCheck.eq(true)))
                 .fetch();
     }
+
 }

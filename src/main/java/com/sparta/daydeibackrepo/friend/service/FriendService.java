@@ -26,6 +26,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.util.Collections.addAll;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -152,67 +154,39 @@ public class FriendService {
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
         List<UserResponseDto> recommendResponseList = new ArrayList<>();
-        List<Long> duplicationCheck =new ArrayList<>();
-        List<User> recommendList = userRepository.findRecommmedList("%" + searchWord + "%", user);
+        List<User> recommendList = new ArrayList<>();
+        List<CategoryEnum> categoryEnums = new ArrayList<>();
+        // input으로 받은 검색어에 해당되면서 카테고리 Enum을 하나라도 포함하는 유저가 다 나옴 (본인 제외)
+        for (String category : categories) {
+            categoryEnums.add(CategoryEnum.valueOf(category.toUpperCase()));
+        }
+        recommendList = userRepository.findRecommmedList(searchWord, user, categoryEnums);
+
         for (User user1 : recommendList) {
-            for (String category : categories) {
-                CategoryEnum categoryEnum = CategoryEnum.valueOf(category.toUpperCase());
-                if (user1.getCategoryEnum().contains(categoryEnum)) {
-                    Friend friend = friendRepository.findFriend(user, user1);
-                    UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
-                    boolean friendCheck = false;
-                    boolean userSubscribeCheck = false;
-                    int friendCount = friendRepository.findFriends(user1).size();
-                    int subscribingCount = userSubscribeRepository.findAllBySubscribingId(user1).size();
-                    int subscriberCount = userSubscribeRepository.findAllBySubscriberId(user1).size();
-                    if (friend != null) {
-                        friendCheck = true;
-                    }
-                    if (userSubscribe != null) {
-                        userSubscribeCheck = true;
-                    }
-                    if ((!friendCheck || !userSubscribeCheck) && !duplicationCheck.contains(user1.getId())) {
-                        duplicationCheck.add(user1.getId());
-                        if (friendRepository.findFirstOneRequest(user1, user) != null) {
-                            boolean isRequestFriend = true;
-                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
-                        } else if (friendRepository.findFirstOneRequest(user, user1) != null) {
-                            boolean isRequestFriend = false;
-                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
-                        } else {
-                            recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
-                        }
-                    }
-                }
+            Friend friend = friendRepository.findFriend(user, user1);
+            UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
+            boolean friendCheck = false;
+            boolean userSubscribeCheck = false;
+            int friendCount = friendRepository.findFriends(user1).size();
+            if (friend != null) {
+                friendCheck = true;
             }
-            if (categories.isEmpty()) {
-                Friend friend = friendRepository.findFriend(user, user1);
-                UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
-                boolean friendCheck = false;
-                boolean userSubscribeCheck = false;
-                int friendCount = friendRepository.findFriends(user1).size();
-                int subscribingCount = userSubscribeRepository.findAllBySubscribingId(user1).size();
-                int subscriberCount = userSubscribeRepository.findAllBySubscriberId(user1).size();
-                if (friend != null) {
-                    friendCheck = true;
-                }
-                if (userSubscribe != null) {
-                    userSubscribeCheck = true;
-                }
-                if ((!friendCheck || !userSubscribeCheck) && !duplicationCheck.contains(user1.getId())) {
-                    duplicationCheck.add(user1.getId());
-                    if (friendRepository.findFirstOneRequest(user1, user) != null) {
-                        boolean isRequestFriend = true;
-                        recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
-                    } else if (friendRepository.findFirstOneRequest(user, user1) != null) {
-                        boolean isRequestFriend = false;
-                        recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
-                    } else {
-                        recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
-                    }
+            if (userSubscribe != null) {
+                userSubscribeCheck = true;
+            }
+            if ((!friendCheck || !userSubscribeCheck)) {
+                if (friendRepository.findFirstOneRequest(user1, user) != null) {
+                    boolean isRequestFriend = true;
+                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount));
+                } else if (friendRepository.findFirstOneRequest(user, user1) != null) {
+                    boolean isRequestFriend = false;
+                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount));
+                } else {
+                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount));
                 }
             }
         }
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
         if (isEven){
@@ -222,7 +196,6 @@ public class FriendService {
             Collections.sort(recommendResponseList, (o1, o2) -> o2.getSubscriberCount() - o1.getSubscriberCount());
         }
         return recommendResponseList;
-        // 유저를 넣었을때 친구 숫자 보여주는 함수 + 유저를 넣었을때 구독자 수 / 구독하는 수 보여주는 함수
     }
 
     @Transactional
@@ -268,51 +241,36 @@ public class FriendService {
         return friendResponseList;
     }
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getRandomList(UserDetailsImpl userDetails) {
+    public List<UserResponseDto> getFamousList(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        List<UserResponseDto> randomList = new ArrayList<>();
-        List<User> users = userRepository.findAll();
-
-
-        // 구독한 유저 객체를 userSubscribers 리스트로 뽑아줍니다.
+        List<UserResponseDto> famousList = new ArrayList<>();
+        List<User> users = userRepository.findAllByIdNot(user.getId());
         List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(user);
-
-        // 나와 친구를 맺은 유저 객체를 user 리스트로 뽑아줍니다.
         List<User> friends = friendRepository.findAllFriends(user);
-
 
         for (User user1 : users){
             boolean friendCheck = false;
             boolean userSubscribeCheck = false;
-
-            //얘네 3개는 유저 entity안에 붙여서 꺼내보자.
             int friendCount = friendRepository.findFriends(user1).size();
-            int subscribingCount = userSubscribeRepository.findAllBySubscribingId(user1).size();
-            int subscriberCount = userSubscribeRepository.findAllBySubscriberId(user1).size();
-
-
             if (friends.contains(user1)) {
                 friendCheck = true;
             }
             if (userSubscribers.contains(user1)) {
                 userSubscribeCheck = true;
             }
-
-            if ((!friendCheck || !userSubscribeCheck)) {
-                if (friendRepository.findFirstOneRequest(user1, user) != null) {
-                    boolean isRequestFriend = true;
-                    randomList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
-                } else if (friendRepository.findFirstOneRequest(user, user1) != null) {
-                    boolean isRequestFriend = false;
-                    randomList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
-                } else {
-                    randomList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount, subscribingCount,subscriberCount));
-                }
+            if (friendRepository.findFirstOneRequest(user1, user) != null) {
+                boolean isRequestFriend = true;
+                famousList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount));
+            } else if (friendRepository.findFirstOneRequest(user, user1) != null) {
+                boolean isRequestFriend = false;
+                famousList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount));
+            } else {
+                famousList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount));
             }
         }
-        Collections.shuffle(randomList);
-        return randomList.stream().limit(3).collect(Collectors.toList());
+        Collections.sort(famousList, Comparator.comparing(UserResponseDto::getSubscriberCount));
+        return famousList.stream().limit(3).collect(Collectors.toList());
     }
 }

@@ -85,7 +85,7 @@ public class UserController {
     }
 
     @GetMapping("/home/profile/{userId}")
-    public StatusResponseDto<UserInfoResponseDto> getUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<UserResponseDto> getUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(userService.getUser(userId, userDetails));
     }
 

@@ -149,7 +149,9 @@ public class FriendService {
             categoryEnums.add(CategoryEnum.valueOf(category.toUpperCase()));
         }
         List<User> recommendList = userRepository.findRecommmedList(searchWord, user, categoryEnums);
-        List<UserResponseDto> recommendResponseList = makeUserResponseDtos(user, recommendList);
+        List<UserResponseDto> recommendResponseList = makeUserResponseDtos(user, recommendList).stream()
+                .filter(userResponseDto -> !userResponseDto.getFriendCheck() || !userResponseDto.getUserSubscribeCheck())
+                .collect(Collectors.toList());
         // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
@@ -210,15 +212,14 @@ public class FriendService {
             if (userSubscribers.contains(user1)) {
                 userSubscribeCheck = true;
             }
-            if ((!friendCheck || !userSubscribeCheck)) {
-                if (requestUsers.contains(user1)) {
+            if (requestUsers.contains(user1)) {
                     userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck));
-                }
-                else if (responseUsers.contains(user1)) {
+            }
+            else if (responseUsers.contains(user1)) {
                     userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck));
-                } else {
+            }
+            else {
                     userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
-                }
             }
         }
         return userResponseDtos;

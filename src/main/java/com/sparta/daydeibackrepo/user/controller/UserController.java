@@ -76,17 +76,17 @@ public class UserController {
 
     @PutMapping("/users/profile")
     public StatusResponseDto<UserProfileResponseDto> updateUser(
-            @RequestPart UserProfileRequestDto userProfileRequstDto,
+            @RequestPart UserProfileRequestDto userProfileRequestDto,
             @RequestPart MultipartFile  multipartFile1,
             @RequestPart MultipartFile multipartFile2,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
             throws IOException {
-        return StatusResponseDto.success(userService.updateUser(userProfileRequstDto, multipartFile1, multipartFile2, userDetails));
+        return StatusResponseDto.success(userService.updateUser(userProfileRequestDto, multipartFile1, multipartFile2, userDetails));
     }
 
     @GetMapping("/home/profile/{userId}")
-    public StatusResponseDto<UserProfileResponseDto> getUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(userService.getUser(userId));
+    public StatusResponseDto<UserInfoResponseDto> getUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(userService.getUser(userId, userDetails));
     }
 
 

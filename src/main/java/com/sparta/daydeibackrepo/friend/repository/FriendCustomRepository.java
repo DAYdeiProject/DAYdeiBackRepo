@@ -14,4 +14,5 @@ public interface FriendCustomRepository {
     public boolean isFriendOrRequest(User user1, User user2);
     List<User> findResponseUser(User user);
     List<User> findRequestUser(User user);
+    List<User> findTagUser(User user, String searchWord);
 }

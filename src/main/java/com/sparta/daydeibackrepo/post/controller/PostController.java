@@ -64,9 +64,9 @@ public class PostController {
     }
 
     //오늘의 일정
-    @GetMapping("/home/today")
-    public StatusResponseDto<?> getTodayPost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return StatusResponseDto.success(postService.getTodayPost(userDetails));
+    @GetMapping("/home/today")              //@Parameter(hidden = true)
+    public StatusResponseDto<?> getTodayPost(@RequestParam String date, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return StatusResponseDto.success(postService.getTodayPost(date, userDetails));
     }
 
     //전체일정 홈화면

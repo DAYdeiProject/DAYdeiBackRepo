@@ -54,23 +54,4 @@ public class UserResponseDto {
         this.subscribingCount = user.getSubscribing().size();
         this.subscriberCount = user.getSubscriber().size();
     }
-    public UserResponseDto(User user, boolean friendCheck){
-        this.id = user.getId();
-        this.email = user.getEmail();
-        this.nickName = user.getNickName();
-        this.profileImage = user.getProfileImage();
-        this.introduction = user.getIntroduction();
-        this.categoryList = user.getCategoryEnum();
-        this.friendCheck = friendCheck;
-
-    }
-
-    public UserResponseDto(UserSubscribe userSubscribe, boolean userSubscribeCheck){
-        this.id = userSubscribe.getSubscriberId().getId();
-        this.email = userSubscribe.getSubscriberId().getEmail();
-        this.nickName = userSubscribe.getSubscriberId().getNickName();
-        this.profileImage = userSubscribe.getSubscriberId().getProfileImage();
-        this.introduction = userSubscribe.getSubscriberId().getIntroduction();
-        this.userSubscribeCheck = userSubscribeCheck;
-    }
 }

@@ -1,7 +1,6 @@
 package com.sparta.daydeibackrepo.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.user.dto.UserInfoRequestDto;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import lombok.*;
@@ -9,7 +8,6 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity(name = "users")

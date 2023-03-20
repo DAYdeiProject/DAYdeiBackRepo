@@ -29,8 +29,19 @@ public class UserCustomRepositoryImpl implements UserCustomRepository{
         return jpaQueryFactory
                 .selectFrom(user)
                 .where(user.email.like("%" + searchWord + "%").or(user.nickName.like("%" + searchWord + "%"))
-                        .and(user.ne(user1)).and(categoryExpression)
-                )
+                        .and(user.ne(user1)).and(categoryExpression))
+                .fetch();
+    }
+    public List<User> findFamousList(User user1) {
+        BooleanExpression categoryExpression = null;
+        if (user1.getCategoryEnum() != null && !user1.getCategoryEnum().isEmpty()) {
+            categoryExpression = user.categoryEnum.contains(user1.getCategoryEnum().get(0));}
+            for (int i = 1; i < user1.getCategoryEnum().size(); i++) {
+                categoryExpression = categoryExpression.or(user.categoryEnum.contains(user1.getCategoryEnum().get(i)));
+            }
+        return jpaQueryFactory
+                .selectFrom(user)
+                .where(user.ne(user1).and(categoryExpression))
                 .fetch();
     }
 }

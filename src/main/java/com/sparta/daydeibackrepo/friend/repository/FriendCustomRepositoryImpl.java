@@ -39,13 +39,12 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository  {
                         .or(friend.friendRequestId.eq(user2).and(friend.friendResponseId.eq(user1)).and(friend.friendCheck.eq(true))))
                 .fetchFirst();
     }
-    //@Query("SELECT f FROM Friend f WHERE f.friendRequestId = :user1 "+" AND f.friendResponseId =:user2 "+" AND f.friendCheck = false")
-    public Friend findFirstOneRequest(User user1, User user2){
+    public boolean isFriendOrRequest(User user1, User user2){
         return jpaQueryFactory
-                .selectFrom(friend)
-                .where(friend.friendRequestId.eq(user1).and(friend.friendResponseId.eq(user2)).and(friend.friendCheck.eq(false)))
-                .fetchFirst();
-    }
+                .from(friend)
+                .where((friend.friendRequestId.eq(user1).and(friend.friendResponseId.eq(user2)))
+                        .or(friend.friendRequestId.eq(user2).and(friend.friendResponseId.eq(user1))))
+                .fetchFirst() != null;}
     public List<User> findAllFriends(User user){
             QUser qUser1 = new QUser("qUser1");
             QUser qUser2 = new QUser("qUser2");
@@ -62,4 +61,17 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository  {
                 .fetch();
     }
 
+    public Friend findFirstUserRequest(User user1, User user2){
+        return jpaQueryFactory
+                .selectFrom(friend)
+                .where(friend.friendRequestId.eq(user1).and(friend.friendResponseId.eq(user2)).and(friend.friendCheck.eq(false)))
+                .fetchFirst();
+    }
+    public boolean isRequestFriend(User user1, User user2){
+        return jpaQueryFactory
+                .from(friend)
+                .where(friend.friendRequestId.eq(user1)
+                        .and(friend.friendResponseId.eq(user2))
+                        .and(friend.friendCheck.eq(false)))
+                .fetchFirst() != null;}
 }

@@ -121,9 +121,14 @@ public class PostService {
                 () -> new NullPointerException("존재하지 않는 게시물입니다.")
         );
         List<Tag> tags = tagRepository.findAllByPostId(postId);
-        List<String> participants = new ArrayList<>();
+//        List<String> participantsName = new ArrayList<>();
+//        List<Long> participantsId = new ArrayList<>();
+        List<ParticipantsResponseDto> participants = new ArrayList<>();
         for(Tag tag : tags) {
-            participants.add(tag.getUser().getNickName());
+//            participantsName.add(tag.getUser().getNickName());
+//            participantsId.add(tag.getUser().getId());
+            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getNickName());
+            participants.add(ParticipantsResponseDto);
         }
 
         return PostResponseDto.of(post, participants);
@@ -142,9 +147,11 @@ public class PostService {
 
 
         List<Tag> tags = tagRepository.findAllByPostId(postId);
-        List<String> participants = new ArrayList<>();
+        List<ParticipantsResponseDto> participants = new ArrayList<>();
+
         for(Tag tag : tags) {
-            participants.add(tag.getUser().getNickName());
+            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getNickName());
+            participants.add(ParticipantsResponseDto);
         }
 
 //        List<String> imageUrl = s3Service.uploadFiles(requestDto.getImage(), "images");

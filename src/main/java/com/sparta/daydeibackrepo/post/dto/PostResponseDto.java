@@ -36,7 +36,7 @@ public class PostResponseDto {
 
     private String location; //위치
 
-    private List<String> participent;
+    private List<ParticipantsResponseDto> participent;
 
     private ScopeEnum scope;
 
@@ -44,7 +44,7 @@ public class PostResponseDto {
 
     private LocalDateTime createdAt;
 
-    public static PostResponseDto of(Post post, List<String> tagedFriends) {
+    public static PostResponseDto of(Post post, List<ParticipantsResponseDto> tagedFriends) {
         return PostResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())

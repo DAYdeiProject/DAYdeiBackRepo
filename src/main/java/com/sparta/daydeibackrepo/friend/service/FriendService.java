@@ -1,13 +1,11 @@
 package com.sparta.daydeibackrepo.friend.service;
 
-import com.sparta.daydeibackrepo.friend.dto.FriendListResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.service.NotificationService;
-import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.repository.PostCustomRepository;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -128,7 +125,6 @@ public class FriendService {
         List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(user);
         List<UserResponseDto> friendList = makeUserResponseDtos(user, friends);
         List<UserResponseDto> userSubscribeList = makeUserResponseDtos(user, userSubscribers);
-
         // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
@@ -153,7 +149,6 @@ public class FriendService {
         }
         List<User> recommendList = userRepository.findRecommmedList(searchWord, user, categoryEnums);
         List<UserResponseDto> recommendResponseList = makeUserResponseDtos(user, recommendList);
-
         // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
@@ -165,7 +160,6 @@ public class FriendService {
         }
         return recommendResponseList;
     }
-
     @Transactional(readOnly = true)
     public List<UserResponseDto> getUpdateFriend(UserDetailsImpl userDetails){
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -196,8 +190,6 @@ public class FriendService {
         Collections.sort(pendingResponseList, Comparator.comparing(UserResponseDto::getId));
         return pendingResponseList;
     }
-
-
     // 유저 본인(user)과 유저 리스트(users) 사이의 친구 상태, 구독 관계 등을 뽑아서 List<UserResponseDto>로 반환합니다.
     private List<UserResponseDto> makeUserResponseDtos(User user, List<User> users){
         List<UserResponseDto> userResponseDtos = new ArrayList<>();
@@ -211,7 +203,6 @@ public class FriendService {
         for (User user1 : users){
             boolean friendCheck = false;
             boolean userSubscribeCheck = false;
-            int friendCount = friendRepository.findFriends(user1).size();
             if (friends.contains(user1)) {
                 friendCheck = true;
             }

@@ -276,49 +276,89 @@ public class PostService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new NullPointerException("등록된 사용자가 없습니다")
         );
+
+        List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
+
         // 캘린더 주인이 구독한 유저의 일정
         // 1. 캘린더 주인이 구독한 유저의 리스트를 다 뽑는다.
         List<Post> userSubscribePosts = new ArrayList<>();
         List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
-        // 2. UserSubscribe 객체에서 구독한 유저 객체를 뽑아주고 그 객체로 오늘의 일정을 뽑아주기
 
+        // 2. UserSubscribe 객체에서 구독한 유저 객체를 뽑아주고 그 객체로 오늘의 일정을 뽑아주기
         for (UserSubscribe userSubscribe : userSubscribes) {
             userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), localDate, ScopeEnum.SUBSCRIBE));
+        }
+        for (Post post : userSubscribePosts) {
+            post.setColor(ColorEnum.GRAY);
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+            todayPostResponseDtos.add(responseDto);
         }
 
 
         // 캘린더 주인이 초대 수락한 일정
         // 1. 캘린더 주인이 수락한 일정 리스트를 다 뽑는다.
         List<Post> postSubscribePosts= new ArrayList<>();
-        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
-        // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
-        LocalDateTime today = LocalDateTime.now();
-        System.out.println(localDate);
 
-        for(PostSubscribe postSubscribe : postSubscribes){ //today.getChronology().dateNow()            //ChronoLocalDate.from(today)
-            LocalDate startDate = postSubscribe.getPost().getStartDate();
-            LocalDate endDate = postSubscribe.getPost().getEndDate();
-            if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate)) && postSubscribe.getPostSubscribeCheck()){
-                postSubscribePosts.add(postSubscribe.getPost());
+        // 캘린더 주인이 visitor와 친구이면 scope가 visitor, all, subscribe를 가지고 오고,
+        // 캘린더 주인이 visitor와 친구가 아니면 scope가 all, subscribe인 것을 가지고 온다.
+        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
+        if (friendRepository.findFriend(user, visitor) != null ) { //친구이면
+            for (PostSubscribe postSubscribe : postSubscribes) {
+                if (postSubscribe.getPost().getScope() != ScopeEnum.ME && postSubscribe.getPostSubscribeCheck()){
+                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
+                    postSubscribePosts.add(postSubscribe.getPost());
+                }
+            }
+        } else { //친구가 아니면
+            for (PostSubscribe postSubscribe : postSubscribes) {
+                if ((postSubscribe.getPost().getScope() == ScopeEnum.ALL || postSubscribe.getPost().getScope() == ScopeEnum.SUBSCRIBE)
+                    && postSubscribe.getPostSubscribeCheck()){
+                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
+                    postSubscribePosts.add(postSubscribe.getPost());
+                }
+            }
+
+
+//        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
+
+            // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
+            LocalDateTime today = LocalDateTime.now();
+            System.out.println(localDate);
+
+//        for(PostSubscribe postSubscribe : postSubscribes){ //today.getChronology().dateNow()            //ChronoLocalDate.from(today)
+//            LocalDate startDate = postSubscribe.getPost().getStartDate();
+//            LocalDate endDate = postSubscribe.getPost().getEndDate();
+//            if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate)) && postSubscribe.getPostSubscribeCheck()){
+//                postSubscribePosts.add(postSubscribe.getPost());
+//            }
+//        }
+
+
+        }
+        for(Post post : postSubscribePosts){ //today.getChronology().dateNow()            //ChronoLocalDate.from(today)
+            LocalDate startDate = post.getStartDate();
+            LocalDate endDate = post.getEndDate();
+            if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate))){
+                TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+                todayPostResponseDtos.add(responseDto);
             }
         }
-
         List<Post> myPosts = postRepository.findAllPostByUser(user);
         myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
         //LocalDate.now()
 
         // dto 타입으로 변경하고 todayPostResponseDtos 리스트에 추가
-        List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
-        for (Post post : userSubscribePosts) {
-            post.setColor(ColorEnum.GRAY);
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
-            todayPostResponseDtos.add(responseDto);
-        }
-        for (Post post : postSubscribePosts) {
-            post.setColor(ColorEnum.GRAY);
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
-            todayPostResponseDtos.add(responseDto);
-        }
+//        List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
+//        for (Post post : userSubscribePosts) {
+//            post.setColor(ColorEnum.GRAY);
+//            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+//            todayPostResponseDtos.add(responseDto);
+//        }
+//        for (Post post : postSubscribePosts) {
+//            post.setColor(ColorEnum.GRAY);
+//            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+//            todayPostResponseDtos.add(responseDto);
+//        }
         for (Post post : myPosts) {
             TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
             todayPostResponseDtos.add(responseDto);

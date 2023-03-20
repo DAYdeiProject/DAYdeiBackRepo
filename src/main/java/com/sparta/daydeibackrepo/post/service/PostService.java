@@ -145,12 +145,16 @@ public class PostService {
         );
 
 
-
         List<Tag> tags = tagRepository.findAllByPostId(postId);
+        List<Long> friends = requestDto.getParticipant();
         List<ParticipantsResponseDto> participants = new ArrayList<>();
 
-        for(Tag tag : tags) {
-            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getNickName());
+        tagRepository.deleteAll(tags);
+
+        for(Long friend : friends) {
+            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(friend, userRepository.findById(friend).get().getNickName());
+            Tag tag = new Tag(userRepository.findById(friend).get(), post);
+            tagRepository.save(tag);
             participants.add(ParticipantsResponseDto);
         }
 

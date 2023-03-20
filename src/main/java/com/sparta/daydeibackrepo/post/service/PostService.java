@@ -218,11 +218,19 @@ public class PostService {
         List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
         // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
         LocalDateTime today = LocalDateTime.now();
+        System.out.println(localDate);
+
         for(PostSubscribe postSubscribe : postSubscribes){ //today.getChronology().dateNow()            //ChronoLocalDate.from(today)
-            if (postSubscribe.getPost().getEndDate().isBefore(localDate) && postSubscribe.getPost().getEndDate().isAfter(localDate) && postSubscribe.getPostSubscribeCheck()){
+            LocalDate startDate = postSubscribe.getPost().getStartDate();
+            LocalDate endDate = postSubscribe.getPost().getEndDate();
+            System.out.println(startDate.isBefore(localDate) || startDate.equals(localDate));
+            System.out.println(endDate.isBefore(localDate) || endDate.equals(localDate));
+            System.out.println(postSubscribe.getPostSubscribeCheck());
+            if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate)) && postSubscribe.getPostSubscribeCheck()){
                 postSubscribePosts.add(postSubscribe.getPost());
             }
         }
+        System.out.println(postSubscribePosts);
 
         List<Post> myPosts = postRepository.findAllPostByUser(user);
         myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));

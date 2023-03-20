@@ -1,6 +1,7 @@
 package com.sparta.daydeibackrepo.user.service;
 
 import com.sparta.daydeibackrepo.friend.repository.FriendCustomRepository;
+import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.mail.dto.MailDto;
 import com.sparta.daydeibackrepo.mail.service.MailService;
@@ -43,6 +44,7 @@ public class UserService {
     private final S3Service s3Service;
     private final FriendCustomRepository friendRepository;
     private final UserSubscribeRepository userSubscribeRepository;
+    private final FriendService friendService;
 
 
     @Transactional
@@ -155,7 +157,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfoResponseDto getUser(Long userId, UserDetailsImpl userDetails){
+    public UserResponseDto getUser(Long userId, UserDetailsImpl userDetails){
         User visitor = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 () -> new NullPointerException("인증되지 않은 사용자입니다.")
         );
@@ -163,8 +165,32 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(
                 ()-> new NullPointerException("등록된 사용자가 없습니다.")
         );
-
-        int subscriberCount = userSubscribeRepository.findAllBySubscriberId(user).size();
-        return new UserInfoResponseDto(user, subscriberCount);
+        if (visitor == user){
+            return new UserResponseDto(user);
+        }
+        UserResponseDto userResponseDto = new UserResponseDto();
+        List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(visitor);
+        List<User> friends = friendRepository.findAllFriends(visitor);
+        List<User> responseUsers = friendRepository.findResponseUser(visitor);
+        List<User> requestUsers = friendRepository.findRequestUser(visitor);
+        boolean friendCheck = false;
+        boolean userSubscribeCheck = false;
+        if (friends.contains(user)) {
+            friendCheck = true;
+        }
+        if (userSubscribers.contains(user)) {
+            userSubscribeCheck = true;
+        }
+        if ((!friendCheck || !userSubscribeCheck)) {
+            if (requestUsers.contains(user)) {
+                userResponseDto = new UserResponseDto(user, friendCheck, true, userSubscribeCheck);
+            }
+            else if (responseUsers.contains(user)) {
+                userResponseDto = new UserResponseDto(user, friendCheck, false, userSubscribeCheck);
+            } else {
+                userResponseDto = new UserResponseDto(user, friendCheck, userSubscribeCheck);
+            }
+        }
+        return userResponseDto;
     }
 }

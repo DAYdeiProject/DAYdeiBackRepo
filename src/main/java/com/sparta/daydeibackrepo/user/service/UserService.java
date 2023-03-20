@@ -161,14 +161,13 @@ public class UserService {
         User visitor = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 () -> new NullPointerException("인증되지 않은 사용자입니다.")
         );
-
         User user = userRepository.findById(userId).orElseThrow(
                 ()-> new NullPointerException("등록된 사용자가 없습니다.")
         );
         if (visitor == user){
             return new UserResponseDto(user);
         }
-        UserResponseDto userResponseDto = new UserResponseDto();
+        UserResponseDto userResponseDto;
         List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(visitor);
         List<User> friends = friendRepository.findAllFriends(visitor);
         List<User> responseUsers = friendRepository.findResponseUser(visitor);
@@ -181,15 +180,14 @@ public class UserService {
         if (userSubscribers.contains(user)) {
             userSubscribeCheck = true;
         }
-        if ((!friendCheck || !userSubscribeCheck)) {
-            if (requestUsers.contains(user)) {
-                userResponseDto = new UserResponseDto(user, friendCheck, true, userSubscribeCheck);
+        if (requestUsers.contains(user)) {
+            userResponseDto = new UserResponseDto(user, friendCheck, true, userSubscribeCheck);
             }
-            else if (responseUsers.contains(user)) {
-                userResponseDto = new UserResponseDto(user, friendCheck, false, userSubscribeCheck);
-            } else {
-                userResponseDto = new UserResponseDto(user, friendCheck, userSubscribeCheck);
-            }
+        else if (responseUsers.contains(user)) {
+            userResponseDto = new UserResponseDto(user, friendCheck, false, userSubscribeCheck);
+        }
+        else {
+            userResponseDto = new UserResponseDto(user, friendCheck, userSubscribeCheck);
         }
         return userResponseDto;
     }

@@ -131,25 +131,8 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 다릅니다.");
         }
 
-////        String imageUrl = s3Service.uploadFile(multipartFile, "image");
-//        String profileImageUrl = user.getProfileImage();
-//        if (multipartFile1 != null) {
-//            profileImageUrl = s3Service.uploadFile(multipartFile1, "image");
-//        }
-////        else {
-////            profileImageUrl = user.getProfileImage(); // 이전 이미지 URL 사용
-////        }
-//
-//        String backgroundImageUrl = user.getBackgroundImage();
-//        if (multipartFile2 != null) {
-//            backgroundImageUrl = s3Service.uploadFile(multipartFile2, "image");
-//        }
-////        else {
-////            backgroundImageUrl = user.getBackgroundImage(); // 이전 이미지 URL 사용
-////        }
-
-        String profileImageUrl = user.getProfileImage();
-        String backgroundImageUrl = user.getBackgroundImage();
+        String profileImageUrl = null;
+        String backgroundImageUrl = null;
 
         if (multipartFile1 != null && !multipartFile1.isEmpty()) {
             profileImageUrl = s3Service.uploadFile(multipartFile1, "image");

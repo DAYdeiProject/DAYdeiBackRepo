@@ -12,6 +12,7 @@ public class UserInfoResponseDto {
     private String email;
     private String nickName;
     private String profileImage;
+    private String backgroundImage;
     private String introduction;
     private String birthday;
 
@@ -19,6 +20,7 @@ public class UserInfoResponseDto {
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
+        this.backgroundImage = user.getBackgroundImage();
         this.introduction = user.getIntroduction();
         this.birthday = user.getBirthday();
     }

@@ -71,8 +71,10 @@ public class PostService {
         Post post = new Post(requestDto, startDate, endDate, startTime, endTime, user);
         Post savePost = postRepository.save(post);
 
-        //시간에 대한    //TODO: startDate는 EndDate보다 작게, 그게 아니면 예외처리
-        //공유일정 삽입
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("일정의 시작 일자는 끝나는 일자보다 빠른 일자여야 합니다.");
+        }
 
         for(Long participant : requestDto.getParticipant()) {
 //            List<Friend> friends = friendRepository.findidFriendList(participant, user);
@@ -119,9 +121,14 @@ public class PostService {
                 () -> new NullPointerException("존재하지 않는 게시물입니다.")
         );
         List<Tag> tags = tagRepository.findAllByPostId(postId);
-        List<String> participants = new ArrayList<>();
+//        List<String> participantsName = new ArrayList<>();
+//        List<Long> participantsId = new ArrayList<>();
+        List<ParticipantsResponseDto> participants = new ArrayList<>();
         for(Tag tag : tags) {
-            participants.add(tag.getUser().getNickName());
+//            participantsName.add(tag.getUser().getNickName());
+//            participantsId.add(tag.getUser().getId());
+            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getNickName());
+            participants.add(ParticipantsResponseDto);
         }
 
         return PostResponseDto.of(post, participants);
@@ -138,10 +145,13 @@ public class PostService {
         );
 
 
+
         List<Tag> tags = tagRepository.findAllByPostId(postId);
-        List<String> participants = new ArrayList<>();
+        List<ParticipantsResponseDto> participants = new ArrayList<>();
+
         for(Tag tag : tags) {
-            participants.add(tag.getUser().getNickName());
+            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getNickName());
+            participants.add(ParticipantsResponseDto);
         }
 
 //        List<String> imageUrl = s3Service.uploadFiles(requestDto.getImage(), "images");
@@ -149,6 +159,10 @@ public class PostService {
         LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
         LocalTime startTime = LocalTime.parse(requestDto.getStartTime());
         LocalTime endTime = LocalTime.parse(requestDto.getEndTime());
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("일정의 시작 일자는 끝나는 일자보다 빠른 일자여야 합니다.");
+        }
 
         //태그당한 친구에게 알림
 
@@ -176,9 +190,10 @@ public class PostService {
         throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
     }
 
-    //미완성 코드입니다.
-    public Object getTodayPost(UserDetailsImpl userDetails) {
+    public Object getTodayPost(String date, UserDetailsImpl userDetails) {
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
@@ -189,7 +204,7 @@ public class PostService {
         // 2. UserSubscribe 객체에서 구독한 유저 객체를 뽑아주고 그 객체로 오늘의 일정을 뽑아주기
 
         for (UserSubscribe userSubscribe : userSubscribes) {
-            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), LocalDate.now(), ScopeEnum.SUBSCRIBE));
+            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), localDate, ScopeEnum.SUBSCRIBE));
         }
 
 
@@ -199,15 +214,15 @@ public class PostService {
         List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
         // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
         LocalDateTime today = LocalDateTime.now();
-        for(PostSubscribe postSubscribe : postSubscribes){
-            if (postSubscribe.getPost().getEndDate().isBefore(today.getChronology().dateNow()) && postSubscribe.getPost().getEndDate().isAfter(ChronoLocalDate.from(today)) && postSubscribe.getPostSubscribeCheck()){
+        for(PostSubscribe postSubscribe : postSubscribes){ //today.getChronology().dateNow()            //ChronoLocalDate.from(today)
+            if (postSubscribe.getPost().getEndDate().isBefore(localDate) && postSubscribe.getPost().getEndDate().isAfter(localDate) && postSubscribe.getPostSubscribeCheck()){
                 postSubscribePosts.add(postSubscribe.getPost());
             }
         }
 
         List<Post> myPosts = postRepository.findAllPostByUser(user);
-        myPosts.removeIf(post -> post.getStartDate().isAfter(LocalDate.now()) || post.getEndDate().isBefore(LocalDate.now()));
-
+        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
+                                                        //LocalDate.now()
 
         // dto 타입으로 변경하고 todayPostResponseDtos 리스트에 추가
         List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
@@ -226,11 +241,11 @@ public class PostService {
             todayPostResponseDtos.add(responseDto);
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHH");
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyyMMddHH");
         Collections.sort(todayPostResponseDtos, (o1, o2) -> {
             LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(), o1.getStartTime() != null ? o1.getStartTime() : LocalTime.MIN);
             LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(), o2.getStartTime() != null ? o2.getStartTime() : LocalTime.MIN);
-            return o1DateTime.format(formatter).compareTo(o2DateTime.format(formatter));
+            return o1DateTime.format(formatter2).compareTo(o2DateTime.format(formatter2));
         });
 
 

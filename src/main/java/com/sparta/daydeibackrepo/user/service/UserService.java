@@ -122,7 +122,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfoResponseDto updateUser(UserInfoRequestDto userInfoRequestDto, MultipartFile multipartFile, UserDetailsImpl userDetails) throws IOException {
+    public UserInfoResponseDto updateUser(UserInfoRequestDto userInfoRequestDto, MultipartFile multipartFile1, MultipartFile multipartFile2, UserDetailsImpl userDetails) throws IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new NullPointerException("인증된 유저가 아닙니다")
         );
@@ -131,12 +131,15 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 다릅니다.");
         }
 
-//        String imageUrl = s3Service.uploadFile(multipartFile, "image");
-        String imageUrl = null;
-        if (multipartFile != null) {
-            imageUrl = s3Service.uploadFile(multipartFile, "image");
-        } else {
-            imageUrl = user.getProfileImage(); // 이전 이미지 URL 사용
+        String profileImageUrl = null;
+        String backgroundImageUrl = null;
+
+        if (multipartFile1 != null && !multipartFile1.isEmpty()) {
+            profileImageUrl = s3Service.uploadFile(multipartFile1, "image");
+        }
+
+        if (multipartFile2 != null && !multipartFile2.isEmpty()) {
+            backgroundImageUrl = s3Service.uploadFile(multipartFile2, "image");
         }
 
         // TODO: 2023/03/19 이미지 삭제버튼도 ?
@@ -144,7 +147,7 @@ public class UserService {
 
         String password = passwordEncoder.encode(userInfoRequestDto.getNewPassword());
         userInfoRequestDto.setNewPassword(password);
-        user.update(userInfoRequestDto, imageUrl);
+        user.update(userInfoRequestDto, profileImageUrl, backgroundImageUrl);
         userRepository.save(user);
         return new UserInfoResponseDto(user);
     }

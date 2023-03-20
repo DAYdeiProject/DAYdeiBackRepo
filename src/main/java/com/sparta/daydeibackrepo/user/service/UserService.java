@@ -122,12 +122,12 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfoResponseDto updateUser(UserInfoRequestDto userInfoRequestDto, MultipartFile multipartFile1, MultipartFile multipartFile2, UserDetailsImpl userDetails) throws IOException {
+    public UserProfileResponseDto updateUser(UserProfileRequestDto userProfileRequestDto, MultipartFile multipartFile1, MultipartFile multipartFile2, UserDetailsImpl userDetails) throws IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new NullPointerException("인증된 유저가 아닙니다")
         );
 
-        if (!userInfoRequestDto.getNewPassword().equals(userInfoRequestDto.getNewPasswordConfirm())){
+        if (!userProfileRequestDto.getNewPassword().equals(userProfileRequestDto.getNewPasswordConfirm())){
             throw new IllegalArgumentException("비밀번호가 다릅니다.");
         }
 
@@ -142,21 +142,19 @@ public class UserService {
             backgroundImageUrl = s3Service.uploadFile(multipartFile2, "image");
         }
 
-        // TODO: 2023/03/19 이미지 삭제버튼도 ?
 
-
-        String password = passwordEncoder.encode(userInfoRequestDto.getNewPassword());
-        userInfoRequestDto.setNewPassword(password);
-        user.update(userInfoRequestDto, profileImageUrl, backgroundImageUrl);
+        String password = passwordEncoder.encode(userProfileRequestDto.getNewPassword());
+        userProfileRequestDto.setNewPassword(password);
+        user.update(userProfileRequestDto, profileImageUrl, backgroundImageUrl);
         userRepository.save(user);
-        return new UserInfoResponseDto(user);
+        return new UserProfileResponseDto(user);
     }
 
     @Transactional
-    public UserInfoResponseDto getUser(Long userId){
+    public UserProfileResponseDto getUser(Long userId){
         User user = userRepository.findById(userId).orElseThrow(
                 ()-> new NullPointerException("등록된 사용자가 없습니다.")
         );
-        return new UserInfoResponseDto(user);
+        return new UserProfileResponseDto(user);
     }
 }

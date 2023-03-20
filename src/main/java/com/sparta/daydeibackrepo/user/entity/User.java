@@ -1,7 +1,7 @@
 package com.sparta.daydeibackrepo.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sparta.daydeibackrepo.user.dto.UserInfoRequestDto;
+import com.sparta.daydeibackrepo.user.dto.UserProfileRequestDto;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import lombok.*;
 
@@ -91,7 +91,7 @@ public class User {
         this.password = newPassword;
     }
 
-    public void update(UserInfoRequestDto requestDto, String profileImageUrl, String backgroundImageUrl){
+    public void update(UserProfileRequestDto requestDto, String profileImageUrl, String backgroundImageUrl){
         this.email = requestDto.getEmail();
         this.nickName = requestDto.getNickName();
         this.password = requestDto.getNewPassword();
@@ -101,7 +101,7 @@ public class User {
         this.birthday = requestDto.getBirthday();
     }
 
-    public void update(UserInfoRequestDto requestDto){
+    public void update(UserProfileRequestDto requestDto){
         this.email = requestDto.getEmail();
         this.nickName = requestDto.getNickName();
         this.password = requestDto.getNewPassword();

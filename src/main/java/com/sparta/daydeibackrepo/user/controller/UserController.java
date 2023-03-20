@@ -31,10 +31,6 @@ public class UserController {
     private final UserService userService;
     private final KakaoService kakaoService;
 
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
 
     @PostMapping("/users/signup")
     public StatusResponseDto<String> signup(@RequestBody @Valid SignupRequestDto signupRequestDto) {
@@ -79,17 +75,17 @@ public class UserController {
     }
 
     @PutMapping("/users/profile")
-    public StatusResponseDto<UserInfoResponseDto> updateUser(
-            @RequestPart UserInfoRequestDto userInfoRequestDto,
+    public StatusResponseDto<UserProfileResponseDto> updateUser(
+            @RequestPart UserProfileRequestDto userProfileRequstDto,
             @RequestPart MultipartFile  multipartFile1,
             @RequestPart MultipartFile multipartFile2,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
             throws IOException {
-        return StatusResponseDto.success(userService.updateUser(userInfoRequestDto, multipartFile1, multipartFile2, userDetails));
+        return StatusResponseDto.success(userService.updateUser(userProfileRequstDto, multipartFile1, multipartFile2, userDetails));
     }
 
     @GetMapping("/home/profile/{userId}")
-    public StatusResponseDto<UserInfoResponseDto> getUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<UserProfileResponseDto> getUser(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(userService.getUser(userId));
     }
 

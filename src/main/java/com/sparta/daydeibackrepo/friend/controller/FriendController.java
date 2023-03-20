@@ -42,9 +42,9 @@ public class FriendController {
     }
 
     // 친구 불러오기 (왼쪽 사이드바)
-    @GetMapping("/friendList")
-    public StatusResponseDto<?> getFriendList(@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getFriendList(userDetails));
+    @GetMapping("/update")
+    public StatusResponseDto<?> getUpdateFriend(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(friendService.getUpdateFriend(userDetails));
     }
 
     @GetMapping("/list/famous")

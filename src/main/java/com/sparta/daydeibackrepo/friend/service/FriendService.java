@@ -7,6 +7,8 @@ import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.service.NotificationService;
+import com.sparta.daydeibackrepo.post.entity.Post;
+import com.sparta.daydeibackrepo.post.repository.PostCustomRepository;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class FriendService {
+    private final PostCustomRepository postRepository;
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final UserSubscribeRepository userSubscribeRepository;
@@ -157,46 +161,14 @@ public class FriendService {
     }
 
     @Transactional
-    public List<FriendListResponseDto> getFriendList(UserDetailsImpl userDetails){
+    public List<UserResponseDto> getUpdateFriend(UserDetailsImpl userDetails){
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("사용자를 찾을 수 없습니다")
         );
+        List<User> updateUsers = postRepository.findAllUpdateFriend(user);
 
-//        List<Friend> friends = friendRepository.findFriends(user);
-//        List<FriendListResponseDto> friendList = new ArrayList<>();
-//        for (Friend friend : friends){
-//            friendList.add(FriendListResponseDto(friend));
-//        }
-
-//        //친구 리스트
-//        List<Friend> friends = friendRepository.findFriends(user); // user랑 친구인 friend를 찾기
-//        List<User> friendList = new ArrayList<>();  //
-//        List<FriendListResponseDto> friendResponseList = new ArrayList<>();
-//        User friendUser = null;
-//        for(Friend friend : friends){
-//            if (friend.getFriendResponseId() != user){
-//                friendUser = friend.getFriendResponseId();
-//            }
-//            else if (friend.getFriendRequestId() != user){
-//                friendUser = friend.getFriendRequestId();
-//            }
-//            friendResponseList.add( new FriendListResponseDto(friendUser));
-//        }
-//        return friendResponseList;
-
-        List<Friend> friends = friendRepository.findFriends(user);
-        List<FriendListResponseDto> friendResponseList = new ArrayList<>();
-        for(Friend friend : friends) {
-            User friendUser = null; // friendUser 변수 초기화
-            if (friend.getFriendResponseId() != user){
-                friendUser = friend.getFriendResponseId();
-            }
-            else if (friend.getFriendRequestId() != user){
-                friendUser = friend.getFriendRequestId();
-            }
-            friendResponseList.add(new FriendListResponseDto(friendUser));
-        }
-        return friendResponseList;
+        List<UserResponseDto> updateList = makeUserResponseDtos(user,updateUsers);
+        return updateList.stream().limit(10).collect(Collectors.toList());
     }
     @Transactional(readOnly = true)
     public List<UserResponseDto> getFamousList(UserDetailsImpl userDetails) {
@@ -211,7 +183,7 @@ public class FriendService {
     // 유저 본인(user)과 유저 리스트(users) 사이의 친구 상태, 구독 관계 등을 뽑아서 List<UserResponseDto>로 반환합니다.
     private List<UserResponseDto> makeUserResponseDtos(User user, List<User> users){
         List<UserResponseDto> userResponseDtos = new ArrayList<>();
-        if (users.contains(null)){
+        if (users==null){
             return userResponseDtos;
         }
         List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(user);

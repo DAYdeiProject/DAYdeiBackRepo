@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.user.service;
 
+import com.sparta.daydeibackrepo.friend.repository.FriendCustomRepository;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.mail.dto.MailDto;
 import com.sparta.daydeibackrepo.mail.service.MailService;
@@ -9,6 +10,8 @@ import com.sparta.daydeibackrepo.user.dto.*;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
+import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeCustomRepository;
+import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import com.sun.xml.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +41,8 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final MailService mailService;
     private final S3Service s3Service;
-
+    private final FriendCustomRepository friendRepository;
+    private final UserSubscribeRepository userSubscribeRepository;
 
 
     @Transactional
@@ -151,10 +155,16 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfileResponseDto getUser(Long userId){
+    public UserInfoResponseDto getUser(Long userId, UserDetailsImpl userDetails){
+        User visitor = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
+                () -> new NullPointerException("인증되지 않은 사용자입니다.")
+        );
+
         User user = userRepository.findById(userId).orElseThrow(
                 ()-> new NullPointerException("등록된 사용자가 없습니다.")
         );
-        return new UserProfileResponseDto(user);
+
+        int subscriberCount = userSubscribeRepository.findAllBySubscriberId(user).size();
+        return new UserInfoResponseDto(user, subscriberCount);
     }
 }

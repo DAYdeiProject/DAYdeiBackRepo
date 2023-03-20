@@ -35,7 +35,8 @@ public class User {
     @Column
     private String birthday;
 
-    private String profileImage; //추후 s3 Multipart 로 타입 변경해야 함
+    private String profileImage;
+    private String backgroundImage;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -64,7 +65,6 @@ public class User {
         this.password = password;
         this.profileImage = img;
         this.birthday = birthday;
-//        this.friendEmailList = friendEmailList;
         this.role = UserRoleEnum.USER;
     }
 
@@ -85,11 +85,12 @@ public class User {
         this.password = newPassword;
     }
 
-    public void update(UserInfoRequestDto requestDto, String imageUrl){
+    public void update(UserInfoRequestDto requestDto, String profileImageUrl, String backgroundImageUrl){
         this.email = requestDto.getEmail();
         this.nickName = requestDto.getNickName();
         this.password = requestDto.getNewPassword();
-        this.profileImage = imageUrl;
+        this.profileImage = profileImageUrl;
+        this.backgroundImage = backgroundImageUrl;
         this.introduction = requestDto.getIntroduction();
         this.birthday = requestDto.getBirthday();
     }

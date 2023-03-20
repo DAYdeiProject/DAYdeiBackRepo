@@ -12,7 +12,6 @@ import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
-import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +23,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static java.util.Collections.addAll;
 
 @Slf4j
 @Service
@@ -44,13 +40,11 @@ public class FriendService {
         User responseUser = userRepository.findById(userId).orElseThrow(
                 () -> new UsernameNotFoundException("유저가 존재하지 않습니다.")
         );
-        if(Objects.equals(requestUser.getId(), responseUser.getId())){
+        if(Objects.equals(requestUser, responseUser)){
             throw new IllegalArgumentException("올바르지 않은 친구 요청입니다.");
         }
-        Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(requestUser, responseUser);
-        Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(responseUser, requestUser);
-        if(friend1 != null || friend2 != null){
-            throw new IllegalArgumentException("이미 친구 상태입니다.");
+        if(friendRepository.isFriendOrRequest(requestUser, responseUser)){
+            throw new IllegalArgumentException("이미 친구 상태이거나 처리 되지 않은 친구 신청이 있습니다.");
         }
         Friend friend = new Friend(requestUser, responseUser, false);
         friendRepository.save(friend);
@@ -65,7 +59,7 @@ public class FriendService {
         User requestUser = userRepository.findById(userId).orElseThrow(
                 () -> new UsernameNotFoundException("유저가 존재하지 않습니다.")
         );
-        if(requestUser==responseUser){
+        if(Objects.equals(requestUser, responseUser)){
             throw new IllegalArgumentException("올바르지 않은 친구 요청입니다.");
         }
         Friend friend = friendRepository.findByFriendRequestIdAndFriendResponseId(requestUser, responseUser);
@@ -84,6 +78,10 @@ public class FriendService {
         User user2 = userRepository.findById(userId).orElseThrow(
                 () -> new UsernameNotFoundException("유저가 존재하지 않습니다.")
         );
+        if(Objects.equals(user1, user2)){
+            throw new IllegalArgumentException("올바르지 않은 친구 요청입니다.");
+        }
+
         Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(user1, user2);
         Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(user2, user1);
         if (friend1 != null && friend2 != null){
@@ -116,77 +114,37 @@ public class FriendService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        //친구 리스트
-        List<Friend> friends = friendRepository.findFriends(user);
-        List<UserResponseDto> friendResponseList = new ArrayList<>();
-        for(Friend friend : friends){
-            User user1 = null;
-            if (friend.getFriendResponseId() != user){
-                user1 = friend.getFriendResponseId();
-            }
-            else if (friend.getFriendRequestId() != user){
-                user1 = friend.getFriendRequestId();
-            }
-            friendResponseList.add( new UserResponseDto(user1, true));
-        }
-        // 구독 리스트
-        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
-        List<UserResponseDto> userSubscribeResponseList = new ArrayList<>();
-        for(UserSubscribe userSubscribe : userSubscribes){
-            userSubscribeResponseList.add(new UserResponseDto(userSubscribe, true));
-        }
-        // 일단위로 sorting 방법 변경 > 일단은 간단하게 구현
+        List<User> friends = friendRepository.findAllFriends(user);
+        List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(user);
+        List<UserResponseDto> friendList = makeUserResponseDtos(user, friends);
+        List<UserResponseDto> userSubscribeList = makeUserResponseDtos(user, userSubscribers);
+
+        // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
         if (isEven){
-            Collections.sort(friendResponseList, Comparator.comparing(UserResponseDto::getEmail));
-            Collections.sort(userSubscribeResponseList, Comparator.comparing(UserResponseDto::getEmail));
+            Collections.sort(friendList, Comparator.comparing(UserResponseDto::getEmail));
+            Collections.sort(userSubscribeList, Comparator.comparing(UserResponseDto::getEmail));
         }
         else {
-            Collections.sort(friendResponseList, Comparator.comparing(UserResponseDto::getNickName));
-            Collections.sort(userSubscribeResponseList, Comparator.comparing(UserResponseDto::getNickName));
+            Collections.sort(friendList, Comparator.comparing(UserResponseDto::getNickName));
+            Collections.sort(userSubscribeList, Comparator.comparing(UserResponseDto::getNickName));
         }
-        return new RelationResponseDto(friendResponseList, userSubscribeResponseList);
+        return new RelationResponseDto(friendList, userSubscribeList);
     }
     @Transactional(readOnly = true)
     public List<UserResponseDto> getRecommendList(List<String> categories, String searchWord, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        List<UserResponseDto> recommendResponseList = new ArrayList<>();
-        List<User> recommendList = new ArrayList<>();
-        List<CategoryEnum> categoryEnums = new ArrayList<>();
-        // input으로 받은 검색어에 해당되면서 카테고리 Enum을 하나라도 포함하는 유저가 다 나옴 (본인 제외)
+                List<CategoryEnum> categoryEnums = new ArrayList<>();
         for (String category : categories) {
             categoryEnums.add(CategoryEnum.valueOf(category.toUpperCase()));
         }
-        recommendList = userRepository.findRecommmedList(searchWord, user, categoryEnums);
+        List<User> recommendList = userRepository.findRecommmedList(searchWord, user, categoryEnums);
+        List<UserResponseDto> recommendResponseList = makeUserResponseDtos(user, recommendList);
 
-        for (User user1 : recommendList) {
-            Friend friend = friendRepository.findFriend(user, user1);
-            UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, user1);
-            boolean friendCheck = false;
-            boolean userSubscribeCheck = false;
-            int friendCount = friendRepository.findFriends(user1).size();
-            if (friend != null) {
-                friendCheck = true;
-            }
-            if (userSubscribe != null) {
-                userSubscribeCheck = true;
-            }
-            if ((!friendCheck || !userSubscribeCheck)) {
-                if (friendRepository.findFirstOneRequest(user1, user) != null) {
-                    boolean isRequestFriend = true;
-                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount));
-                } else if (friendRepository.findFirstOneRequest(user, user1) != null) {
-                    boolean isRequestFriend = false;
-                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount));
-                } else {
-                    recommendResponseList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount));
-                }
-            }
-        }
-
+        // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
         if (isEven){
@@ -245,11 +203,20 @@ public class FriendService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-        List<UserResponseDto> famousList = new ArrayList<>();
         List<User> users = userRepository.findAllByIdNot(user.getId());
+        List<UserResponseDto> famousList = makeUserResponseDtos(user, users);
+        // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
+        Collections.sort(famousList, Comparator.comparing(UserResponseDto::getSubscriberCount));
+        return famousList.stream().limit(3).collect(Collectors.toList());
+    }
+    // 유저 본인(user)과 유저 리스트(users) 사이의 친구 상태, 구독 관계 등을 뽑아서 List<UserResponseDto>로 반환합니다.
+    private List<UserResponseDto> makeUserResponseDtos(User user, List<User> users){
+        List<UserResponseDto> userResponseDtos = new ArrayList<>();
+        if (users.contains(null)){
+            return userResponseDtos;
+        }
         List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(user);
         List<User> friends = friendRepository.findAllFriends(user);
-
         for (User user1 : users){
             boolean friendCheck = false;
             boolean userSubscribeCheck = false;
@@ -260,17 +227,17 @@ public class FriendService {
             if (userSubscribers.contains(user1)) {
                 userSubscribeCheck = true;
             }
-            if (friendRepository.findFirstOneRequest(user1, user) != null) {
-                boolean isRequestFriend = true;
-                famousList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount));
-            } else if (friendRepository.findFirstOneRequest(user, user1) != null) {
-                boolean isRequestFriend = false;
-                famousList.add(new UserResponseDto(user1, friendCheck, isRequestFriend, userSubscribeCheck, friendCount));
-            } else {
-                famousList.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount));
+            if ((!friendCheck || !userSubscribeCheck)) {
+                if (friendRepository.findFirstUserRequest(user1,user) != null) {
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck, friendCount));
+                }
+                else if (friendRepository.findFirstUserRequest(user,user1) != null) {
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck, friendCount));
+                } else {
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount));
+                }
             }
         }
-        Collections.sort(famousList, Comparator.comparing(UserResponseDto::getSubscriberCount));
-        return famousList.stream().limit(3).collect(Collectors.toList());
+        return userResponseDtos;
     }
 }

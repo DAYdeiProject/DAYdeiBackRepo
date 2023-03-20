@@ -71,8 +71,10 @@ public class PostService {
         Post post = new Post(requestDto, startDate, endDate, startTime, endTime, user);
         Post savePost = postRepository.save(post);
 
-        //시간에 대한    //TODO: startDate는 EndDate보다 작게, 그게 아니면 예외처리
-        //공유일정 삽입
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("일정의 시작 일자는 끝나는 일자보다 빠른 일자여야 합니다.");
+        }
 
         for(Long participant : requestDto.getParticipant()) {
 //            List<Friend> friends = friendRepository.findidFriendList(participant, user);
@@ -138,6 +140,7 @@ public class PostService {
         );
 
 
+
         List<Tag> tags = tagRepository.findAllByPostId(postId);
         List<String> participants = new ArrayList<>();
         for(Tag tag : tags) {
@@ -149,6 +152,10 @@ public class PostService {
         LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
         LocalTime startTime = LocalTime.parse(requestDto.getStartTime());
         LocalTime endTime = LocalTime.parse(requestDto.getEndTime());
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("일정의 시작 일자는 끝나는 일자보다 빠른 일자여야 합니다.");
+        }
 
         //태그당한 친구에게 알림
 

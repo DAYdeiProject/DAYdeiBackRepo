@@ -1,25 +1,34 @@
 package com.sparta.daydeibackrepo.post.repository;
 
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.daydeibackrepo.friend.repository.FriendCustomRepository;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
-import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
+import com.sparta.daydeibackrepo.user.entity.QUser;
 import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import static com.sparta.daydeibackrepo.friend.entity.QFriend.friend;
 import static com.sparta.daydeibackrepo.post.entity.QPost.post;
+
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
 public class PostCustomRepositoryImpl implements PostCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
+    private final FriendCustomRepository friendRepository;
 
     //@Query(value = "Select p From Post p Where p.user = :user "+" AND "+" p.scope = :SUBSCRIBE ")
     public List<Post> findSubscribePost(User user){
         return jpaQueryFactory
                 .selectFrom(post)
-                .where(post.user.eq(user).and(post.scope.eq(ScopeEnum.SUBSCRIBE)))
+                .where(post.user.eq(user).and(post.scope.in(ScopeEnum.SUBSCRIBE)))
                 .fetch();
     }
     public List<Post> findAllPostByUser(User user){
@@ -32,14 +41,41 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
     public List<Post> findFriendPost(User master){
         return jpaQueryFactory
                 .selectFrom(post)
-                .where(post.user.eq(master).and((post.scope.eq(ScopeEnum.ALL).or(post.scope.eq(ScopeEnum.SUBSCRIBE)).or(post.scope.eq(ScopeEnum.FRIEND)))))
+                .where(post.user.eq(master).and(post.scope.in(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE, ScopeEnum.FRIEND)))
                 .fetch();
     }
     //@Query(value = "Select p From Post p Where p.user = :master "+" AND (p.scope = :ALL OR "+" p.scope = :SUBSCRIBE )")
     public List<Post> findNotFriendPost(User master){
         return jpaQueryFactory
                 .selectFrom(post)
-                .where(post.user.eq(master).and((post.scope.eq(ScopeEnum.ALL).or(post.scope.eq(ScopeEnum.SUBSCRIBE)))))
+                .where(post.user.eq(master).and(post.scope.in(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE)))
+                .fetch();
+    }
+    public List<User> findAllUpdateUser(User user){
+        List<Post> updatePosts = jpaQueryFactory
+                .selectFrom(post)
+                .where(post.user.ne(user)
+                        .and(post.modifiedAt.between(LocalDateTime.now().minus(7, ChronoUnit.DAYS), LocalDateTime.now()))
+                        .and(post.scope.in(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE, ScopeEnum.FRIEND)))
+                .orderBy(post.modifiedAt.desc())
+                .fetch();
+        return updatePosts.stream()
+                .map(Post::getUser)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<User> findAllUpdateFriend(User user) {
+        List<User> friends = friendRepository.findAllFriends(user);
+        return jpaQueryFactory
+                .select(post.user)
+                .from(post)
+                .where(post.user.ne(user)
+                        .and(post.modifiedAt.between(LocalDateTime.now().minus(7, ChronoUnit.DAYS), LocalDateTime.now()))
+                        .and(post.scope.in(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE, ScopeEnum.FRIEND))
+                        .and(post.user.in(friends)))
+                .orderBy(post.modifiedAt.desc())
+                .distinct()
                 .fetch();
     }
 }

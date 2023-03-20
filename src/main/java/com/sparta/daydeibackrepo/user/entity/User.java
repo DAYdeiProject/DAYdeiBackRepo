@@ -1,6 +1,7 @@
 package com.sparta.daydeibackrepo.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.user.dto.UserInfoRequestDto;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import lombok.*;
@@ -43,6 +44,8 @@ public class User {
     private String introduction;
 
     private Long kakaoId;
+    @JsonIgnore
+    private int friendCount;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscribingId")
     @JsonIgnore
@@ -51,6 +54,7 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscriberId")
     @JsonIgnore
     private List<UserSubscribe> subscriber;
+
 
 //    @ElementCollection(fetch = FetchType.EAGER)
 //    @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -108,5 +112,11 @@ public class User {
 //        this.profileImage = requestDto.getProfileImage();
         this.introduction = requestDto.getIntroduction();
         this.birthday = requestDto.getBirthday();
+    }
+    public void addFriendCount(){
+        this.friendCount += 1;
+    }
+    public void substractFriendCount(){
+        this.friendCount -= 1;
     }
 }

@@ -71,6 +71,8 @@ public class FriendService {
             throw new IllegalArgumentException("승인 가능한 친구 요청이 없습니다.");
         }
         friend.update(requestUser, responseUser, true);
+        responseUser.addFriendCount();
+        requestUser.addFriendCount();
         notificationService.send(requestUser.getId() , NotificationType.FRIEND_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(responseUser.getNickName()), NotificationType.FRIEND_ACCEPT.makeUrl(responseUser.getId()));
         return new FriendResponseDto(friend);
     }
@@ -94,6 +96,8 @@ public class FriendService {
         else if (friend1 != null){
             friendRepository.delete(friend1);
             if (friend1.getFriendCheck()){
+                user1.substractFriendCount();
+                user2.substractFriendCount();
                 return "친구를 삭제했습니다.";
             }
             else {
@@ -103,6 +107,8 @@ public class FriendService {
         else if (friend2 != null){
             friendRepository.delete(friend2);
             if (friend1.getFriendCheck()){
+                user1.substractFriendCount();
+                user2.substractFriendCount();
                 return "친구를 삭제했습니다.";
             }
             else {
@@ -214,12 +220,12 @@ public class FriendService {
             }
             if ((!friendCheck || !userSubscribeCheck)) {
                 if (requestUsers.contains(user1)) {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck, friendCount));
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck));
                 }
                 else if (responseUsers.contains(user1)) {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck, friendCount));
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck));
                 } else {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount));
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
                 }
             }
         }

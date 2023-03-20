@@ -14,63 +14,58 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class UserResponseDto {
-    Long id;
-    String email;
-    String nickName;
-    String profileImage;
-
-    String introduction;
-    List<CategoryEnum> categoryList;
-    Boolean friendCheck;
-    Boolean isRequestFriend;
-    Boolean userSubscribeCheck;
-    int friendCount;
-    int subscribingCount;
-    int subscriberCount;
-    public UserResponseDto(User user, boolean friendCheck,boolean isRequestFriend, boolean userSubscribeCheck, int friendCount){
+    private Long id;
+    private String email;
+    private String nickName;
+    private String profileImage;
+    private String introduction;
+    private String birthday;
+    private List<CategoryEnum> categoryList;
+    private Boolean friendCheck;
+    private Boolean isRequestFriend;
+    private Boolean userSubscribeCheck;
+    private int friendCount;
+    private int subscribingCount;
+    private int subscriberCount;
+    public UserResponseDto(User user, boolean friendCheck,boolean isRequestFriend, boolean userSubscribeCheck){
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
         this.introduction = user.getIntroduction();
         this.categoryList = user.getCategoryEnum();
+        this.birthday = user.getBirthday();
         this.friendCheck = friendCheck;
         this.isRequestFriend = isRequestFriend;
         this.userSubscribeCheck = userSubscribeCheck;
-        this.friendCount = friendCount;
+        this.friendCount = user.getFriendCount();
         this.subscribingCount = user.getSubscribing().size();
         this.subscriberCount = user.getSubscriber().size();
     }
-    public UserResponseDto(User user, boolean friendCheck, boolean userSubscribeCheck, int friendCount){
+    public UserResponseDto(User user, boolean friendCheck, boolean userSubscribeCheck){
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
         this.introduction = user.getIntroduction();
         this.categoryList = user.getCategoryEnum();
+        this.birthday = user.getBirthday();
         this.friendCheck = friendCheck;
         this.userSubscribeCheck = userSubscribeCheck;
-        this.friendCount = friendCount;
+        this.friendCount = user.getFriendCount();
         this.subscribingCount = user.getSubscribing().size();
         this.subscriberCount = user.getSubscriber().size();
     }
-    public UserResponseDto(User user, boolean friendCheck){
+    public UserResponseDto(User user){
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
         this.introduction = user.getIntroduction();
         this.categoryList = user.getCategoryEnum();
-        this.friendCheck = friendCheck;
-
-    }
-
-    public UserResponseDto(UserSubscribe userSubscribe, boolean userSubscribeCheck){
-        this.id = userSubscribe.getSubscriberId().getId();
-        this.email = userSubscribe.getSubscriberId().getEmail();
-        this.nickName = userSubscribe.getSubscriberId().getNickName();
-        this.profileImage = userSubscribe.getSubscriberId().getProfileImage();
-        this.introduction = userSubscribe.getSubscriberId().getIntroduction();
-        this.userSubscribeCheck = userSubscribeCheck;
+        this.birthday = user.getBirthday();
+        this.friendCount = user.getFriendCount();
+        this.subscribingCount = user.getSubscribing().size();
+        this.subscriberCount = user.getSubscriber().size();
     }
 }

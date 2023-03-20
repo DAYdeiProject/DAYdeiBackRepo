@@ -1,13 +1,11 @@
 package com.sparta.daydeibackrepo.friend.service;
 
-import com.sparta.daydeibackrepo.friend.dto.FriendListResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.service.NotificationService;
-import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.repository.PostCustomRepository;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,6 +68,8 @@ public class FriendService {
             throw new IllegalArgumentException("승인 가능한 친구 요청이 없습니다.");
         }
         friend.update(requestUser, responseUser, true);
+        responseUser.addFriendCount();
+        requestUser.addFriendCount();
         notificationService.send(requestUser.getId() , NotificationType.FRIEND_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(responseUser.getNickName()), NotificationType.FRIEND_ACCEPT.makeUrl(responseUser.getId()));
         return new FriendResponseDto(friend);
     }
@@ -85,15 +84,18 @@ public class FriendService {
         if(Objects.equals(user1, user2)){
             throw new IllegalArgumentException("올바르지 않은 친구 요청입니다.");
         }
-
         Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(user1, user2);
         Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(user2, user1);
+
         if (friend1 != null && friend2 != null){
             throw new IllegalArgumentException("친구 상태가 올바르지 않습니다.");
         }
+
         else if (friend1 != null){
             friendRepository.delete(friend1);
             if (friend1.getFriendCheck()){
+                user1.substractFriendCount();
+                user2.substractFriendCount();
                 return "친구를 삭제했습니다.";
             }
             else {
@@ -103,6 +105,8 @@ public class FriendService {
         else if (friend2 != null){
             friendRepository.delete(friend2);
             if (friend1.getFriendCheck()){
+                user1.substractFriendCount();
+                user2.substractFriendCount();
                 return "친구를 삭제했습니다.";
             }
             else {
@@ -122,7 +126,6 @@ public class FriendService {
         List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(user);
         List<UserResponseDto> friendList = makeUserResponseDtos(user, friends);
         List<UserResponseDto> userSubscribeList = makeUserResponseDtos(user, userSubscribers);
-
         // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
@@ -146,8 +149,9 @@ public class FriendService {
             categoryEnums.add(CategoryEnum.valueOf(category.toUpperCase()));
         }
         List<User> recommendList = userRepository.findRecommmedList(searchWord, user, categoryEnums);
-        List<UserResponseDto> recommendResponseList = makeUserResponseDtos(user, recommendList);
-
+        List<UserResponseDto> recommendResponseList = makeUserResponseDtos(user, recommendList).stream()
+                .filter(userResponseDto -> !userResponseDto.getFriendCheck() || !userResponseDto.getUserSubscribeCheck())
+                .collect(Collectors.toList());
         // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
@@ -159,7 +163,6 @@ public class FriendService {
         }
         return recommendResponseList;
     }
-
     @Transactional(readOnly = true)
     public List<UserResponseDto> getUpdateFriend(UserDetailsImpl userDetails){
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -190,10 +193,8 @@ public class FriendService {
         Collections.sort(pendingResponseList, Comparator.comparing(UserResponseDto::getId));
         return pendingResponseList;
     }
-
-
     // 유저 본인(user)과 유저 리스트(users) 사이의 친구 상태, 구독 관계 등을 뽑아서 List<UserResponseDto>로 반환합니다.
-    private List<UserResponseDto> makeUserResponseDtos(User user, List<User> users){
+    public List<UserResponseDto> makeUserResponseDtos(User user, List<User> users){
         List<UserResponseDto> userResponseDtos = new ArrayList<>();
         if (users==null){
             return userResponseDtos;
@@ -205,22 +206,20 @@ public class FriendService {
         for (User user1 : users){
             boolean friendCheck = false;
             boolean userSubscribeCheck = false;
-            int friendCount = friendRepository.findFriends(user1).size();
             if (friends.contains(user1)) {
                 friendCheck = true;
             }
             if (userSubscribers.contains(user1)) {
                 userSubscribeCheck = true;
             }
-            if ((!friendCheck || !userSubscribeCheck)) {
-                if (requestUsers.contains(user1)) {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck, friendCount));
-                }
-                else if (responseUsers.contains(user1)) {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck, friendCount));
-                } else {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, friendCount));
-                }
+            if (requestUsers.contains(user1)) {
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck));
+            }
+            else if (responseUsers.contains(user1)) {
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck));
+            }
+            else {
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
             }
         }
         return userResponseDtos;

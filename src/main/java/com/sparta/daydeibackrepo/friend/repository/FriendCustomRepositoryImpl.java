@@ -1,21 +1,17 @@
 package com.sparta.daydeibackrepo.friend.repository;
 
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
-import com.sparta.daydeibackrepo.post.entity.Post;
-import com.sparta.daydeibackrepo.user.entity.QUser;
 import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.sparta.daydeibackrepo.friend.entity.QFriend.friend;
+import static com.sparta.daydeibackrepo.user.entity.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -68,19 +64,6 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository  {
         return results;
     }
 
-    public Friend findFirstUserRequest(User user1, User user2){
-        return jpaQueryFactory
-                .selectFrom(friend)
-                .where(friend.friendRequestId.eq(user1).and(friend.friendResponseId.eq(user2)).and(friend.friendCheck.eq(false)))
-                .fetchFirst();
-    }
-    public boolean isRequestFriend(User user1, User user2){
-        return jpaQueryFactory
-                .from(friend)
-                .where(friend.friendRequestId.eq(user1)
-                        .and(friend.friendResponseId.eq(user2))
-                        .and(friend.friendCheck.eq(false)))
-                .fetchFirst() != null;}
     public List<User> findRequestUser(User user){
         return jpaQueryFactory
                 .select(friend.friendRequestId)
@@ -96,5 +79,11 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository  {
                 .where(friend.friendRequestId.eq(user)
                         .and(friend.friendCheck.eq(false)))
                 .fetch();
+    }
+    public List<User> findTagUser(User user1, String searchWord){
+        List<User> friends = findAllFriends(user1);
+        return friends.stream()
+                .filter(user -> user.getEmail().contains(searchWord) || user.getNickName().contains(searchWord))
+                .collect(Collectors.toList());
     }
 }

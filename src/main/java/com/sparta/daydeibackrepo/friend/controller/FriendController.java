@@ -43,17 +43,17 @@ public class FriendController {
 
     // 친구 불러오기 (왼쪽 사이드바)
     @GetMapping("/update")
-    public StatusResponseDto<?> getUpdateFriend(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<?> getUpdateFriend(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.getUpdateFriend(userDetails));
     }
 
     @GetMapping("/list/famous")
-    public StatusResponseDto<List<UserResponseDto>> getFamousList(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<List<UserResponseDto>> getFamousList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.getFamousList(userDetails));
     }
 
     @GetMapping("/list/response")
-    public StatusResponseDto<List<UserResponseDto>> getPendingResponseList(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<List<UserResponseDto>> getPendingResponseList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.getPendingResponseList(userDetails));
     }
 }

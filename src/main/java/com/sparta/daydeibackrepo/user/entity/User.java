@@ -8,7 +8,6 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity(name = "users")
@@ -43,6 +42,8 @@ public class User {
     private String introduction;
 
     private Long kakaoId;
+    @JsonIgnore
+    private int friendCount;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscribingId")
     @JsonIgnore
@@ -51,6 +52,7 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscriberId")
     @JsonIgnore
     private List<UserSubscribe> subscriber;
+
 
 //    @ElementCollection(fetch = FetchType.EAGER)
 //    @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -108,5 +110,11 @@ public class User {
 //        this.profileImage = requestDto.getProfileImage();
         this.introduction = requestDto.getIntroduction();
         this.birthday = requestDto.getBirthday();
+    }
+    public void addFriendCount(){
+        this.friendCount += 1;
+    }
+    public void substractFriendCount(){
+        this.friendCount -= 1;
     }
 }

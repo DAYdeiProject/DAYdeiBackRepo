@@ -173,7 +173,7 @@ public class UserService {
         List<User> friends = friendRepository.findAllFriends(visitor);
         List<User> responseUsers = friendRepository.findResponseUser(visitor);
         List<User> requestUsers = friendRepository.findRequestUser(visitor);
-        List<User> updateUsers = postRepository.findAllUpdateFriend(visitor);
+        List<User> updateUsers = postRepository.findAllUpdateUser(visitor);
         boolean friendCheck = false;
         boolean userSubscribeCheck = false;
         boolean updateCheck = false;

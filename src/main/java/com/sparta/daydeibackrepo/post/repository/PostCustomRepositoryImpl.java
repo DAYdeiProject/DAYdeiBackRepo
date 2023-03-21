@@ -51,7 +51,8 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
     // 모든 유저(본인 제외) 중에서 최근에 글을 올린 친구가 아닌 유저를 List<User>로 뽑아옴
     public List<User> findAllUpdateUser(User user){
         return  jpaQueryFactory
-                .selectFrom(post.user)
+                .select(post.user)
+                .from(post)
                 .where(post.user.ne(user)
                         .and(post.modifiedAt.between(LocalDateTime.now().minus(7, ChronoUnit.DAYS), LocalDateTime.now()))
                         .and(post.scope.in(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE)))

@@ -486,17 +486,30 @@ public class PostService {
             allowedScopes.add(ScopeEnum.FRIEND);
             allowedScopes.add(ScopeEnum.ME);
         }
+        //TODO 태그 당한 일정 미완성
+        List<Post> postSubscribePosts= new ArrayList<>();
+        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
+
+
+//        if (friendRepository.findFriend(master, visitor) != null ) { //친구이면
+//            for (PostSubscribe postSubscribe : postSubscribes) {
+//                if (postSubscribe.getPost().getScope() != ScopeEnum.ME && postSubscribe.getPostSubscribeCheck()){
+//                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
+//                    postSubscribePosts.add(postSubscribe.getPost());
+//                }
+//            }
+
 
         List<Post> posts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNotNullOrderByModifiedAtDesc(
                 master, allowedScopes, PageRequest.of(0, 5)
         );
-        if (posts.size() < 5) {
-            List<Post> additionalPosts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNullOrderByCreatedAtDesc(
-                    master, allowedScopes, PageRequest.of(0, 5 - posts.size())
-            );
-            posts.addAll(additionalPosts);
-            posts = posts.subList(0, Math.min(posts.size(), 5));
-        }
+//        if (posts.size() < 5) {
+//            List<Post> additionalPosts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNullOrderByCreatedAtDesc(
+//                    master, allowedScopes, PageRequest.of(0, 5 - posts.size())
+//            );
+//            posts.addAll(additionalPosts);
+//            posts = posts.subList(0, Math.min(posts.size(), 5));
+//        }
         List<Tag> tags = new ArrayList<>();
         for (Post post: posts){
 

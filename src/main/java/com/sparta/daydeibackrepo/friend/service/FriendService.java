@@ -104,7 +104,7 @@ public class FriendService {
         }
         else if (friend2 != null){
             friendRepository.delete(friend2);
-            if (friend1.getFriendCheck()){
+            if (friend2.getFriendCheck()){
                 user1.substractFriendCount();
                 user2.substractFriendCount();
                 return "친구를 삭제했습니다.";

@@ -49,14 +49,14 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
                 .fetch();
     }
     public List<User> findAllUpdateUser(User user){
-        List<Post> updatePosts = jpaQueryFactory
+        return  jpaQueryFactory
                 .selectFrom(post)
                 .where(post.user.ne(user)
                         .and(post.modifiedAt.between(LocalDateTime.now().minus(7, ChronoUnit.DAYS), LocalDateTime.now()))
                         .and(post.scope.in(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE, ScopeEnum.FRIEND)))
                 .orderBy(post.modifiedAt.desc())
-                .fetch();
-        return updatePosts.stream()
+                .fetch()
+                .stream()
                 .map(Post::getUser)
                 .distinct()
                 .collect(Collectors.toList());

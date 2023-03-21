@@ -1,6 +1,5 @@
 package com.sparta.daydeibackrepo.friend.repository;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.daydeibackrepo.friend.entity.Friend;

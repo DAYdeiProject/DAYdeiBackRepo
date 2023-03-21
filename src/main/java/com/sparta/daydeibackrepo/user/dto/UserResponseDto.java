@@ -18,6 +18,7 @@ public class UserResponseDto {
     private String email;
     private String nickName;
     private String profileImage;
+    private String backgroundImage;
     private String introduction;
     private String birthday;
     private List<CategoryEnum> categoryList;
@@ -33,6 +34,7 @@ public class UserResponseDto {
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
+        this.backgroundImage = user.getBackgroundImage();
         this.introduction = user.getIntroduction();
         this.categoryList = user.getCategoryEnum();
         this.birthday = user.getBirthday();
@@ -49,6 +51,7 @@ public class UserResponseDto {
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
+        this.backgroundImage = user.getBackgroundImage();
         this.introduction = user.getIntroduction();
         this.categoryList = user.getCategoryEnum();
         this.birthday = user.getBirthday();
@@ -64,6 +67,7 @@ public class UserResponseDto {
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
+        this.backgroundImage = user.getBackgroundImage();
         this.introduction = user.getIntroduction();
         this.categoryList = user.getCategoryEnum();
         this.birthday = user.getBirthday();

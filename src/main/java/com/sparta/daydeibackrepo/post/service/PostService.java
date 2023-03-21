@@ -60,7 +60,6 @@ public class PostService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
         );
-
 //        List<String> imageUrl = s3Service.uploadFiles(requestDto.getImage(), "images");
 
         LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);

@@ -36,6 +36,10 @@ public class FriendController {
     public StatusResponseDto<RelationResponseDto> getRelationList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.getRelationList(userDetails));
     }
+    @GetMapping("/list/{userId}")
+    public StatusResponseDto<RelationResponseDto> getYourRelationList(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(friendService.getYourRelationList(userId, userDetails));
+    }
     @GetMapping("/recommend")
     public StatusResponseDto<List<UserResponseDto>> getRecommendList(@RequestParam List<String> category, @RequestParam String searchword, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.getRecommendList(category,searchword,userDetails));

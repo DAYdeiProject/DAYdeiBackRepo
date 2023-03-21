@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.post.service;
 
+import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.post.dto.*;
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,10 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -124,9 +123,11 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시물입니다.")
         );
+
         List<Tag> tags = tagRepository.findAllByPostId(postId);
 //        List<String> participantsName = new ArrayList<>();
 //        List<Long> participantsId = new ArrayList<>();
+
         List<ParticipantsResponseDto> participants = new ArrayList<>();
         for(Tag tag : tags) {
 //            participantsName.add(tag.getUser().getNickName());
@@ -135,7 +136,20 @@ public class PostService {
             participants.add(ParticipantsResponseDto);
         }
 
-        return PostResponseDto.of(post, participants);
+//        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscriberId(post.getUser());
+//        UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(post.getUser(), user);
+
+        List<User> friends = friendRepository.findAllFriends(user);
+
+        if(post.getScope() == ScopeEnum.ME && !Objects.equals(post.getUser().getId(), user.getId())) {
+            throw new AccessDeniedException("작성자가 나만 보기로 설정한 일정입니다.");
+        } else if (post.getScope() == ScopeEnum.FRIEND && !friends.contains(user)) {
+            throw new AccessDeniedException("작성자가 친구공개로 설정한 일정입니다");
+        } else {
+            return PostResponseDto.of(post, participants);
+        }
+
+
 
     }
 

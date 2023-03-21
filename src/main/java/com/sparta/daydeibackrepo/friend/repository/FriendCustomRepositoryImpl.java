@@ -1,17 +1,18 @@
 package com.sparta.daydeibackrepo.friend.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
+import com.sparta.daydeibackrepo.user.entity.QUser;
 import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.sparta.daydeibackrepo.friend.entity.QFriend.friend;
-import static com.sparta.daydeibackrepo.user.entity.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -46,24 +47,23 @@ public class FriendCustomRepositoryImpl implements FriendCustomRepository  {
                 .where((friend.friendRequestId.eq(user).or(friend.friendResponseId.eq(user))).and(friend.friendCheck.eq(true)))
                 .fetch();
     }
-    // 더 간단하게 작성할 방법 고민하기
     public List<User> findAllFriends(User user){
-        List<User> requests = jpaQueryFactory
-                .select(friend.friendRequestId)
+        QUser requestUser = new QUser("requestUser");
+        QUser responseUser = new QUser("responseUser");
+        List<Long> userIds = jpaQueryFactory
+                .select(new CaseBuilder()
+                        .when(friend.friendRequestId.eq(user))
+                        .then(responseUser.id)
+                        .otherwise(requestUser.id)
+                )
                 .from(friend)
-                .where(friend.friendResponseId.eq(user).and(friend.friendCheck.eq(true)))
+                .leftJoin(requestUser).on(friend.friendRequestId.eq(requestUser))
+                .leftJoin(responseUser).on(friend.friendResponseId.eq(responseUser))
+                .where(friend.friendCheck.eq(true)
+                        .and(friend.friendRequestId.eq(user).or(friend.friendResponseId.eq(user))))
                 .fetch();
-        List<User> responses = jpaQueryFactory
-                .select(friend.friendResponseId)
-                .from(friend)
-                .where(friend.friendRequestId.eq(user).and(friend.friendCheck.eq(true)))
-                .fetch();
-        List<User> results = new ArrayList<>();
-        results.addAll(requests);
-        results.addAll(responses);
-        return results;
+        return jpaQueryFactory.selectFrom(QUser.user).where(QUser.user.id.in(userIds)).fetch();
     }
-
     public List<User> findRequestUser(User user){
         return jpaQueryFactory
                 .select(friend.friendRequestId)

@@ -5,6 +5,7 @@ import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.mail.dto.MailDto;
 import com.sparta.daydeibackrepo.mail.service.MailService;
+import com.sparta.daydeibackrepo.post.repository.PostRepository;
 import com.sparta.daydeibackrepo.s3.service.S3Service;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.*;
@@ -44,7 +45,7 @@ public class UserService {
     private final S3Service s3Service;
     private final FriendCustomRepository friendRepository;
     private final UserSubscribeRepository userSubscribeRepository;
-    private final FriendService friendService;
+    private final PostRepository postRepository;
 
 
     @Transactional
@@ -172,22 +173,27 @@ public class UserService {
         List<User> friends = friendRepository.findAllFriends(visitor);
         List<User> responseUsers = friendRepository.findResponseUser(visitor);
         List<User> requestUsers = friendRepository.findRequestUser(visitor);
+        List<User> updateUsers = postRepository.findAllUpdateFriend(visitor);
         boolean friendCheck = false;
         boolean userSubscribeCheck = false;
+        boolean updateCheck = false;
         if (friends.contains(user)) {
             friendCheck = true;
         }
         if (userSubscribers.contains(user)) {
             userSubscribeCheck = true;
         }
+        if (updateUsers.contains(user)){
+            updateCheck = true;
+        }
         if (requestUsers.contains(user)) {
-            userResponseDto = new UserResponseDto(user, friendCheck, true, userSubscribeCheck);
+            userResponseDto = new UserResponseDto(user, friendCheck, true, userSubscribeCheck, updateCheck);
             }
         else if (responseUsers.contains(user)) {
-            userResponseDto = new UserResponseDto(user, friendCheck, false, userSubscribeCheck);
+            userResponseDto = new UserResponseDto(user, friendCheck, false, userSubscribeCheck, updateCheck);
         }
         else {
-            userResponseDto = new UserResponseDto(user, friendCheck, userSubscribeCheck);
+            userResponseDto = new UserResponseDto(user, friendCheck, userSubscribeCheck, updateCheck);
         }
         return userResponseDto;
     }

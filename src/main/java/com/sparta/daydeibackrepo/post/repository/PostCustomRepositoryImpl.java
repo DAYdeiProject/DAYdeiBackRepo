@@ -2,6 +2,7 @@ package com.sparta.daydeibackrepo.post.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.daydeibackrepo.friend.repository.FriendCustomRepository;
+import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
 import com.sparta.daydeibackrepo.user.entity.User;
@@ -73,5 +74,14 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
                 .orderBy(post.modifiedAt.desc())
                 .distinct()
                 .fetch();
+    }
+    public Post findBirthdayPost(User master, User birthdayUser){
+        return jpaQueryFactory
+                .selectFrom(post)
+                .where(post.user.eq(master)
+                        .and(post.color.eq(ColorEnum.PINK))
+                        .and(post.title.contains(birthdayUser.getNickName()))
+                        .and(post.startDate.eq(LocalDate.parse("2023-" + birthdayUser.getBirthday().substring(0,2) + "-" + birthdayUser.getBirthday().substring(2,4)))))
+                .fetchFirst();
     }
 }

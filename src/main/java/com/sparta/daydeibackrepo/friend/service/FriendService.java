@@ -7,6 +7,7 @@ import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.post.repository.PostCustomRepository;
+import com.sparta.daydeibackrepo.post.service.PostService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
@@ -33,6 +34,7 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final UserSubscribeRepository userSubscribeRepository;
     private final NotificationService notificationService;
+    private final PostService postService;
     @Transactional
     public FriendResponseDto requestFriend(Long userId, UserDetailsImpl userDetails) {
         User requestUser = userRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
@@ -70,6 +72,7 @@ public class FriendService {
         friend.update(requestUser, responseUser, true);
         responseUser.addFriendCount();
         requestUser.addFriendCount();
+        postService.createBirthday(requestUser, responseUser);
         notificationService.send(requestUser.getId() , NotificationType.FRIEND_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(responseUser.getNickName()), NotificationType.FRIEND_ACCEPT.makeUrl(responseUser.getId()));
         return new FriendResponseDto(friend);
     }
@@ -92,6 +95,7 @@ public class FriendService {
         }
 
         else if (friend1 != null){
+            postService.deleteBirthday(user1, user2);
             friendRepository.delete(friend1);
             if (friend1.getFriendCheck()){
                 user1.substractFriendCount();
@@ -103,6 +107,7 @@ public class FriendService {
             }
         }
         else if (friend2 != null){
+            postService.deleteBirthday(user1, user2);
             friendRepository.delete(friend2);
             if (friend2.getFriendCheck()){
                 user1.substractFriendCount();

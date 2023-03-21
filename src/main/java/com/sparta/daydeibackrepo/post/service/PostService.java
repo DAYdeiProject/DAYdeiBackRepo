@@ -142,7 +142,7 @@ public class PostService {
 
         if(post.getScope() == ScopeEnum.ME && !Objects.equals(post.getUser().getId(), user.getId())) {
             throw new AccessDeniedException("작성자가 나만 보기로 설정한 일정입니다.");
-        } else if (post.getScope() == ScopeEnum.FRIEND && !friends.contains(user)) {
+        } else if (post.getScope() == ScopeEnum.FRIEND && !friends.contains(user) && post.getUser() != user) {
             throw new AccessDeniedException("작성자가 친구공개로 설정한 일정입니다");
         } else {
             return PostResponseDto.of(post, participants);

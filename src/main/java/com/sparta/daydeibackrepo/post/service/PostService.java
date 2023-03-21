@@ -498,8 +498,12 @@ public class PostService {
     public void deleteBirthday(User user1, User user2) {
         Post post1 = postRepository.findBirthdayPost(user1, user2);
         Post post2 = postRepository.findBirthdayPost(user2, user1);
-        postRepository.delete(post1);
-        postRepository.delete(post2);
+        if(post1 != null) {
+            postRepository.delete(post1);
+        }
+        if(post2 != null) {
+            postRepository.delete(post2);
+        }
     }
     public void createBirthdayPost(PostRequestDto requestDto, User user) {
         LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);

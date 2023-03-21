@@ -81,6 +81,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
                 .where(post.user.eq(master)
                         .and(post.color.eq(ColorEnum.PINK))
                         .and(post.title.contains(birthdayUser.getNickName()))
+                        .and(post.scope.eq(ScopeEnum.ME))
                         .and(post.startDate.eq(LocalDate.parse("2023-" + birthdayUser.getBirthday().substring(0,2) + "-" + birthdayUser.getBirthday().substring(2,4)))))
                 .fetchFirst();
     }

@@ -16,7 +16,7 @@ public interface PostSubscribeRepository extends JpaRepository<PostSubscribe, Lo
 
 //    @Query("DELETE FROM PostSubscribe p WHERE p.post = :post AND p.user = :user")
 //    void deleteByPostAndUser(Post post, User user);
-    void deleteAllById(Long postId);
+//    void deleteAllById(Long postId);
 
     List<PostSubscribe> findAllByPostId(Long postId);
 }

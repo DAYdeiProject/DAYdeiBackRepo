@@ -201,7 +201,15 @@ public class PostService {
         );
         //태그당한 친구에게 알림
         if (hasAuthority(user, post)) {
+            List<User> joiners = new ArrayList<>();
+            List<Tag> tags = tagRepository.findAllByPostId(post.getId());
+
+            for(Tag tag : tags) {
+                joiners.add(tag.getUser());
+            }
+            postSubscribeService.deleteJoin(post.getId(), joiners, userDetails);
             postRepository.delete(post);
+
             return "일정이 삭제되었습니다.";
         }
         throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");

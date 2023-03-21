@@ -13,7 +13,8 @@ public enum ColorEnum {
     GREEN,
     BLUE,
     NAVY,
-    PURPLE
+    PURPLE,
+    PINK
 
 
 }

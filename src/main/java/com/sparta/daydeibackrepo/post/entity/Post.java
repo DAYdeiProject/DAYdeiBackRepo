@@ -97,6 +97,13 @@ public class Post extends TimeStamped {
         this.color = requestDto.getColor();
     }
 
-
+    public Post(PostRequestDto requestDto, LocalDate startDate, LocalDate endDate, User user) {
+        this.title = requestDto.getTitle();
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.scope = requestDto.getScope();
+        this.color = requestDto.getColor();
+        this.user = user;
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.post.service;
 
+import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.post.dto.*;
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
@@ -495,5 +496,28 @@ public class PostService {
                 .collect(Collectors.toList());
 
         return postResponseDtos;
+    }
+    public void createBirthday(User user1, User user2) {
+        PostRequestDto postRequestDto1 = new PostRequestDto(user2);
+        PostRequestDto postRequestDto2 = new PostRequestDto(user1);
+        createBirthdayPost(postRequestDto1, user1);
+        createBirthdayPost(postRequestDto2, user2);
+    }
+    public void deleteBirthday(User user1, User user2) {
+        Post post1 = postRepository.findBirthdayPost(user1, user2);
+        Post post2 = postRepository.findBirthdayPost(user2, user1);
+        if(post1 != null) {
+            postRepository.delete(post1);
+        }
+        if(post2 != null) {
+            postRepository.delete(post2);
+        }
+    }
+    public void createBirthdayPost(PostRequestDto requestDto, User user) {
+        LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
+
+        Post post = new Post(requestDto, startDate, endDate, user);
+        postRepository.save(post);
     }
 }

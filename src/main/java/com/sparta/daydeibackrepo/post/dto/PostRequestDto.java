@@ -2,6 +2,7 @@ package com.sparta.daydeibackrepo.post.dto;
 
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
+import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,5 +36,11 @@ public class PostRequestDto {
     private ScopeEnum scope;
 
     private ColorEnum color;
-
+    public PostRequestDto(User user){
+        this.title = "🎉" + user.getNickName() + "님의 생일";
+        this.startDate = "2023-" + user.getBirthday().substring(0,2) + "-" + user.getBirthday().substring(2,4); // 0101을 2023-01-01로 바꿔야함.
+        this.endDate = "2023-" + user.getBirthday().substring(0,2) + "-" + user.getBirthday().substring(2,4);
+        this.scope = ScopeEnum.ME;
+        this.color = ColorEnum.PINK;
+    }
 }

@@ -173,7 +173,8 @@ public class UserService {
         List<User> friends = friendRepository.findAllFriends(visitor);
         List<User> responseUsers = friendRepository.findResponseUser(visitor);
         List<User> requestUsers = friendRepository.findRequestUser(visitor);
-        List<User> updateUsers = postRepository.findAllUpdateFriend(visitor);
+        List<User> updateUsers = postRepository.findAllUpdateUser(visitor);
+        List<User> updateFriends = postRepository.findAllUpdateFriend(user);
         boolean friendCheck = false;
         boolean userSubscribeCheck = false;
         boolean updateCheck = false;
@@ -183,8 +184,11 @@ public class UserService {
         if (userSubscribers.contains(user)) {
             userSubscribeCheck = true;
         }
-        if (updateUsers.contains(user)){
-            updateCheck = true;
+        if(friendCheck) {
+            if (updateFriends.contains(user)) {updateCheck = true;}
+        }
+        else{
+            if (updateUsers.contains(user)) {updateCheck = true;}
         }
         if (requestUsers.contains(user)) {
             userResponseDto = new UserResponseDto(user, friendCheck, true, userSubscribeCheck, updateCheck);

@@ -203,23 +203,28 @@ public class FriendService {
         List<User> friends = friendRepository.findAllFriends(user);
         List<User> responseUsers = friendRepository.findResponseUser(user);
         List<User> requestUsers = friendRepository.findRequestUser(user);
+        List<User> updateUsers = postRepository.findAllUpdateFriend(user);
         for (User user1 : users){
             boolean friendCheck = false;
             boolean userSubscribeCheck = false;
+            boolean updateCheck = false;
             if (friends.contains(user1)) {
                 friendCheck = true;
             }
             if (userSubscribers.contains(user1)) {
                 userSubscribeCheck = true;
             }
+            if (updateUsers.contains(user1)){
+                updateCheck = true;
+            }
             if (requestUsers.contains(user1)) {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck));
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck, updateCheck));
             }
             else if (responseUsers.contains(user1)) {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck));
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck, updateCheck));
             }
             else {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck));
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, updateCheck));
             }
         }
         return userResponseDtos;

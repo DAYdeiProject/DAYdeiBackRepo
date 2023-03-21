@@ -36,4 +36,5 @@ public class PostSubscribe {
         this.user = user;
         this.postSubscribeCheck=postSubscribeCheck;
     }
+
 }

@@ -81,4 +81,9 @@ public class PostController {
         return StatusResponseDto.success(postService.getHomePost(userId, userDetails));
     }
 
+    @GetMapping("/post/update/{userId}")
+    public StatusResponseDto<?> getUpdatePost(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(postService.getUpdatePost(userId, userDetails));
+    }
+
 }

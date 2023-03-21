@@ -36,7 +36,7 @@ public class PostResponseDto {
 
     private String location; //위치
 
-    private List<ParticipantsResponseDto> participent;
+    private List<ParticipantsResponseDto> participant;
 
     private ScopeEnum scope;
 
@@ -55,10 +55,17 @@ public class PostResponseDto {
                 .content(post.getContent())
                 .image(post.getImage())
                 .location(post.getLocation())
-                .participent(tagedFriends)
+                .participant(tagedFriends)
                 .scope(post.getScope())
                 .color(post.getColor())
                 .createdAt(post.getCreatedAt())
                 .build();
+    }
+
+    public static PostResponseDto create(Post post, List<ParticipantsResponseDto> taggedFriends) {
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getStartDate(),
+                post.getEndDate(), post.getStartTime(), post.getEndTime(), post.getContent(),
+                post.getImage(), post.getLocation(), taggedFriends, post.getScope(),
+                post.getColor(), post.getCreatedAt());
     }
 }

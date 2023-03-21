@@ -23,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +35,10 @@ import java.time.LocalTime;
 import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -437,5 +441,51 @@ public class PostService {
             return o1DateTime.format(formatter).compareTo(o2DateTime.format(formatter));
         });
         return homeResponseDtos;
+    }
+
+    @Transactional
+    public List<PostResponseDto> getUpdatePost(Long userId, UserDetailsImpl userDetails) {
+        User visitor = userRepository.findById(userDetails.getUser().getId())
+                .orElseThrow(() -> new NullPointerException("인증되지 않은 사용자입니다"));
+        User master = userRepository.findById(userId)
+                .orElseThrow(() -> new NullPointerException("존재하지 않는 사용자입니다"));
+
+        List<ScopeEnum> allowedScopes = new ArrayList<>();
+        if (friendRepository.findFriend(master, visitor) != null ) {
+            allowedScopes.add(ScopeEnum.ALL);
+            allowedScopes.add(ScopeEnum.SUBSCRIBE);
+        } else {
+            allowedScopes.add(ScopeEnum.ALL);
+            allowedScopes.add(ScopeEnum.SUBSCRIBE);
+            allowedScopes.add(ScopeEnum.FRIEND);
+            allowedScopes.add(ScopeEnum.ME);
+        }
+
+        List<Post> posts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNotNullOrderByModifiedAtDesc(
+                master, allowedScopes, PageRequest.of(0, 5)
+        );
+        if (posts.size() < 5) {
+            List<Post> additionalPosts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNullOrderByCreatedAtDesc(
+                    master, allowedScopes, PageRequest.of(0, 5 - posts.size())
+            );
+            posts.addAll(additionalPosts);
+            posts = posts.subList(0, Math.min(posts.size(), 5));
+        }
+        List<Tag> tags = new ArrayList<>();
+        for (Post post: posts){
+            tags.addAll(tagRepository.findAllByPostId(post.getId()));
+        }
+
+        List<ParticipantsResponseDto> participants = new ArrayList<>();
+        for(Tag tag : tags) {
+            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getNickName());
+            participants.add(ParticipantsResponseDto);
+        }
+
+        List<PostResponseDto> postResponseDtos = posts.stream()
+                .map(post -> PostResponseDto.create(post, participants))
+                .collect(Collectors.toList());
+
+        return postResponseDtos;
     }
 }

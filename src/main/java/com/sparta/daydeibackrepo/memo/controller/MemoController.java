@@ -34,4 +34,9 @@ public class MemoController {
         return StatusResponseDto.success(memoService.updateMemo(memoId, requestDto, userDetails));
     }
 
+    @DeleteMapping("/memos/{memoId}")
+    public StatusResponseDto<?> deleteMemo(@PathVariable Long memoId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
+        return StatusResponseDto.success(memoService.deleteMemo(memoId, userDetails));
+    }
+
 }

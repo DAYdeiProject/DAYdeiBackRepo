@@ -469,7 +469,7 @@ public class PostService {
         return homeResponseDtos;
     }
 
-    @Transactional
+    @Transactional // 업데이트 된 일정 (최근 일주일)
     public List<PostResponseDto> getUpdatePost(Long userId, UserDetailsImpl userDetails) {
         User visitor = userRepository.findById(userDetails.getUser().getId())
                 .orElseThrow(() -> new NullPointerException("인증되지 않은 사용자입니다"));
@@ -506,14 +506,11 @@ public class PostService {
         List<Post> posts = new ArrayList<>();
         posts.addAll(myPosts);
         posts.addAll(postSubscribePosts);
-//        Collections.sort(posts, Comparator.comparing(Post::getModifiedAt).reversed());
         posts = posts.stream()
                 .filter(post -> post.getModifiedAt().toLocalDate().isAfter(LocalDate.now().minusWeeks(1)))
                 .sorted(Comparator.comparing(Post::getStartDate))
                 .limit(5)
                 .collect(Collectors.toList());
-        //posts.stream().limit(5).collect(Collectors.toList());
-
 
         List<PostResponseDto> postResponseDtos = new ArrayList<>();
         for (Post post: posts) {
@@ -527,12 +524,11 @@ public class PostService {
                 }
             }
             postResponseDtos.add(PostResponseDto.create(post, writerResponseDto, participants));
-
         }
         return postResponseDtos;
     }
 
-    @Transactional
+    @Transactional //나와 공유한 일정
     public List<PostResponseDto> getSharePost(Long userId, UserDetailsImpl userDetails){
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증되지 않은 사용자입니다")
@@ -565,6 +561,7 @@ public class PostService {
                         .thenComparing(Comparator.comparing(Post::getStartTime)))
                 .limit(5)
                 .collect(Collectors.toList());
+
         List<PostResponseDto> postResponseDtos = new ArrayList<>();
         for (Post post: posts) {
             List<ParticipantsResponseDto> participants = new ArrayList<>();
@@ -577,7 +574,6 @@ public class PostService {
                 }
             }
             postResponseDtos.add(PostResponseDto.create(post, writerResponseDto, participants));
-
         }
         return postResponseDtos;
     }

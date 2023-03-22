@@ -12,13 +12,10 @@ import com.sparta.daydeibackrepo.user.dto.*;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
-import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeCustomRepository;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
-import com.sun.xml.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,6 +43,7 @@ public class UserService {
     private final FriendCustomRepository friendRepository;
     private final UserSubscribeRepository userSubscribeRepository;
     private final PostRepository postRepository;
+    private final FriendService friendService;
 
 
     @Transactional
@@ -175,6 +173,8 @@ public class UserService {
         List<User> requestUsers = friendRepository.findRequestUser(visitor);
         List<User> updateUsers = postRepository.findAllUpdateUser(visitor);
         List<User> updateFriends = postRepository.findAllUpdateFriend(visitor);
+        List<User> mutualFriends = friendRepository.findAllFriends(user);
+        mutualFriends.retainAll(friends);
         boolean friendCheck = false;
         boolean userSubscribeCheck = false;
         boolean updateCheck = false;
@@ -191,13 +191,13 @@ public class UserService {
             if (updateUsers.contains(user)) {updateCheck = true;}
         }
         if (requestUsers.contains(user)) {
-            userResponseDto = new UserResponseDto(user, friendCheck, true, userSubscribeCheck, updateCheck);
+            userResponseDto = new UserResponseDto(user, friendCheck, true, userSubscribeCheck, updateCheck, mutualFriends);
             }
         else if (responseUsers.contains(user)) {
-            userResponseDto = new UserResponseDto(user, friendCheck, false, userSubscribeCheck, updateCheck);
+            userResponseDto = new UserResponseDto(user, friendCheck, false, userSubscribeCheck, updateCheck, mutualFriends);
         }
         else {
-            userResponseDto = new UserResponseDto(user, friendCheck, userSubscribeCheck, updateCheck);
+            userResponseDto = new UserResponseDto(user, friendCheck, userSubscribeCheck, updateCheck, mutualFriends);
         }
         return userResponseDto;
     }

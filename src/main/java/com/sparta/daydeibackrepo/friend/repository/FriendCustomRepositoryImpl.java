@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.sparta.daydeibackrepo.friend.entity.QFriend.friend;
+import static com.sparta.daydeibackrepo.user.entity.QUser.user;
 
 @Repository
 @RequiredArgsConstructor

@@ -27,7 +27,9 @@ public class UserResponseDto {
     private int friendCount;
     private int subscribingCount;
     private int subscriberCount;
-    public UserResponseDto(User user, boolean friendCheck,boolean isRequestFriend, boolean userSubscribeCheck, boolean updateCheck){
+    private List<User> mutualFriends;
+    private int mutualFriendsCount;
+    public UserResponseDto(User user, boolean friendCheck,boolean isRequestFriend, boolean userSubscribeCheck, boolean updateCheck, List<User> mutualFriends){
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
@@ -43,8 +45,10 @@ public class UserResponseDto {
         this.friendCount = user.getFriendCount();
         this.subscribingCount = user.getSubscribing().size();
         this.subscriberCount = user.getSubscriber().size();
+        this.mutualFriends = mutualFriends;
+        this.mutualFriendsCount = mutualFriends.size();
     }
-    public UserResponseDto(User user, boolean friendCheck, boolean userSubscribeCheck, boolean updateCheck){
+    public UserResponseDto(User user, boolean friendCheck, boolean userSubscribeCheck, boolean updateCheck, List<User> mutualFriends){
         this.id = user.getId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
@@ -59,6 +63,8 @@ public class UserResponseDto {
         this.friendCount = user.getFriendCount();
         this.subscribingCount = user.getSubscribing().size();
         this.subscriberCount = user.getSubscriber().size();
+        this.mutualFriends = mutualFriends;
+        this.mutualFriendsCount = mutualFriends.size();
     }
     public UserResponseDto(User user){
         this.id = user.getId();

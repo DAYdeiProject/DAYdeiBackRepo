@@ -123,6 +123,8 @@ public class PostService {
                 () -> new NullPointerException("존재하지 않는 게시물입니다.")
         );
 
+        WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
+
         List<Tag> tags = tagRepository.findAllByPostId(postId);
 //        List<String> participantsName = new ArrayList<>();
 //        List<Long> participantsId = new ArrayList<>();
@@ -131,7 +133,7 @@ public class PostService {
         for(Tag tag : tags) {
 //            participantsName.add(tag.getUser().getNickName());
 //            participantsId.add(tag.getUser().getId());
-            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getNickName());
+            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getProfileImage(), tag.getUser().getNickName());
             participants.add(ParticipantsResponseDto);
         }
 
@@ -145,7 +147,7 @@ public class PostService {
         } else if (post.getScope() == ScopeEnum.FRIEND && !friends.contains(user) && post.getUser() != user) {
             throw new AccessDeniedException("작성자가 친구공개로 설정한 일정입니다");
         } else {
-            return PostResponseDto.of(post, participants);
+            return PostResponseDto.of(post, writerResponseDto, participants);
         }
 
 
@@ -161,6 +163,8 @@ public class PostService {
                 () -> new NullPointerException("존재하지 않는 게시물입니다.")
         );
 
+        WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
+
 
         List<Tag> tags = tagRepository.findAllByPostId(postId);
         List<Long> friends = requestDto.getParticipant();
@@ -169,7 +173,7 @@ public class PostService {
         tagRepository.deleteAll(tags);
 
         for(Long friend : friends) {
-            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(friend, userRepository.findById(friend).get().getNickName());
+            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(friend, userRepository.findById(friend).get().getProfileImage(), userRepository.findById(friend).get().getNickName());
             Tag tag = new Tag(userRepository.findById(friend).get(), post);
             tagRepository.save(tag);
             participants.add(ParticipantsResponseDto);
@@ -199,7 +203,7 @@ public class PostService {
             }
             postSubscribeService.updateJoin(postId, joiners, userDetails);
             
-            return PostResponseDto.of(post, participants);
+            return PostResponseDto.of(post, writerResponseDto, participants);
         }
         throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
 
@@ -495,18 +499,26 @@ public class PostService {
         }
         List<Tag> tags = new ArrayList<>();
         for (Post post: posts){
+
             tags.addAll(tagRepository.findAllByPostId(post.getId()));
         }
 
         List<ParticipantsResponseDto> participants = new ArrayList<>();
         for(Tag tag : tags) {
-            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getNickName());
+            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getProfileImage(), tag.getUser().getNickName());
             participants.add(ParticipantsResponseDto);
         }
 
-        List<PostResponseDto> postResponseDtos = posts.stream()
-                .map(post -> PostResponseDto.create(post, participants))
-                .collect(Collectors.toList());
+//        List<PostResponseDto> postResponseDtos = posts.stream()
+//                .map(post -> PostResponseDto.create(post, participants))
+//                .collect(Collectors.toList());
+        List<PostResponseDto> postResponseDtos = new ArrayList<>();
+        for (Post post: posts){
+            WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
+            postResponseDtos.add(PostResponseDto.create(post, writerResponseDto, participants));
+
+        }
+
 
         return postResponseDtos;
     }

@@ -17,6 +17,8 @@ import java.util.List;
 public class PostResponseDto {
     private Long id;
 
+    private WriterResponseDto writer;
+
     private String title;
 
     private LocalDate startDate;   //추후 Date 타입으로 변경해야함
@@ -41,9 +43,10 @@ public class PostResponseDto {
 
     private LocalDateTime createdAt;
 
-    public static PostResponseDto of(Post post, List<ParticipantsResponseDto> tagedFriends) {
+    public static PostResponseDto of(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> tagedFriends) {
         return PostResponseDto.builder()
                 .id(post.getId())
+                .writer(writerResponseDto)
                 .title(post.getTitle())
                 .startDate(post.getStartDate())
                 .endDate(post.getEndDate())
@@ -59,10 +62,12 @@ public class PostResponseDto {
                 .build();
     }
 
-    public static PostResponseDto create(Post post, List<ParticipantsResponseDto> taggedFriends) {
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getStartDate(),
+    public static PostResponseDto create(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> taggedFriends) {
+        return new PostResponseDto(post.getId(), writerResponseDto, post.getTitle(), post.getStartDate(),
                 post.getEndDate(), post.getStartTime(), post.getEndTime(), post.getContent(),
                 post.getImage(), post.getLocation(), taggedFriends, post.getScope(),
                 post.getColor(), post.getCreatedAt());
     }
 }
+
+

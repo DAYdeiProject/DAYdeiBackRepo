@@ -1,18 +1,15 @@
 package com.sparta.daydeibackrepo.post.dto;
 
-import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
 
-import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter

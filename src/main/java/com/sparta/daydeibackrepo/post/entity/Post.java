@@ -105,5 +105,4 @@ public class Post extends TimeStamped {
         this.color = requestDto.getColor();
         this.user = user;
     }
-
 }

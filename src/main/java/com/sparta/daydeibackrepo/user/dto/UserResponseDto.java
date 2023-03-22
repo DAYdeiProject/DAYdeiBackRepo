@@ -2,8 +2,6 @@ package com.sparta.daydeibackrepo.user.dto;
 
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.User;
-import com.sparta.daydeibackrepo.user.repository.UserRepository;
-import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

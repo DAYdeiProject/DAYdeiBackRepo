@@ -1,6 +1,5 @@
 package com.sparta.daydeibackrepo.friend.controller;
 
-import com.sparta.daydeibackrepo.friend.dto.FriendListResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
 import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
 import com.sparta.daydeibackrepo.friend.service.FriendService;
@@ -8,7 +7,6 @@ import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
-import jdk.jshell.Snippet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

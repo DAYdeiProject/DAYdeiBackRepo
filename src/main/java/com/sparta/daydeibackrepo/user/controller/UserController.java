@@ -4,25 +4,18 @@ package com.sparta.daydeibackrepo.user.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.*;
-import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.service.KakaoService;
 import com.sparta.daydeibackrepo.user.service.UserService;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
-import jdk.jshell.Snippet;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 @RestController
 @RequiredArgsConstructor

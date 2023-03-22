@@ -1,7 +1,6 @@
 package com.sparta.daydeibackrepo.post.controller;
 
 import com.sparta.daydeibackrepo.post.dto.HomeResponseDto;
-import com.sparta.daydeibackrepo.post.dto.MultipartListRequestDto;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.post.dto.PostResponseDto;
 import com.sparta.daydeibackrepo.post.service.PostService;
@@ -16,9 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -31,12 +27,6 @@ public class PostController {
     //일정 작성
     @PostMapping("/posts")
     public StatusResponseDto<?> createPost(@RequestBody PostRequestDto requestDto,@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YYYY.MM.dd");
-//        LocalDate startDate = LocalDate.parse(startDate1, DateTimeFormatter.ISO_DATE);
-//        LocalDate endDate = LocalDate.parse(endDate1, DateTimeFormatter.ISO_DATE);
-//        LocalTime startTime = LocalTime.parse(startTime1, DateTimeFormatter.ISO_DATE_TIME);
-//        LocalTime endTime = LocalTime.parse(endTime1, DateTimeFormatter.ISO_DATE_TIME);
-//        PostRequestDto requestDto = new PostRequestDto(title, startDate, endDate, startTime, endTime, content, fileList, location, scope, color);
         return StatusResponseDto.success(postService.createPost(requestDto, userDetails));
     }
 

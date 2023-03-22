@@ -1,8 +1,6 @@
 package com.sparta.daydeibackrepo.post.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 public enum ColorEnum {
@@ -15,6 +13,5 @@ public enum ColorEnum {
     NAVY,
     PURPLE,
     PINK
-
 
 }

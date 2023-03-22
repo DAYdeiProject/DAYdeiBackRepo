@@ -210,6 +210,31 @@ public class PostService {
     }
 
     @Transactional
+    public Object dragUpdatePost(Long postId, PostDragRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new NullPointerException("존재하지 않는 게시물입니다.")
+        );
+
+        LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
+
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("일정의 시작 일자는 끝나는 일자보다 빠른 일자여야 합니다.");
+        }
+
+        if (hasAuthority(user, post)) {
+            post.dragUpdate(startDate, endDate);
+
+            return "일정의 일자가 변경되었습니다.";
+        }
+        throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
+
+    }
+
+    @Transactional
     public Object deletePost(Long postId, UserDetailsImpl userDetails) throws IllegalAccessException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")

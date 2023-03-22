@@ -1,6 +1,7 @@
 package com.sparta.daydeibackrepo.post.controller;
 
 import com.sparta.daydeibackrepo.post.dto.HomeResponseDto;
+import com.sparta.daydeibackrepo.post.dto.PostDragRequestDto;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.post.dto.PostResponseDto;
 import com.sparta.daydeibackrepo.post.service.PostService;
@@ -45,6 +46,11 @@ public class PostController {
     @PatchMapping("/posts/{postId}")
     public StatusResponseDto<PostResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException, IOException {
         return StatusResponseDto.success(postService.updatePost(postId, requestDto, userDetails));
+    }
+
+    @PatchMapping("/posts/drag/{postId}")
+    public StatusResponseDto<?> dragUpdatePost(@PathVariable Long postId, @RequestBody PostDragRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException, IOException {
+        return StatusResponseDto.success(postService.dragUpdatePost(postId, requestDto, userDetails));
     }
 
     //일정 삭제

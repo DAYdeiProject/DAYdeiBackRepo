@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.post.entity;
 
+import com.sparta.daydeibackrepo.post.dto.PostDragRequestDto;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.postSubscribe.entity.PostSubscribe;
 import com.sparta.daydeibackrepo.tag.entity.Tag;
@@ -95,6 +96,11 @@ public class Post extends TimeStamped {
         this.location = requestDto.getLocation();
         this.scope = requestDto.getScope();
         this.color = requestDto.getColor();
+    }
+
+    public void dragUpdate(LocalDate startDate, LocalDate endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     public Post(PostRequestDto requestDto, LocalDate startDate, LocalDate endDate, User user) {

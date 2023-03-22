@@ -45,7 +45,7 @@ public class UserResponseDto {
         this.friendCount = user.getFriendCount();
         this.subscribingCount = user.getSubscribing().size();
         this.subscriberCount = user.getSubscriber().size();
-        this.mutualFriends = mutualFriends;
+        //this.mutualFriends = mutualFriends; 열면 큰일나는 지옥문입니다.
         this.mutualFriendsCount = mutualFriends.size();
     }
     public UserResponseDto(User user, boolean friendCheck, boolean userSubscribeCheck, boolean updateCheck, List<User> mutualFriends){
@@ -63,7 +63,7 @@ public class UserResponseDto {
         this.friendCount = user.getFriendCount();
         this.subscribingCount = user.getSubscribing().size();
         this.subscriberCount = user.getSubscriber().size();
-        this.mutualFriends = mutualFriends;
+        //this.mutualFriends = mutualFriends;
         this.mutualFriendsCount = mutualFriends.size();
     }
     public UserResponseDto(User user){

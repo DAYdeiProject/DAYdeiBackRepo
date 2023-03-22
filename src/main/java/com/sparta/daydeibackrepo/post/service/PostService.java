@@ -443,7 +443,7 @@ public class PostService {
                     post.setColor(ColorEnum.GRAY);
                     AllPosts.add(post);
                 }
-            }
+            }용
             // Master를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {
@@ -477,51 +477,66 @@ public class PostService {
                 .orElseThrow(() -> new NullPointerException("존재하지 않는 사용자입니다"));
 
         List<ScopeEnum> allowedScopes = new ArrayList<>();
-        if (friendRepository.findFriend(master, visitor) != null ) {
-            allowedScopes.add(ScopeEnum.ALL);
-            allowedScopes.add(ScopeEnum.SUBSCRIBE);
-        } else {
-            allowedScopes.add(ScopeEnum.ALL);
-            allowedScopes.add(ScopeEnum.SUBSCRIBE);
+        allowedScopes.add(ScopeEnum.ALL);
+        allowedScopes.add(ScopeEnum.SUBSCRIBE);
+        if (friendRepository.findFriend(master, visitor) != null ) { //친구이면
             allowedScopes.add(ScopeEnum.FRIEND);
-            allowedScopes.add(ScopeEnum.ME);
-        }
+        } //자기 자신일 경우 getUpdatePost 메서드를 탈 수 없기 때문에 일단 ME는 아예 추가하지 않았음.
 
-        List<Post> posts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNotNullOrderByModifiedAtDesc(
+        // 태그 당했고 수락한 일정 모두 가져오기
+        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserIdAndPostSubscribeCheck(master.getId(), true);
+        List<Post> postSubscribePosts= new ArrayList<>();
+        for (PostSubscribe postSubscribe : postSubscribes) {
+            // postSubscribe 객체에서 post를 가져오기
+            Post post = postSubscribe.getPost();
+            if (allowedScopes.contains(post.getScope())){
+                postSubscribePosts.add(post);  // 태그당하고 수락한 일정들
+            }
+        }
+        // modifiedAt 기준으로 최신순으로 정렬한 후 5개만 뽑아 내기.
+        Collections.sort(postSubscribePosts, Comparator.comparing(Post::getModifiedAt).reversed());
+        postSubscribePosts = postSubscribePosts.stream().limit(5).collect(Collectors.toList());
+
+        // master가 직접 작성한 것도 최신순으로 5개만 가지고 왔어 .
+        List<Post> myPosts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNotNullOrderByModifiedAtDesc(
                 master, allowedScopes, PageRequest.of(0, 5)
         );
-        if (posts.size() < 5) {
-            List<Post> additionalPosts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNullOrderByCreatedAtDesc(
-                    master, allowedScopes, PageRequest.of(0, 5 - posts.size())
-            );
-            posts.addAll(additionalPosts);
-            posts = posts.subList(0, Math.min(posts.size(), 5));
-        }
-        List<Tag> tags = new ArrayList<>();
-        for (Post post: posts){
 
-            tags.addAll(tagRepository.findAllByPostId(post.getId()));
+        // posts 리스트에 '태그당한일정5개'와 '직접작성한일정5개'를 합치고 최신순으로 5개만 남기고 나머지 5개는 제거
+        List<Post> posts = new ArrayList<>();
+        posts.addAll(myPosts);
+        for (Post post : posts){
+            System.out.println(post.getId());
+        }
+        System.out.println();
+        posts.addAll(postSubscribePosts);
+        for (Post post : posts){
+            System.out.println(post.getId());
+        }
+        Collections.sort(posts, Comparator.comparing(Post::getModifiedAt).reversed());
+        posts = posts.stream().limit(5).collect(Collectors.toList());
+        for (Post post : posts){
+            System.out.println(post.getId());
         }
 
-        List<ParticipantsResponseDto> participants = new ArrayList<>();
-        for(Tag tag : tags) {
-            ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getProfileImage(), tag.getUser().getNickName());
-            participants.add(ParticipantsResponseDto);
-        }
 
-//        List<PostResponseDto> postResponseDtos = posts.stream()
-//                .map(post -> PostResponseDto.create(post, participants))
-//                .collect(Collectors.toList());
         List<PostResponseDto> postResponseDtos = new ArrayList<>();
-        for (Post post: posts){
+        for (Post post: posts) {
+            List<ParticipantsResponseDto> participants = new ArrayList<>();
             WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
+            //만약에 해당 post에 대해 태그당한 사람이 있을 경우, participants 리스트에 태그당한 사람 수만큼 participantsResponseDto 추가
+            List<PostSubscribe> tagList = postSubscribeRepository.findAllByPostId(post.getId()); // 2. 개수 파악
+            if (!tagList.isEmpty()) { // 1. 존재한다면
+                for (PostSubscribe postSubscribe : tagList) {
+                    participants.add(new ParticipantsResponseDto(postSubscribe.getUser().getId(), postSubscribe.getUser().getProfileImage(), postSubscribe.getUser().getNickName()));
+                }
+            }
             postResponseDtos.add(PostResponseDto.create(post, writerResponseDto, participants));
 
         }
-
-
         return postResponseDtos;
     }
+
     public void createBirthday(User user1, User user2) {
         PostRequestDto postRequestDto1 = new PostRequestDto(user2);
         PostRequestDto postRequestDto2 = new PostRequestDto(user1);

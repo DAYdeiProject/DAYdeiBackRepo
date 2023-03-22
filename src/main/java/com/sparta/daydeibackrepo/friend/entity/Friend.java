@@ -1,6 +1,7 @@
 package com.sparta.daydeibackrepo.friend.entity;
 
 import com.sparta.daydeibackrepo.user.entity.User;
+import com.sparta.daydeibackrepo.util.TimeStamped;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Setter
 @Getter
 @NoArgsConstructor
-public class Friend {
+public class Friend extends TimeStamped {
 
     @Id
     @Column

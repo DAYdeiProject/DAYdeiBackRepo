@@ -2,6 +2,7 @@ package com.sparta.daydeibackrepo.friend.repository;
 
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.user.entity.User;
+import com.sparta.daydeibackrepo.util.SortEnum;
 
 import java.util.List;
 public interface FriendCustomRepository {
@@ -13,4 +14,5 @@ public interface FriendCustomRepository {
     List<User> findResponseUser(User user);
     List<User> findRequestUser(User user);
     List<User> findTagUser(User user, String searchWord);
+    List<User> findAllFriendsBySort(User user, SortEnum sortEnum);
 }

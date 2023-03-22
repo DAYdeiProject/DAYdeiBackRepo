@@ -1,7 +1,6 @@
 package com.sparta.daydeibackrepo.friend.controller;
 
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
-import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
 import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
@@ -30,13 +29,9 @@ public class FriendController {
     public StatusResponseDto<String> deleteFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.deleteFriend(userId, userDetails));
     }
-    @GetMapping("/list")
-    public StatusResponseDto<RelationResponseDto> getRelationList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getRelationList(userDetails));
-    }
     @GetMapping("/list/{userId}")
-    public StatusResponseDto<RelationResponseDto> getYourRelationList(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getYourRelationList(userId, userDetails));
+    public StatusResponseDto<List<UserResponseDto>> getFriendList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(friendService.getFriendList(userId, userDetails, searchword, sort));
     }
     @GetMapping("/recommend")
     public StatusResponseDto<List<UserResponseDto>> getRecommendList(@RequestParam List<String> category, @RequestParam String searchword, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){

@@ -42,7 +42,7 @@ public class PostController {
     }
 
     //일정 수정
-    @PutMapping("/posts/{postId}")
+    @PatchMapping("/posts/{postId}")
     public StatusResponseDto<PostResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException, IOException {
         return StatusResponseDto.success(postService.updatePost(postId, requestDto, userDetails));
     }

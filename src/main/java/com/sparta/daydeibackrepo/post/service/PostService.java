@@ -505,19 +505,14 @@ public class PostService {
         // posts 리스트에 '태그당한일정5개'와 '직접작성한일정5개'를 합치고 최신순으로 5개만 남기고 나머지 5개는 제거
         List<Post> posts = new ArrayList<>();
         posts.addAll(myPosts);
-        for (Post post : posts){
-            System.out.println(post.getId());
-        }
-        System.out.println();
         posts.addAll(postSubscribePosts);
-        for (Post post : posts){
-            System.out.println(post.getId());
-        }
-        Collections.sort(posts, Comparator.comparing(Post::getModifiedAt).reversed());
-        posts = posts.stream().limit(5).collect(Collectors.toList());
-        for (Post post : posts){
-            System.out.println(post.getId());
-        }
+//        Collections.sort(posts, Comparator.comparing(Post::getModifiedAt).reversed());
+        posts = posts.stream()
+                .filter(post -> post.getModifiedAt().toLocalDate().isAfter(LocalDate.now().minusWeeks(1)))
+                .sorted(Comparator.comparing(Post::getStartDate))
+                .limit(5)
+                .collect(Collectors.toList());
+        //posts.stream().limit(5).collect(Collectors.toList());
 
 
         List<PostResponseDto> postResponseDtos = new ArrayList<>();
@@ -525,8 +520,8 @@ public class PostService {
             List<ParticipantsResponseDto> participants = new ArrayList<>();
             WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
             //만약에 해당 post에 대해 태그당한 사람이 있을 경우, participants 리스트에 태그당한 사람 수만큼 participantsResponseDto 추가
-            List<PostSubscribe> tagList = postSubscribeRepository.findAllByPostId(post.getId()); // 2. 개수 파악
-            if (!tagList.isEmpty()) { // 1. 존재한다면
+            List<PostSubscribe> tagList = postSubscribeRepository.findAllByPostId(post.getId());
+            if (!tagList.isEmpty()) {
                 for (PostSubscribe postSubscribe : tagList) {
                     participants.add(new ParticipantsResponseDto(postSubscribe.getUser().getId(), postSubscribe.getUser().getProfileImage(), postSubscribe.getUser().getNickName()));
                 }
@@ -536,6 +531,59 @@ public class PostService {
         }
         return postResponseDtos;
     }
+
+    @Transactional
+    public List<PostResponseDto> getSharePost(Long userId, UserDetailsImpl userDetails){
+        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증되지 않은 사용자입니다")
+        );
+        User master = userRepository.findById(userId).orElseThrow(
+                () -> new NullPointerException("존재하지 않는 사용자입니다")
+        );
+        List<Post> posts = new ArrayList<>();
+
+        // 내가 작성한 일정 중에 master를 초대한 일정이 있는지. (수락한 것, 오늘을 기준으로 오늘 포함 미래 일정)
+        List<Post> visitorPosts = postRepository.findAllPostByUser(visitor);
+        for (Post post : visitorPosts){
+            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserIdAndPostSubscribeCheck(post.getId(), master.getId(), true);
+            if (postSubscribe != null && !postSubscribe.getPost().getStartDate().isBefore(LocalDate.now())){ // 태그수락한 일정이 존재하고, 그 일정이 과거가 아니라면
+                posts.add(postSubscribe.getPost());
+            }
+        }
+
+        // master가 작성한 일정 중에 visitor를 초대한 일정이 있는지 (수락한 것, 오늘을 기준으로 오늘 포함 미래 일정)
+        List<Post> masterPosts = postRepository.findAllPostByUser(master);
+        for (Post post : masterPosts){
+            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserIdAndPostSubscribeCheck(post.getId(), visitor.getId(), true);
+            if (postSubscribe != null && !postSubscribe.getPost().getStartDate().isBefore(LocalDate.now())){ // 태그수락한 일정이 존재하고, 그 일정이 과거가 아니라면
+                posts.add(postSubscribe.getPost());
+            }
+        }
+        posts = posts.stream()
+                .filter(post -> !post.getStartDate().isBefore(LocalDate.now()))
+                .sorted(Comparator.comparing(Post::getStartDate)
+                        .thenComparing(Comparator.comparing(Post::getStartTime)))
+                .limit(5)
+                .collect(Collectors.toList());
+        List<PostResponseDto> postResponseDtos = new ArrayList<>();
+        for (Post post: posts) {
+            List<ParticipantsResponseDto> participants = new ArrayList<>();
+            WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
+            //만약에 해당 post에 대해 태그당한 사람이 있을 경우, participants 리스트에 태그당한 사람 수만큼 participantsResponseDto 추가
+            List<PostSubscribe> tagList = postSubscribeRepository.findAllByPostId(post.getId());
+            if (!tagList.isEmpty()) {
+                for (PostSubscribe postSubscribe : tagList) {
+                    participants.add(new ParticipantsResponseDto(postSubscribe.getUser().getId(), postSubscribe.getUser().getProfileImage(), postSubscribe.getUser().getNickName()));
+                }
+            }
+            postResponseDtos.add(PostResponseDto.create(post, writerResponseDto, participants));
+
+        }
+        return postResponseDtos;
+    }
+
+
+
 
     public void createBirthday(User user1, User user2) {
         PostRequestDto postRequestDto1 = new PostRequestDto(user2);

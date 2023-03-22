@@ -61,7 +61,7 @@ public class PostController {
 
     // 특정 날짜의 일정 ( 다른 사용자 )
     @GetMapping("/home/today/{userId}")
-    public StatusResponseDto<?> getDatePost(@PathVariable Long userId, @RequestParam String date,@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<Object> getDatePost(@PathVariable Long userId, @RequestParam String date,@AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(postService.getDatePost(userId, date, userDetails));
     }
 
@@ -72,8 +72,13 @@ public class PostController {
     }
 
     @GetMapping("/post/update/{userId}")
-    public StatusResponseDto<?> getUpdatePost(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<List<PostResponseDto>> getUpdatePost(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(postService.getUpdatePost(userId, userDetails));
+    }
+
+    @GetMapping("/post/share/{userId}")
+    public StatusResponseDto<List<PostResponseDto>> getSharePost(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(postService.getSharePost(userId, userDetails));
     }
 
 }

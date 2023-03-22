@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface PostSubscribeRepository extends JpaRepository<PostSubscribe, Long>, PostSubscribeCustomRepository {
     PostSubscribe findByPostIdAndUserId(Long postId, Long userId);
-
+    PostSubscribe findByPostIdAndUserIdAndPostSubscribeCheck(Long postId, Long userId, Boolean check);
     List<PostSubscribe> findAllByUserId(Long userId);
     List<PostSubscribe> findAllByUserIdAndPostSubscribeCheck(Long userId, Boolean check);
 

@@ -1,7 +1,6 @@
 package com.sparta.daydeibackrepo.friend.service;
 
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
-import com.sparta.daydeibackrepo.friend.dto.RelationResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
@@ -14,6 +13,7 @@ import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
+import com.sparta.daydeibackrepo.util.SortEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -123,42 +123,6 @@ public class FriendService {
         }
     }
     @Transactional(readOnly = true)
-    public RelationResponseDto getRelationList(UserDetailsImpl userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("인증된 유저가 아닙니다"));
-        return getRelationListForUser(user);
-    }
-
-    @Transactional
-    public RelationResponseDto getYourRelationList(Long userId, UserDetailsImpl userDetails) {
-        User visitor = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new NullPointerException("인증된 유저가 아닙니다"));
-        User master = userRepository.findById(userId)
-                .orElseThrow(() -> new NullPointerException("사용자를 찾을 수 없습니다"));
-        return getRelationListForUser(master);
-    }
-
-    private RelationResponseDto getRelationListForUser(User user) {
-        List<User> friends = friendRepository.findAllFriends(user);
-        List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(user);
-        List<UserResponseDto> friendList = makeUserResponseDtos(user, friends);
-        List<UserResponseDto> userSubscribeList = makeUserResponseDtos(user, userSubscribers);
-        // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        boolean isEven = Integer.parseInt(LocalDate.now().format(formatter)) % 2 == 0;
-        if (isEven){
-            Collections.sort(friendList, Comparator.comparing(UserResponseDto::getEmail));
-            Collections.sort(userSubscribeList, Comparator.comparing(UserResponseDto::getEmail));
-        }
-        else {
-            Collections.sort(friendList, Comparator.comparing(UserResponseDto::getNickName));
-            Collections.sort(userSubscribeList, Comparator.comparing(UserResponseDto::getNickName));
-        }
-        return new RelationResponseDto(friendList, userSubscribeList);
-    }
-
-
-    @Transactional(readOnly = true)
     public List<UserResponseDto> getRecommendList(List<String> categories, String searchWord, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
@@ -253,5 +217,17 @@ public class FriendService {
             }
         }
         return userResponseDtos;
+    }
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getFriendList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
+        User visitor = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("인증된 유저가 아닙니다"));
+        User master = userRepository.findById(userId)
+                .orElseThrow(() -> new NullPointerException("사용자를 찾을 수 없습니다"));
+
+        List<User> friends = friendRepository.findAllFriendsBySort(master, SortEnum.valueOf(sort.toUpperCase()));
+        List<UserResponseDto> friendList = makeUserResponseDtos(master, friends).stream()
+                .filter(user -> user.getNickName().contains(searchWord) || user.getEmail().contains(searchWord)).collect(Collectors.toList());
+        return friendList;
     }
 }

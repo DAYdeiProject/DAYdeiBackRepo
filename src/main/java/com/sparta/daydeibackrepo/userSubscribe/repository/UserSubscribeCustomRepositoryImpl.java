@@ -1,7 +1,10 @@
 package com.sparta.daydeibackrepo.userSubscribe.repository;
 
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.daydeibackrepo.user.entity.User;
+import com.sparta.daydeibackrepo.userSubscribe.entity.QUserSubscribe;
+import com.sparta.daydeibackrepo.util.SortEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,5 +22,24 @@ public class UserSubscribeCustomRepositoryImpl implements UserSubscribeCustomRep
                 .from(userSubscribe)
                 .where(userSubscribe.subscribingId.eq(user))
                 .fetch();
+    }
+    public List<User> findAllSubscriberUserBySort(User user, SortEnum sortEnum){
+        QUserSubscribe userSubscribe = QUserSubscribe.userSubscribe;
+        JPQLQuery<User> query = jpaQueryFactory.select(userSubscribe.subscriberId)
+                .from(userSubscribe)
+                .where(userSubscribe.subscribingId.eq(user));
+        if (sortEnum.equals(SortEnum.FAMOUS)) {
+            query.orderBy(userSubscribe.subscriberId.subscriber.size().desc());
+        }
+        else if (sortEnum.equals(SortEnum.RECENT)) {
+            query.orderBy(userSubscribe.createdAt.desc());
+        }
+        else if (sortEnum.equals(SortEnum.OLD)) {
+            query.orderBy(userSubscribe.createdAt.asc());
+        }
+        else if (sortEnum.equals(SortEnum.NAME)){
+            query.orderBy(userSubscribe.subscriberId.nickName.asc());
+        }
+        return query.fetch();
     }
 }

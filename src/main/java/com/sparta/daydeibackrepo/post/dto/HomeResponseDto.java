@@ -2,14 +2,11 @@ package com.sparta.daydeibackrepo.post.dto;
 
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.Post;
-import com.sparta.daydeibackrepo.post.entity.ScopeEnum;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 @Getter
 @Setter
 public class HomeResponseDto {

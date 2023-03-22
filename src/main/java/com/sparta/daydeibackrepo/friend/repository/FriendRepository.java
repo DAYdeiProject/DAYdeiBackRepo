@@ -1,13 +1,8 @@
 package com.sparta.daydeibackrepo.friend.repository;
 
 import com.sparta.daydeibackrepo.friend.entity.Friend;
-import com.sparta.daydeibackrepo.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
-
 
 public interface FriendRepository extends JpaRepository<Friend, Long>, FriendCustomRepository {
     /*Friend findByFriendRequestIdAndFriendResponseId(User requestUser, User responseUser);*/

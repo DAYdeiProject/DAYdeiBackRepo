@@ -1,11 +1,7 @@
 package com.sparta.daydeibackrepo.postSubscribe.repository;
 
-import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.postSubscribe.entity.PostSubscribe;
-import com.sparta.daydeibackrepo.tag.entity.Tag;
-import com.sparta.daydeibackrepo.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 

@@ -14,7 +14,6 @@ import static com.sparta.daydeibackrepo.post.entity.QPost.post;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor

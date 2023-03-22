@@ -1,6 +1,5 @@
 package com.sparta.daydeibackrepo.postSubscribe.service;
 
-import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.post.entity.Post;

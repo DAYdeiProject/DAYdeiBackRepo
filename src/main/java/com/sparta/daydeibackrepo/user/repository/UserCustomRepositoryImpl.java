@@ -1,10 +1,8 @@
 package com.sparta.daydeibackrepo.user.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
-import com.sparta.daydeibackrepo.user.entity.QUser;
 import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

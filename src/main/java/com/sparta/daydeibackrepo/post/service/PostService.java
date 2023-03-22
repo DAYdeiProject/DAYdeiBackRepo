@@ -508,7 +508,7 @@ public class PostService {
         posts.addAll(postSubscribePosts);
         posts = posts.stream()
                 .filter(post -> post.getModifiedAt().toLocalDate().isAfter(LocalDate.now().minusWeeks(1)))
-                .sorted(Comparator.comparing(Post::getStartDate))
+                .sorted(Comparator.comparing(Post::getModifiedAt).reversed())
                 .limit(5)
                 .collect(Collectors.toList());
 

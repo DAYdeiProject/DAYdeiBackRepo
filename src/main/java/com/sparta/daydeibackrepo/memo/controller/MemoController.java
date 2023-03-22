@@ -29,4 +29,9 @@ public class MemoController {
         return StatusResponseDto.success(memoService.getAllMemo(userDetails));
     }
 
+    @PatchMapping("/memos/{memoId}")
+    public StatusResponseDto<?> updateMemo(@PathVariable Long memoId, @RequestBody MemoRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
+        return StatusResponseDto.success(memoService.updateMemo(memoId, requestDto, userDetails));
+    }
+
 }

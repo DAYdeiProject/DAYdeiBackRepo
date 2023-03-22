@@ -4,12 +4,15 @@ import com.sparta.daydeibackrepo.memo.dto.MemoRequestDto;
 import com.sparta.daydeibackrepo.memo.dto.MemoResponseDto;
 import com.sparta.daydeibackrepo.memo.entity.Memo;
 import com.sparta.daydeibackrepo.memo.repository.MemoRepository;
+import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.User;
+import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,10 @@ import java.util.List;
 public class MemoService {
     private final MemoRepository memoRepository;
     private final UserRepository userRepository;
+
+    private boolean hasAuthority(User user, Memo memo) {
+        return user.getId().equals(memo.getUser().getId()) || user.getRole().equals(UserRoleEnum.ADMIN);
+    }
 
     public Object createMemo(MemoRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -44,5 +51,23 @@ public class MemoService {
         }
 
         return memoResponseDtos;
+    }
+
+    @Transactional
+    public Object updateMemo(Long memoId, MemoRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        Memo memo = memoRepository.findById(memoId).orElseThrow(
+                () -> new NullPointerException("존재하지 않는 메모입니다.")
+        );
+
+        if(hasAuthority(user, memo)) {
+            memo.update(requestDto);
+            return "메모가 수정되었습니다.";
+        }
+        throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
+
+
     }
 }

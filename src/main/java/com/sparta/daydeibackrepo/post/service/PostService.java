@@ -505,19 +505,15 @@ public class PostService {
         // posts 리스트에 '태그당한일정5개'와 '직접작성한일정5개'를 합치고 최신순으로 5개만 남기고 나머지 5개는 제거
         List<Post> posts = new ArrayList<>();
         posts.addAll(myPosts);
-        for (Post post : posts){
-            System.out.println(post.getId());
-        }
         System.out.println();
         posts.addAll(postSubscribePosts);
-        for (Post post : posts){
-            System.out.println(post.getId());
-        }
-        Collections.sort(posts, Comparator.comparing(Post::getModifiedAt).reversed());
-        posts = posts.stream().limit(5).collect(Collectors.toList());
-        for (Post post : posts){
-            System.out.println(post.getId());
-        }
+//        Collections.sort(posts, Comparator.comparing(Post::getModifiedAt).reversed());
+        posts = posts.stream()
+                .filter(post -> post.getModifiedAt().toLocalDate().isAfter(LocalDate.now().minusWeeks(1)))
+                .sorted(Comparator.comparing(Post::getModifiedAt).reversed())
+                .limit(5)
+                .collect(Collectors.toList());
+        //posts.stream().limit(5).collect(Collectors.toList());
 
 
         List<PostResponseDto> postResponseDtos = new ArrayList<>();
@@ -536,6 +532,11 @@ public class PostService {
         }
         return postResponseDtos;
     }
+
+
+
+
+
 
     public void createBirthday(User user1, User user2) {
         PostRequestDto postRequestDto1 = new PostRequestDto(user2);

@@ -443,7 +443,7 @@ public class PostService {
                     post.setColor(ColorEnum.GRAY);
                     AllPosts.add(post);
                 }
-            }용
+            }
             // Master를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {

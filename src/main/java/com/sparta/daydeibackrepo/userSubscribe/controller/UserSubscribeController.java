@@ -36,8 +36,15 @@ public class UserSubscribeController {
         return StatusResponseDto.success(userSubscribeService.getUserSubscribeList(userId, userDetails, searchword, sort));
     }
 
+    @GetMapping("/followers/{userId}")
+    public StatusResponseDto<List<UserResponseDto>> getUserFollowerList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(userSubscribeService.getUserFollowerList(userId, userDetails, searchword, sort));
+    }
+
     @PutMapping("/show/{userId}")
     public StatusResponseDto<String> setSubscrbeVisibility(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(userSubscribeService.setSubscrbeVisibility(userId, userDetails));
     }
+
+
 }

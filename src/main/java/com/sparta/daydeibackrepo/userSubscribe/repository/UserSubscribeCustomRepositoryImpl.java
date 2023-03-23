@@ -27,6 +27,29 @@ public class UserSubscribeCustomRepositoryImpl implements UserSubscribeCustomRep
                 .where(userSubscribe.subscribingId.eq(user))
                 .fetch();
     }
+
+    @Override
+    public List<User> findAllSubscribingUserBySort(User user, SortEnum sortEnum) {
+        QUserSubscribe userSubscribe = QUserSubscribe.userSubscribe;
+        JPQLQuery<User> query = jpaQueryFactory.select(userSubscribe.subscribingId)
+                .from(userSubscribe)
+                .where(userSubscribe.subscriberId.eq(user));
+        if (sortEnum.equals(SortEnum.FAMOUS)) {
+            query.orderBy(userSubscribe.subscribingId.subscribing.size().desc());
+        }
+        else if (sortEnum.equals(SortEnum.RECENT)) {
+            query.orderBy(userSubscribe.createdAt.desc());
+        }
+        else if (sortEnum.equals(SortEnum.OLD)) {
+            query.orderBy(userSubscribe.createdAt.asc());
+        }
+        else if (sortEnum.equals(SortEnum.NAME)){
+            query.orderBy(userSubscribe.subscribingId.nickName.asc());
+        }
+        return query.fetch();
+    }
+
+
     public List<User> findAllSubscriberUserBySort(User user, SortEnum sortEnum){
         QUserSubscribe userSubscribe = QUserSubscribe.userSubscribe;
         JPQLQuery<User> query = jpaQueryFactory.select(userSubscribe.subscriberId)

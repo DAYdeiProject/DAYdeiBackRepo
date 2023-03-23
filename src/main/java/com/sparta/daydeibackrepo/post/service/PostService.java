@@ -269,7 +269,7 @@ public class PostService {
         // 내가 구독한 유저의 일정
         // 1. 내가 구독한 유저의 리스트를 다 뽑는다.
         List<Post> userSubscribePosts = new ArrayList<>();
-        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
+        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingIdAndIsVisible(user, true);
         // 2. UserSubscribe 객체에서 구독한 유저 객체를 뽑아주고 그 객체로 오늘의 일정을 뽑아주기
 
         for (UserSubscribe userSubscribe : userSubscribes) {
@@ -345,7 +345,7 @@ public class PostService {
 
         // 캘린더 주인이 구독한 유저의 일정
         List<Post> userSubscribePosts = new ArrayList<>(); // 구독한 유저의 포스트 리스트
-        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(user);
+        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingIdAndIsVisible(user, true);
 
         for (UserSubscribe userSubscribe : userSubscribes) { // 구독한 유저의 포스트 리스트 중에서 해당 날짜에 해당하는 것만
             userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), localDate, ScopeEnum.SUBSCRIBE));

@@ -190,7 +190,6 @@ public class PostService {
         }
 
 
-
         //태그당한 친구에게 알림
 
         if (hasAuthority(user, post)) {

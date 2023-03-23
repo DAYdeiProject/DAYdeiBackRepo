@@ -29,9 +29,15 @@ public class UserSubscribe extends TimeStamped {
     @JoinColumn(name = "subscriber_Id")
     private User subscriberId;
 
+    @Column
+    private Boolean isVisiable;
+
+
+
     public UserSubscribe(User subscribingId, User subscriberId){
         this.subscribingId = subscribingId;
         this.subscriberId = subscriberId;
+        this.isVisiable = true;
     }
 
 }

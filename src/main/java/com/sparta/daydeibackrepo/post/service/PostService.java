@@ -74,7 +74,8 @@ public class PostService {
         Post savePost = postRepository.save(post);
 
 
-        if (startDate.isAfter(endDate) || (startDate.isEqual(endDate) && startTime.isAfter(endTime))) {
+        if (startDate.isAfter(endDate) || (startDate.isEqual(endDate) && startTime.isAfter(endTime)) ||
+                (startDate.isEqual(endDate) && (startTime.equals(endTime) && !startTime.equals(LocalTime.parse("00:00"))))) {
             throw new IllegalArgumentException("일정의 시간 설정이 올바르지 않습니다.");
         }
 
@@ -185,7 +186,8 @@ public class PostService {
         LocalTime startTime = LocalTime.parse(requestDto.getStartTime());
         LocalTime endTime = LocalTime.parse(requestDto.getEndTime());
 
-        if (startDate.isAfter(endDate) || (startDate.isEqual(endDate) && startTime.isAfter(endTime))) {
+        if (startDate.isAfter(endDate) || (startDate.isEqual(endDate) && startTime.isAfter(endTime)) ||
+                (startDate.isEqual(endDate) && (startTime.equals(endTime) && !startTime.equals(LocalTime.parse("00:00"))))) {
             throw new IllegalArgumentException("일정의 시간 설정이 올바르지 않습니다.");
         }
 
@@ -319,9 +321,9 @@ public class PostService {
 
         DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyyMMddHH");
         Collections.sort(todayPostResponseDtos, (o1, o2) -> {
-            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(), o1.getStartTime() != null ? o1.getStartTime() : LocalTime.MIN);
-            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(), o2.getStartTime() != null ? o2.getStartTime() : LocalTime.MIN);
-            return o1DateTime.format(formatter2).compareTo(o2DateTime.format(formatter2));
+            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(),o1.getStartTime());
+            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(),o2.getStartTime());
+            return o1DateTime.compareTo(o2DateTime);
         });
 
 
@@ -400,12 +402,10 @@ public class PostService {
                 todayPostResponseDtos.add(responseDto);
             }
         }
-
-        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyyMMddHH");
         Collections.sort(todayPostResponseDtos, (o1, o2) -> {
-            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(), o1.getStartTime() != null ? o1.getStartTime() : LocalTime.MIN);
-            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(), o2.getStartTime() != null ? o2.getStartTime() : LocalTime.MIN);
-            return o1DateTime.format(formatter2).compareTo(o2DateTime.format(formatter2));
+            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(),o1.getStartTime());
+            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(),o2.getStartTime());
+            return o1DateTime.compareTo(o2DateTime);
         });
 
 
@@ -479,11 +479,10 @@ public class PostService {
                 homeResponseDtos.add(new HomeResponseDto(post));
             }
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHH");
         Collections.sort(homeResponseDtos, (o1, o2) -> {
-            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(), o1.getStartTime() != null ? o1.getStartTime() : LocalTime.MIN);
-            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(), o2.getStartTime() != null ? o2.getStartTime() : LocalTime.MIN);
-            return o1DateTime.format(formatter).compareTo(o2DateTime.format(formatter));
+            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(),o1.getStartTime());
+            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(),o2.getStartTime());
+            return o1DateTime.compareTo(o2DateTime);
         });
         return homeResponseDtos;
     }

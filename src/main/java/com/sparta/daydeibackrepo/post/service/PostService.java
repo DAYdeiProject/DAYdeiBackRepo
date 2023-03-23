@@ -428,14 +428,13 @@ public class PostService {
         if (master == visitor) {
             // 내가 작성한 일정
             List<Post> AllPosts = postRepository.findAllPostByUser(master);
-            // 내가 구독하는 일정
-            List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
+            // 내가 구독하는 일정 // 모든 구독자의 일정이 아니라 마스터가 체크 표시 했는지가 중요. + usersubscrbingId를 넣으면 포스트가 나오게 필터링
+            /*List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master); // 이거 필터링할때 체크여부까지 확인해야함 (작업필요)
             for (UserSubscribe userSubscribe : userSubscribes) {
-                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId());
-                for (Post post: subscribePost){
-                    post.setColor(ColorEnum.GRAY);
-                    AllPosts.add(post);
-                }
+                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId());*/
+            List<Post> subscribePost = postRepository.findSubscribingPost(master);
+            for (Post post : subscribePost) {
+                AllPosts.add(new Post(post, ColorEnum.GRAY));
             }
             // 나를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
@@ -461,13 +460,9 @@ public class PostService {
                 AllPosts = postRepository.findNotFriendPost(master);
             }
             // Master가 구독하는 일정
-            List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingId(master);
-            for (UserSubscribe userSubscribe : userSubscribes) {
-                List<Post> subscribePost = postRepository.findSubscribePost(userSubscribe.getSubscriberId());
-                for (Post post: subscribePost){
-                    post.setColor(ColorEnum.GRAY);
-                    AllPosts.add(post);
-                }
+            List<Post> subscribePost = postRepository.findSubscribingPost(master);
+            for (Post post : subscribePost) {
+                AllPosts.add(new Post(post, ColorEnum.GRAY));
             }
             // Master를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());

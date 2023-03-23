@@ -74,8 +74,8 @@ public class PostService {
         Post savePost = postRepository.save(post);
 
 
-        if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("일정의 시작 일자는 끝나는 일자보다 빠른 일자여야 합니다.");
+        if (startDate.isAfter(endDate) || (startDate.isEqual(endDate) && startTime.isAfter(endTime))) {
+            throw new IllegalArgumentException("일정의 시간 설정이 올바르지 않습니다.");
         }
 
         for(Long participant : requestDto.getParticipant()) {
@@ -185,8 +185,8 @@ public class PostService {
         LocalTime startTime = LocalTime.parse(requestDto.getStartTime());
         LocalTime endTime = LocalTime.parse(requestDto.getEndTime());
 
-        if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("일정의 시작 일자는 끝나는 일자보다 빠른 일자여야 합니다.");
+        if (startDate.isAfter(endDate) || (startDate.isEqual(endDate) && startTime.isAfter(endTime))) {
+            throw new IllegalArgumentException("일정의 시간 설정이 올바르지 않습니다.");
         }
 
 

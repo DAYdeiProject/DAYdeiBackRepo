@@ -2,14 +2,18 @@ package com.sparta.daydeibackrepo.userSubscribe.repository;
 
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.daydeibackrepo.post.entity.Post;
+import com.sparta.daydeibackrepo.post.entity.QPost;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.userSubscribe.entity.QUserSubscribe;
+import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.util.SortEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.sparta.daydeibackrepo.post.entity.QPost.post;
 import static com.sparta.daydeibackrepo.userSubscribe.entity.QUserSubscribe.userSubscribe;
 
 @Repository
@@ -42,4 +46,13 @@ public class UserSubscribeCustomRepositoryImpl implements UserSubscribeCustomRep
         }
         return query.fetch();
     }
+
+    /*public List<Post> findSubscribingPost(User user){
+
+        return jpaQueryFactory.selectFrom(post)
+                .leftJoin(userSubscribe).on(post.user.eq(userSubscribe.subscriberId))
+                .where(userSubscribe.subscribingId.eq(user))
+                        //.and(userSubscribe.isVisibile.eq(true)))
+                .fetch();
+    }*/
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import static com.sparta.daydeibackrepo.post.entity.QPost.post;
+import static com.sparta.daydeibackrepo.userSubscribe.entity.QUserSubscribe.userSubscribe;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -83,5 +84,14 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
                         .and(post.scope.eq(ScopeEnum.ME))
                         .and(post.startDate.eq(LocalDate.parse("2023-" + birthdayUser.getBirthday().substring(0,2) + "-" + birthdayUser.getBirthday().substring(2,4)))))
                 .fetchFirst();
+    }
+    public List<Post> findSubscribingPost(User user){
+
+        return jpaQueryFactory.selectFrom(post)
+                .leftJoin(userSubscribe).on(post.user.eq(userSubscribe.subscriberId))
+                .where(userSubscribe.subscribingId.eq(user)
+                        .and(post.scope.in(ScopeEnum.SUBSCRIBE))
+                .and(userSubscribe.isVisible.eq(true)))
+                .fetch();
     }
 }

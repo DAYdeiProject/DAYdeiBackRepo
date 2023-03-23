@@ -40,4 +40,10 @@ public class UserSubscribe extends TimeStamped {
         this.isVisible = true;
     }
 
+    public void update(User subscribingId, User subscriberId, Boolean isVisible){
+        this.subscribingId = subscribingId;
+        this.subscriberId = subscriberId;
+        this.isVisible = isVisible;
+    }
+
 }

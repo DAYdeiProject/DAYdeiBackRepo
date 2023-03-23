@@ -85,6 +85,23 @@ public class UserSubscribeService {
 
     @Transactional
     public String setSubscrbeVisibility(Long userId, UserDetailsImpl userDetails){
-        return "";
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증되지 않은 사용자입니다")
+        );
+        User subscribe = userRepository.findById(userId).orElseThrow(
+                () -> new NullPointerException("존재하지 않는 사용자입니다")
+        );
+        //user가 subscribe를 구독하고 있다면. (테이블에 존재한다면)
+        UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, subscribe);
+        if (userSubscribe != null){
+            if (userSubscribe.getIsVisible()) { // true였다면
+                userSubscribe.update(user, subscribe, false);
+                return "구독한 일정을 표시하지 않습니다";
+            } else { //false였다면
+                userSubscribe.update(user, subscribe, true);
+                return "구독한 일정을 표시합니다";
+            }
+        }
+        throw new NullPointerException("구독하지 않은 계정입니다");
     }
 }

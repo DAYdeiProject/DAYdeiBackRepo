@@ -30,14 +30,14 @@ public class UserSubscribe extends TimeStamped {
     private User subscriberId;
 
     @Column
-    private Boolean isVisiable;
+    private Boolean isVisible;
 
 
 
     public UserSubscribe(User subscribingId, User subscriberId){
         this.subscribingId = subscribingId;
         this.subscriberId = subscriberId;
-        this.isVisiable = true;
+        this.isVisible = true;
     }
 
 }

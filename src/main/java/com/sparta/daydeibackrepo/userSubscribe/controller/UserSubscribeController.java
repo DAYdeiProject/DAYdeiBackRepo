@@ -35,4 +35,9 @@ public class UserSubscribeController {
     public StatusResponseDto<List<UserResponseDto>> getUserSubscribeList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(userSubscribeService.getUserSubscribeList(userId, userDetails, searchword, sort));
     }
+
+    @PutMapping("/show/{userId}")
+    public StatusResponseDto<String> setSubscrbeVisibility(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(userSubscribeService.setSubscrbeVisibility(userId, userDetails));
+    }
 }

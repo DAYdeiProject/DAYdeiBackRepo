@@ -82,4 +82,9 @@ public class UserSubscribeService {
                 .collect(Collectors.toList());
         return userSubscribeList;
     }
+
+    @Transactional
+    public String setSubscrbeVisibility(Long userId, UserDetailsImpl userDetails){
+        return "";
+    }
 }

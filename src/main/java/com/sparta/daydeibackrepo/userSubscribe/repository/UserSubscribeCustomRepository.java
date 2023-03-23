@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface UserSubscribeCustomRepository {
     List<User> findAllSubscriberUser(User user);
+    List<User> findAllSubscribingUserBySort(User user, SortEnum sortEnum);
 
     List<User> findAllSubscriberUserBySort(User user, SortEnum sortEnum);
 }

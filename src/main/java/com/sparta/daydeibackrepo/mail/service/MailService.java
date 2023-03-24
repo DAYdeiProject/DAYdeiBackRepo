@@ -14,14 +14,22 @@ public class MailService {
 
     private String sender;
 
-    public void sendMail(MailDto mailDto) throws MailException {
+    public void sendFindPasswordMail(MailDto mailDto) throws MailException {
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setTo(mailDto.getEmail());
         message.setFrom(sender);
         message.setSubject(String.format("%S님의 비밀번호가 재설정되었습니다.", mailDto.getName()));
         message.setText(mailDto.getMessage());
+        mailSender.send(message);
+    }
+    public void sendScheduleNotifyMail(MailDto mailDto) throws MailException {
+        SimpleMailMessage message = new SimpleMailMessage();
 
+        message.setTo(mailDto.getEmail());
+        message.setFrom(sender);
+        message.setSubject(String.format("%S 일정이 한 시간 후에 시작합니다.", mailDto.getName()));
+        message.setText(mailDto.getMessage());
         mailSender.send(message);
     }
 }

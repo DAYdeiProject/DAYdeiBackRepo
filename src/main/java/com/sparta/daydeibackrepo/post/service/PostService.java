@@ -1,7 +1,10 @@
 package com.sparta.daydeibackrepo.post.service;
 
-import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
+import com.sparta.daydeibackrepo.mail.dto.MailDto;
+import com.sparta.daydeibackrepo.mail.service.MailService;
+import com.sparta.daydeibackrepo.notification.entity.NotificationType;
+import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.post.dto.*;
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.Post;
@@ -26,6 +29,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -34,7 +39,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.time.LocalTime;
-import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -53,6 +57,8 @@ public class PostService {
     private final PostSubscribeService postSubscribeService;
 
     private final S3Service s3Service;
+    private final MailService mailService;
+    private final NotificationService notificationService;
 
     private boolean hasAuthority(User user, Post post) {
         return user.getId().equals(post.getUser().getId()) || user.getRole().equals(UserRoleEnum.ADMIN);
@@ -588,9 +594,6 @@ public class PostService {
         return postResponseDtos;
     }
 
-
-
-
     public void createBirthday(User user1, User user2) {
         PostRequestDto postRequestDto1 = new PostRequestDto(user2);
         PostRequestDto postRequestDto2 = new PostRequestDto(user1);
@@ -613,5 +616,19 @@ public class PostService {
 
         Post post = new Post(requestDto, startDate, endDate, user);
         postRepository.save(post);
+    }
+
+    @Async
+    @Scheduled(cron="0 0 * * * ?")
+    @Transactional
+    public void notifySchedule(){
+        List<Post> notifySchedules = postRepository.findAll();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+        for (Post post : notifySchedules){
+            if (LocalDateTime.now().format(formatter).equals(LocalDateTime.of(post.getStartDate(), post.getStartTime()).minusHours(1).format(formatter))){
+                mailService.sendScheduleNotifyMail(new MailDto(post));
+                notificationService.send(post.getUser().getId(), NotificationType.SCHEDULE_NOTIFY, NotificationType.SCHEDULE_NOTIFY.makeContent(post.getTitle()), NotificationType.SCHEDULE_NOTIFY.makeUrl(post.getId()));
+            }
+        }
     }
 }

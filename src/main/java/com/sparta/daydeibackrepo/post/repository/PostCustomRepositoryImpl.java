@@ -13,6 +13,7 @@ import static com.sparta.daydeibackrepo.post.entity.QPost.post;
 import static com.sparta.daydeibackrepo.userSubscribe.entity.QUserSubscribe.userSubscribe;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -94,4 +95,12 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
                 .and(userSubscribe.isVisible.eq(true)))
                 .fetch();
     }
+    /* //추후 구현해보기
+    List<Post> findNofitySchedule(){
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime postDateTime = LocalDateTime.of(post.startDate, post.startTime);
+        return jpaQueryFactory.selectFrom(post)
+                .where(post.startDate.atTime(post.startTime).isBefore(now) && post.startDate.atTime(post.startTime).plusHours(1).isAfter(now))
+                .fetch();
+    }*/
 }

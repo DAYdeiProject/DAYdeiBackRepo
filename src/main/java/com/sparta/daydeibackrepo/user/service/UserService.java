@@ -101,7 +101,7 @@ public class UserService {
             throw new IllegalArgumentException("생일이 일치하지 않습니다.");
         }
         String newPassword = UUID.randomUUID().toString().substring(0,8);
-        mailService.sendMail(new MailDto(user, newPassword));
+        mailService.sendFindPasswordMail(new MailDto(user, newPassword));
         user.updatePassword(passwordEncoder.encode(newPassword));
         return "임시 비밀번호가 이메일로 전송되었습니다.";
     }

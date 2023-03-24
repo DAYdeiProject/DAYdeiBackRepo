@@ -148,8 +148,8 @@ public class PostService {
 
 //        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscriberId(post.getUser());
 //        UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(post.getUser(), user);
-
-        List<User> friends = friendRepository.findAllFriends(user);
+                                                            //로그인한유저 -> postId의 post의 user(작성자)
+        List<User> friends = friendRepository.findAllFriends(post.getUser());
 
         if(post.getScope() == ScopeEnum.ME && !Objects.equals(post.getUser().getId(), user.getId())) {
             throw new AccessDeniedException("작성자가 나만 보기로 설정한 일정입니다.");

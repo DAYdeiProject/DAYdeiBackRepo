@@ -305,13 +305,11 @@ public class PostService {
         // dto 타입으로 변경하고 todayPostResponseDtos 리스트에 추가
         List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
         for (Post post : userSubscribePosts) {
-            post.setColor(ColorEnum.GRAY);
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(new Post(post, ColorEnum.GRAY));
             todayPostResponseDtos.add(responseDto);
         }
         for (Post post : postSubscribePosts) {
-            post.setColor(ColorEnum.GRAY);
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(new Post(post, ColorEnum.GRAY));
             todayPostResponseDtos.add(responseDto);
         }
         for (Post post : myPosts) {
@@ -352,8 +350,7 @@ public class PostService {
             userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), localDate, ScopeEnum.SUBSCRIBE));
         }
         for (Post post : userSubscribePosts) { // 반환 타입 리스트에 추가
-            post.setColor(ColorEnum.GRAY);
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(new Post(post, ColorEnum.GRAY));
             todayPostResponseDtos.add(responseDto);
         }
 
@@ -369,8 +366,7 @@ public class PostService {
         if (friendRepository.findFriend(user, visitor) != null ) { //친구이면
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if (postSubscribe.getPost().getScope() != ScopeEnum.ME && postSubscribe.getPostSubscribeCheck()){
-                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
-                    postSubscribePosts.add(postSubscribe.getPost());
+                    postSubscribePosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
                 }
             } // 캘린더 주인이 직접 작성한 것
             for (Post post : myPosts){
@@ -383,8 +379,7 @@ public class PostService {
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if ((postSubscribe.getPost().getScope() == ScopeEnum.ALL || postSubscribe.getPost().getScope() == ScopeEnum.SUBSCRIBE)
                     && postSubscribe.getPostSubscribeCheck()){
-                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
-                    postSubscribePosts.add(postSubscribe.getPost());
+                    postSubscribePosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
                 }
             } // 캘린더 주인이 직접 작성한 것
             for (Post post : myPosts){
@@ -439,8 +434,7 @@ public class PostService {
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if (postSubscribe.getPostSubscribeCheck()) {
-                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
-                    AllPosts.add(postSubscribe.getPost());
+                    AllPosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
                 }
             }
             for (Post post : AllPosts) {
@@ -467,12 +461,10 @@ public class PostService {
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if (postSubscribe.getPostSubscribeCheck()&&(postSubscribe.getPost().getScope() == ScopeEnum.ALL || postSubscribe.getPost().getScope() == ScopeEnum.SUBSCRIBE)){
-                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
-                    AllPosts.add(postSubscribe.getPost());
+                    AllPosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
                 }
                 else if (postSubscribe.getPostSubscribeCheck() && postSubscribe.getPost().getScope() == ScopeEnum.FRIEND && friendRepository.findFriend(master, visitor) != null) {
-                    postSubscribe.getPost().setColor(ColorEnum.GRAY);
-                    AllPosts.add(postSubscribe.getPost());
+                    AllPosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
                 }
             }
             for (Post post : AllPosts) {

@@ -95,12 +95,13 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
                 .and(userSubscribe.isVisible.eq(true)))
                 .fetch();
     }
-    /* //추후 구현해보기
-    List<Post> findNofitySchedule(){
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime postDateTime = LocalDateTime.of(post.startDate, post.startTime);
+    //추후 구현해보기 // 특정 시간에 시작하는 게시글 다 가져오기
+    public List<Post> findNofitySchedule(){
+        LocalDateTime localDateTime = LocalDateTime.now().plusHours(1);
+        LocalDate localDate = localDateTime.toLocalDate();
+        LocalTime localTime = localDateTime.toLocalTime();
         return jpaQueryFactory.selectFrom(post)
-                .where(post.startDate.atTime(post.startTime).isBefore(now) && post.startDate.atTime(post.startTime).plusHours(1).isAfter(now))
+                .where(post.startDate.eq(localDate).and(post.startTime.eq(localTime)))
                 .fetch();
-    }*/
+    }
 }

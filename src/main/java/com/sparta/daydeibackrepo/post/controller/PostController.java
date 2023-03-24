@@ -59,11 +59,11 @@ public class PostController {
         return StatusResponseDto.success(postService.deletePost(postId, userDetails));
     }
 
-    //특정 날짜의 일정 ( 내 캘린더 )
-    @GetMapping("/home/today")              //@Parameter(hidden = true)
-    public StatusResponseDto<?> getTodayPost(@RequestParam String date, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return StatusResponseDto.success(postService.getTodayPost(date, userDetails));
-    }
+//    //특정 날짜의 일정 ( 내 캘린더 )
+//    @GetMapping("/home/today")              //@Parameter(hidden = true)
+//    public StatusResponseDto<?> getTodayPost(@RequestParam String date, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return StatusResponseDto.success(postService.getTodayPost(date, userDetails));
+//    }
 
     // 특정 날짜의 일정 ( 다른 사용자 )
     @GetMapping("/home/today/{userId}")

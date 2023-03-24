@@ -10,7 +10,7 @@ public interface PostSubscribeRepository extends JpaRepository<PostSubscribe, Lo
     PostSubscribe findByPostIdAndUserId(Long postId, Long userId);
     PostSubscribe findByPostIdAndUserIdAndPostSubscribeCheck(Long postId, Long userId, Boolean check);
     List<PostSubscribe> findAllByUserId(Long userId);
-    List<PostSubscribe> findAllByUserIdAndPostSubscribeCheckAndPostScopeIn(Long userId, Boolean check, List<ScopeEnum> scopeEnums);
+    List<PostSubscribe> findAllByUserIdAndPostSubscribeCheck(Long userId, Boolean check);
 
 
 //    @Query("DELETE FROM PostSubscribe p WHERE p.post = :post AND p.user = :user")

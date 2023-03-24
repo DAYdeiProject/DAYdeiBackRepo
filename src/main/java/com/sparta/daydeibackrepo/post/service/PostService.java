@@ -381,9 +381,10 @@ public class PostService {
         );
         // 태그 당했고 수락한 일정 모두 가져오기
         List<Post> postSubscribePosts = postSubscribeRepository
-                .findAllByUserIdAndPostSubscribeCheckAndPostScopeIn(master.getId(), true, allowedScopes)
+                .findAllByUserIdAndPostSubscribeCheck(master.getId(), true)
                 .stream()
                 .map(PostSubscribe::getPost)
+                .filter(post -> allowedScopes.contains(post.getScope())) // 권한 확인 및 필터링
                 .collect(Collectors.toList());
         posts.addAll(postSubscribePosts);
 
@@ -485,7 +486,7 @@ public class PostService {
             }
         }
         // 캘린더 주인이 태그당한
-        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserIdAndPostSubscribeCheckAndPostScopeIn(master.getId(), true, allowedScopes);
+        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserIdAndPostSubscribeCheck(master.getId(), true);
         // 허용 되는 범위 골라내기
         for (PostSubscribe postSubscribe : postSubscribes) {
             Post post = postSubscribe.getPost();

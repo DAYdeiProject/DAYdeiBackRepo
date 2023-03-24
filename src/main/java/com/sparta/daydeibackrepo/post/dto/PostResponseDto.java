@@ -42,6 +42,7 @@ public class PostResponseDto {
     private ColorEnum color;
 
     private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
     public static PostResponseDto of(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> tagedFriends) {
         return PostResponseDto.builder()
@@ -59,6 +60,7 @@ public class PostResponseDto {
                 .scope(post.getScope())
                 .color(post.getColor())
                 .createdAt(post.getCreatedAt())
+                .modifiedAt(post.getModifiedAt())
                 .build();
     }
 
@@ -66,7 +68,7 @@ public class PostResponseDto {
         return new PostResponseDto(post.getId(), writerResponseDto, post.getTitle(), post.getStartDate(),
                 post.getEndDate(), post.getStartTime(), post.getEndTime(), post.getContent(),
                 post.getImage(), post.getLocation(), taggedFriends, post.getScope(),
-                post.getColor(), post.getCreatedAt());
+                post.getColor(), post.getCreatedAt(), post.getModifiedAt());
     }
 }
 

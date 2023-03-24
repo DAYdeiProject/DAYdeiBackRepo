@@ -67,8 +67,8 @@ public class PostController {
 
     // 특정 날짜의 일정 ( 다른 사용자 )
     @GetMapping("/home/today/{userId}")
-    public StatusResponseDto<Object> getDatePost(@PathVariable Long userId, @RequestParam String date, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(postService.getDatePost(userId, date, userDetails));
+    public StatusResponseDto<Object> getPostByDate(@PathVariable Long userId, @RequestParam String date, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(postService.getPostByDate(userId, date, userDetails));
     }
 
     //전체일정 홈화면

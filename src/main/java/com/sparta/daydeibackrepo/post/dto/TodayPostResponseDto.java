@@ -29,7 +29,7 @@ public class TodayPostResponseDto {
     private String content;
     private ColorEnum color;
 
-    public TodayPostResponseDto(Post post) {
+    public TodayPostResponseDto(Post post, ColorEnum color) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.startDate = post.getStartDate();
@@ -38,6 +38,6 @@ public class TodayPostResponseDto {
         this.endTime = post.getEndTime();
         this.location = post.getLocation();
         this.content = post.getContent();
-        this.color = post.getColor();
+        this.color = color;
     }
 }

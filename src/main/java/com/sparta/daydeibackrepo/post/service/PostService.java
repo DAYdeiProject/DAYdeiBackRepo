@@ -338,97 +338,104 @@ public class PostService {
 //        return todayPostResponseDtos;
 //    }
 
+//    @Transactional(readOnly = true)
+//    public Object getPostByDate(Long userId, String date, UserDetailsImpl userDetails) {
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        LocalDate localDate = LocalDate.parse(date, formatter);
+//        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+//                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+//        );
+//        User master = userRepository.findById(userId).orElseThrow(
+//                () -> new NullPointerException("등록된 사용자가 없습니다")
+//        );
+//
+//        List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
+//
+//        // 캘린더 주인이 구독한 유저의 일정
+//        List<Post> userSubscribePosts = new ArrayList<>(); // 구독한 유저의 포스트 리스트
+//        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingIdAndIsVisible(master, true);
+//
+//        for (UserSubscribe userSubscribe : userSubscribes) { // 구독한 유저의 포스트 리스트 중에서 해당 날짜에 해당하는 것만
+//            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), localDate, ScopeEnum.SUBSCRIBE));
+//        }
+//        for (Post post : userSubscribePosts) { // 반환 타입 리스트에 추가
+//            TodayPostResponseDto responseDto = new TodayPostResponseDto(new Post(post, ColorEnum.GRAY));
+//            todayPostResponseDtos.add(responseDto);
+//        }
+//        List<ScopeEnum> allowedScopes = new ArrayList<>(Arrays.asList(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE));
+//        if (friendRepository.findFriend(master, visitor) != null) {
+//            allowedScopes.add(ScopeEnum.FRIEND);
+//        }
+//        if (visitor == master) {
+//            allowedScopes.add(ScopeEnum.ME);
+//            allowedScopes.add(ScopeEnum.FRIEND);
+//        }
+//
+//        // 캘린더 주인이 초대 수락한 일정
+//        List<Post> postSubscribePosts= new ArrayList<>(); // 캘린더 주인이 초대 수락한 일정
+//        List<Post> myPosts = postRepository.findAllPostByUser(master); // 캘린더 주인이 직접 작성한 일정
+//        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate)); // 해당 날짜만 남기기
+//        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
+//        for (PostSubscribe postSubscribe : postSubscribes){
+//            Post post = postSubscribe.getPost();
+//            if (allowedScopes.contains(post.getScope())){
+//                postSubscribePosts.add(post);
+//            }
+//        }
+//        for (Post post : myPosts){
+//            if (allowedScopes.contains(post.getScope())){
+//                TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+//                todayPostResponseDtos.add(responseDto);
+//            }
+//        }
+//        for(Post post : postSubscribePosts){
+//            LocalDate startDate = post.getStartDate();
+//            LocalDate endDate = post.getEndDate();
+//            if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate))){
+//                TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+//                todayPostResponseDtos.add(responseDto);
+//            }
+//        }
+//        Collections.sort(todayPostResponseDtos, (o1, o2) -> {
+//            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(),o1.getStartTime());
+//            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(),o2.getStartTime());
+//            return o1DateTime.compareTo(o2DateTime);
+//        });
+//        return todayPostResponseDtos;
+//    }
 
-    // TODO: 2023/03/24 리팩토링 예정 (지윤) 
-    @Transactional
-    public Object getDatePost(Long userId, String date, UserDetailsImpl userDetails) {
+    @Transactional(readOnly = true)
+    public List<TodayPostResponseDto> getPostByDate(Long userId, String date, UserDetailsImpl userDetails) {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
-        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
-        );
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new NullPointerException("등록된 사용자가 없습니다")
-        );
+        User visitor = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("인증된 유저가 아닙니다"));
 
+        User master = userRepository.findById(userId)
+                .orElseThrow(() -> new NullPointerException("등록된 사용자가 없습니다"));
+
+        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
 
-        // 캘린더 주인이 구독한 유저의 일정
-        List<Post> userSubscribePosts = new ArrayList<>(); // 구독한 유저의 포스트 리스트
-        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingIdAndIsVisible(user, true);
+        List<Post> subscribePosts = getSubscribePosts(master, localDate);
+        List<Post> allAllowedPosts = getAllowedPosts(master, visitor, localDate);
 
-        for (UserSubscribe userSubscribe : userSubscribes) { // 구독한 유저의 포스트 리스트 중에서 해당 날짜에 해당하는 것만
-            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), localDate, ScopeEnum.SUBSCRIBE));
-        }
-        for (Post post : userSubscribePosts) { // 반환 타입 리스트에 추가
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(new Post(post, ColorEnum.GRAY));
+        for(Post post : subscribePosts) {
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(post, ColorEnum.GRAY);
             todayPostResponseDtos.add(responseDto);
         }
 
-
-        // 캘린더 주인이 초대 수락한 일정
-        List<Post> postSubscribePosts= new ArrayList<>(); // 캘린더 주인이 초대 수락한 일정
-        List<Post> myPosts = postRepository.findAllPostByUser(user); // 캘린더 주인이 직접 작성한 일정
-        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate)); // 해당 날짜만
-
-        // 캘린더 주인이 visitor와 친구이면 scope가 visitor, all, subscribe를 가지고 오고,
-        // 캘린더 주인이 visitor와 친구가 아니면 scope가 all, subscribe인 것을 가지고 온다.
-        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
-        if (friendRepository.findFriend(user, visitor) != null ) { //친구이면
-            for (PostSubscribe postSubscribe : postSubscribes) {
-                if (postSubscribe.getPost().getScope() != ScopeEnum.ME && postSubscribe.getPostSubscribeCheck()){
-                    postSubscribePosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
-                }
-            } // 캘린더 주인이 직접 작성한 것
-            for (Post post : myPosts){
-                if (post.getScope() != ScopeEnum.ME){
-                    TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
-                    todayPostResponseDtos.add(responseDto);
-                }
-            }
-        } else if (user == visitor){ //자기 자신이면
-            for (PostSubscribe postSubscribe : postSubscribes) {
-                if (postSubscribe.getPostSubscribeCheck()){
-                    postSubscribePosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
-                }
-            } // 캘린더 주인이 직접 작성한 것
-            for (Post post : myPosts){
-                TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
-                todayPostResponseDtos.add(responseDto);
-            }
-        }else { //친구가 아니면
-            for (PostSubscribe postSubscribe : postSubscribes) {
-                if ((postSubscribe.getPost().getScope() == ScopeEnum.ALL || postSubscribe.getPost().getScope() == ScopeEnum.SUBSCRIBE)
-                    && postSubscribe.getPostSubscribeCheck()){
-                    postSubscribePosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
-                }
-            } // 캘린더 주인이 직접 작성한 것
-            for (Post post : myPosts){
-                if (post.getScope() == ScopeEnum.SUBSCRIBE || post.getScope() == ScopeEnum.ALL){
-                    TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
-                    todayPostResponseDtos.add(responseDto);
-                }
-            }
+        for(Post post : allAllowedPosts) {
+            TodayPostResponseDto responseDto = new TodayPostResponseDto(post, post.getColor());
+            todayPostResponseDtos.add(responseDto);
         }
-        for(Post post : postSubscribePosts){
-            LocalDate startDate = post.getStartDate();
-            LocalDate endDate = post.getEndDate();
-            if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate))){
-                TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
-                todayPostResponseDtos.add(responseDto);
-            }
-        }
-        Collections.sort(todayPostResponseDtos, (o1, o2) -> {
-            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(),o1.getStartTime());
-            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(),o2.getStartTime());
-            return o1DateTime.compareTo(o2DateTime);
-        });
+
+        Collections.sort(todayPostResponseDtos, Comparator.comparing(o -> LocalDateTime.of(o.getStartDate(), o.getStartTime())));
+
         return todayPostResponseDtos;
     }
 
-
-    //내가 구독하는 유저가 스크랩 가능으로 글을 올리고 나를 태그했다. > 현재는 2번 불러옴 > 1번만 불러올 수 있도록 고쳐야함.
+        //내가 구독하는 유저가 스크랩 가능으로 글을 올리고 나를 태그했다. > 현재는 2번 불러옴 > 1번만 불러올 수 있도록 고쳐야함.
     @Transactional
     public List<HomeResponseDto> getHomePost(Long userId, UserDetailsImpl userDetails) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -505,56 +512,30 @@ public class PostService {
                 .orElseThrow(() -> new NullPointerException("인증되지 않은 사용자입니다"));
         User master = userRepository.findById(userId)
                 .orElseThrow(() -> new NullPointerException("존재하지 않는 사용자입니다"));
-
-        List<ScopeEnum> allowedScopes = new ArrayList<>();
-        allowedScopes.add(ScopeEnum.ALL);
-        allowedScopes.add(ScopeEnum.SUBSCRIBE);
-        if (friendRepository.findFriend(master, visitor) != null ) { //친구이면
-            allowedScopes.add(ScopeEnum.FRIEND);
-        } //자기 자신일 경우 getUpdatePost 메서드를 탈 수 없기 때문에 일단 ME는 아예 추가하지 않았음.
-
-        // 태그 당했고 수락한 일정 모두 가져오기
-        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserIdAndPostSubscribeCheck(master.getId(), true);
-        List<Post> postSubscribePosts= new ArrayList<>();
-        for (PostSubscribe postSubscribe : postSubscribes) {
-            // postSubscribe 객체에서 post를 가져오기
-            Post post = postSubscribe.getPost();
-            if (allowedScopes.contains(post.getScope())){
-                postSubscribePosts.add(post);  // 태그당하고 수락한 일정들
-            }
-        }
-        // modifiedAt 기준으로 최신순으로 정렬한 후 5개만 뽑아 내기.
-        Collections.sort(postSubscribePosts, Comparator.comparing(Post::getModifiedAt).reversed());
-        postSubscribePosts = postSubscribePosts.stream().limit(5).collect(Collectors.toList());
-
+        List<ScopeEnum> allowedScopes = getAllowedScopes(master, visitor);
         // master가 직접 작성한 것도 최신순으로 5개만 가지고 왔어 .
-        List<Post> myPosts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNotNullOrderByModifiedAtDesc(
+        List<Post> posts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNotNullOrderByModifiedAtDesc(
                 master, allowedScopes, PageRequest.of(0, 5)
         );
-
-        // posts 리스트에 '태그당한일정5개'와 '직접작성한일정5개'를 합치고 최신순으로 5개만 남기고 나머지 5개는 제거
-        List<Post> posts = new ArrayList<>();
-        posts.addAll(myPosts);
+        // 태그 당했고 수락한 일정 모두 가져오기
+        List<Post> postSubscribePosts = postSubscribeRepository
+                .findAllByUserIdAndPostSubscribeCheckAndPostScopeIn(master.getId(), true, allowedScopes)
+                .stream()
+                .map(PostSubscribe::getPost)
+                .collect(Collectors.toList());
         posts.addAll(postSubscribePosts);
-        posts = posts.stream()
+
+        List<PostResponseDto> postResponseDtos = posts.stream()
                 .filter(post -> post.getModifiedAt().toLocalDate().isAfter(LocalDate.now().minusWeeks(1)))
                 .sorted(Comparator.comparing(Post::getModifiedAt).reversed())
                 .limit(5)
+                .map(post -> {
+                    List<ParticipantsResponseDto> participants = getParticipants(post);
+                    WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
+                    return PostResponseDto.create(post, writerResponseDto, participants);
+                })
                 .collect(Collectors.toList());
 
-        List<PostResponseDto> postResponseDtos = new ArrayList<>();
-        for (Post post: posts) {
-            List<ParticipantsResponseDto> participants = new ArrayList<>();
-            WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
-            //만약에 해당 post에 대해 태그당한 사람이 있을 경우, participants 리스트에 태그당한 사람 수만큼 participantsResponseDto 추가
-            List<PostSubscribe> tagList = postSubscribeRepository.findAllByPostId(post.getId());
-            if (!tagList.isEmpty()) {
-                for (PostSubscribe postSubscribe : tagList) {
-                    participants.add(new ParticipantsResponseDto(postSubscribe.getUser().getId(), postSubscribe.getUser().getProfileImage(), postSubscribe.getUser().getNickName()));
-                }
-            }
-            postResponseDtos.add(PostResponseDto.create(post, writerResponseDto, participants));
-        }
         return postResponseDtos;
     }
 
@@ -630,6 +611,70 @@ public class PostService {
 
         Post post = new Post(requestDto, startDate, endDate, user);
         postRepository.save(post);
+    }
+
+    private List<Post> getSubscribePosts(User user, LocalDate localDate) {
+        List<Post> subscribePosts = new ArrayList<>();
+        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingIdAndIsVisible(user, true);
+        for(UserSubscribe userSubscribe : userSubscribes) {
+            subscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), localDate, ScopeEnum.SUBSCRIBE));
+        }
+        return subscribePosts;
+    }
+
+    private List<Post> getAllowedPosts(User master, User visitor, LocalDate localDate) {
+        List<Post> allowedPosts = new ArrayList<>();
+        List<ScopeEnum> allowedScopes = getAllowedScopes(master, visitor);
+
+        // 캘린더 주인이 작성한 일정 중에서 입력받은 날짜에 해당하는 일정만 추출
+        List<Post> myPosts = postRepository.findAllPostByUser(master);
+        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
+
+        // 반환할 일정 리스트에 추가
+        for (Post post : myPosts) {
+            if (allowedScopes.contains(post.getScope())) {
+                allowedPosts.add(post);
+            }
+        }
+
+        // 캘린더 주인이 구독하고 있는 모든 일정 가져오기
+        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
+
+        // 허용 되는 범위 골라내기
+        for (PostSubscribe postSubscribe : postSubscribes) {
+            Post post = postSubscribe.getPost();
+            if (allowedScopes.contains(post.getScope())) {
+                // 날짜 필터링
+                LocalDate startDate = post.getStartDate();
+                LocalDate endDate = post.getEndDate();
+                if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate))) {
+                    allowedPosts.add(post);
+                }
+            }
+        }
+        return allowedPosts;
+    }
+
+    private List<ScopeEnum> getAllowedScopes(User master, User visitor) {
+        List<ScopeEnum> allowedScopes = new ArrayList<>(Arrays.asList(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE));
+        if (friendRepository.findFriend(master, visitor) != null) {
+            allowedScopes.add(ScopeEnum.FRIEND);
+        }
+        if (visitor == master) {
+            allowedScopes.add(ScopeEnum.ME);
+            allowedScopes.add(ScopeEnum.FRIEND);
+        }
+        return allowedScopes;
+    }
+
+    private List<ParticipantsResponseDto> getParticipants(Post post) {
+        List<PostSubscribe> tagList = postSubscribeRepository.findAllByPostId(post.getId());
+        if (tagList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return tagList.stream()
+                .map(postSubscribe -> new ParticipantsResponseDto(postSubscribe.getUser().getId(), postSubscribe.getUser().getProfileImage(), postSubscribe.getUser().getNickName()))
+                .collect(Collectors.toList());
     }
 
     @Async

@@ -43,6 +43,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -547,46 +548,29 @@ public class PostService {
         User master = userRepository.findById(userId).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 사용자입니다")
         );
-        List<Post> posts = new ArrayList<>();
-
-        // 내가 작성한 일정 중에 master를 초대한 일정이 있는지. (수락한 것, 오늘을 기준으로 오늘 포함 미래 일정)
         List<Post> visitorPosts = postRepository.findAllPostByUser(visitor);
-        for (Post post : visitorPosts){
-            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserIdAndPostSubscribeCheck(post.getId(), master.getId(), true);
-            if (postSubscribe != null && !postSubscribe.getPost().getStartDate().isBefore(LocalDate.now())){ // 태그수락한 일정이 존재하고, 그 일정이 과거가 아니라면
-                posts.add(postSubscribe.getPost());
-            }
-        }
-
-        // master가 작성한 일정 중에 visitor를 초대한 일정이 있는지 (수락한 것, 오늘을 기준으로 오늘 포함 미래 일정)
         List<Post> masterPosts = postRepository.findAllPostByUser(master);
-        for (Post post : masterPosts){
-            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserIdAndPostSubscribeCheck(post.getId(), visitor.getId(), true);
-            if (postSubscribe != null && !postSubscribe.getPost().getStartDate().isBefore(LocalDate.now())){ // 태그수락한 일정이 존재하고, 그 일정이 과거가 아니라면
-                posts.add(postSubscribe.getPost());
-            }
-        }
-        posts = posts.stream()
-                .filter(post -> !post.getStartDate().isBefore(LocalDate.now()))
+        List<Post> posts = Stream.concat(visitorPosts.stream(), masterPosts.stream())
+                .flatMap(p -> p.getPostSubscribe().stream()
+                        .filter(ps -> ps.getUser().equals(visitor) || ps.getUser().equals(master))
+                        .filter(PostSubscribe::getPostSubscribeCheck)
+                        .map(PostSubscribe::getPost))
+                .filter(p -> !p.getStartDate().isBefore(LocalDate.now()))
                 .sorted(Comparator.comparing(Post::getStartDate)
-                        .thenComparing(Comparator.comparing(Post::getStartTime)))
+                        .thenComparing(Post::getStartTime))
                 .limit(5)
                 .collect(Collectors.toList());
 
-        List<PostResponseDto> postResponseDtos = new ArrayList<>();
-        for (Post post: posts) {
-            List<ParticipantsResponseDto> participants = new ArrayList<>();
-            WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
-            //만약에 해당 post에 대해 태그당한 사람이 있을 경우, participants 리스트에 태그당한 사람 수만큼 participantsResponseDto 추가
-            List<PostSubscribe> tagList = postSubscribeRepository.findAllByPostId(post.getId());
-            if (!tagList.isEmpty()) {
-                for (PostSubscribe postSubscribe : tagList) {
-                    participants.add(new ParticipantsResponseDto(postSubscribe.getUser().getId(), postSubscribe.getUser().getProfileImage(), postSubscribe.getUser().getNickName()));
-                }
-            }
-            postResponseDtos.add(PostResponseDto.create(post, writerResponseDto, participants));
-        }
-        return postResponseDtos;
+        return posts.stream()
+                .map(post -> {
+                    List<ParticipantsResponseDto> participants = post.getPostSubscribe().stream()
+                            .filter(ps -> !ps.getUser().equals(post.getUser()))
+                            .map(ps -> new ParticipantsResponseDto(ps.getUser().getId(), ps.getUser().getProfileImage(), ps.getUser().getNickName()))
+                            .collect(Collectors.toList());
+                    WriterResponseDto writer = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
+                    return PostResponseDto.create(post, writer, participants);
+                })
+                .collect(Collectors.toList());
     }
 
     public void createBirthday(User user1, User user2) {
@@ -613,6 +597,7 @@ public class PostService {
         postRepository.save(post);
     }
 
+    // 구독한 계정의 일정 중에서 subscribe허용 && date에 해당하는 일정들 가져오는 메서드
     private List<Post> getSubscribePosts(User user, LocalDate localDate) {
         List<Post> subscribePosts = new ArrayList<>();
         List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingIdAndIsVisible(user, true);
@@ -622,6 +607,8 @@ public class PostService {
         return subscribePosts;
     }
 
+    // master가 작성한 일정한 일정 & 태그 당했고 수락한 일정
+    // master와 visitor의 관계를 판단하여 scope권한이 있으며 && localDate에 해당하는 일정만 가져오는 메서드
     private List<Post> getAllowedPosts(User master, User visitor, LocalDate localDate) {
         List<Post> allowedPosts = new ArrayList<>();
         List<ScopeEnum> allowedScopes = getAllowedScopes(master, visitor);
@@ -636,10 +623,8 @@ public class PostService {
                 allowedPosts.add(post);
             }
         }
-
-        // 캘린더 주인이 구독하고 있는 모든 일정 가져오기
-        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
-
+        // 캘린더 주인이 태그당한
+        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserIdAndPostSubscribeCheckAndPostScopeIn(master.getId(), true, allowedScopes);
         // 허용 되는 범위 골라내기
         for (PostSubscribe postSubscribe : postSubscribes) {
             Post post = postSubscribe.getPost();

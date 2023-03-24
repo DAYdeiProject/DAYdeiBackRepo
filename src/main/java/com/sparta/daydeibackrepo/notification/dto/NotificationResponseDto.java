@@ -15,10 +15,11 @@ public class NotificationResponseDto {
     private String content;
 
     private String url;
+    private Boolean isRead;
 
     public static NotificationResponseDto create(Notification notification) {
         return new NotificationResponseDto(notification.getId(), notification.getContent(),
-                notification.getUrl());
+                notification.getUrl(), notification.getIsRead());
     }
 }
 

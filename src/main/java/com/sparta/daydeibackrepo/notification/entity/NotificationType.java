@@ -1,11 +1,11 @@
 package com.sparta.daydeibackrepo.notification.entity;
 
 public enum NotificationType {
-    FRIEND_ACCEPT("님이 회원님의 친구 신청을 승인하였습니다.", "/api/home/profile/"), SUBSCRIBE_ACCEPT("님이 구독하기 시작하였습니다.", "/api/home/profile/"),
-    JOIN_REQUEST("님의 일정 참여 요청이 도착하였습니다.", "/api/posts/"), JOIN_REJECT("님이 회원님의 일정 참여 요청을 거절하였습니다.", "/api/posts/"),
-    JOIN_UPDATE_REQUEST("님과의 일정이 수정되었습니다.", "/api/posts/"), JOIN_DELETE_REQUEST("님과의 일정이 삭제되었습니다.", "/api/posts/"),
-    FRIEND_REQUEST("님이 회원님께 친구 신청을 보냈습니다.", "/api/home/profile/"), JOIN_ACCEPT("님이 회원님의 일정 참여 요청을 수락하였습니다.", "/api/posts/"),
-    SCHEDULE_NOTIFY(" 일정이 한 시간 후에 시작됩니다.", "/api/posts/");
+    FRIEND_ACCEPT("님이 @ 회원님의 친구 신청을 승인하였습니다.", "/api/home/profile/"), SUBSCRIBE_ACCEPT("님이 @ 구독하기 시작하였습니다.", "/api/home/profile/"),
+    JOIN_REQUEST("님의 @ 일정 참여 요청이 도착하였습니다.", "/api/posts/"), JOIN_REJECT("님이 @ 회원님의 일정 참여 요청을 거절하였습니다.", "/api/posts/"),
+    JOIN_UPDATE_REQUEST("님과의 @ 일정이 수정되었습니다.", "/api/posts/"), JOIN_DELETE_REQUEST("님과의 @ 일정이 삭제되었습니다.", "/api/posts/"),
+    FRIEND_REQUEST("님이 @ 회원님께 친구 신청을 보냈습니다.", "/api/home/profile/"), JOIN_ACCEPT("님이 @ 회원님의 일정 참여 요청을 수락하였습니다.", "/api/posts/"),
+    SCHEDULE_NOTIFY(" @ 일정이 한 시간 후에 시작됩니다.", "/api/posts/");
 
     private String content;
     private String url;

@@ -116,7 +116,7 @@ public class PostSubscribeService {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new EntityNotFoundException("작성글이 존재하지 않습니다.")
         );
-        PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getUser().getId(), user.getId());
+        PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         if (postSubscribe==null){
             throw new EntityNotFoundException("수락 가능한 공유 일정이 없습니다.");
         }

@@ -24,6 +24,7 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class PostSubscribeService {
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostSubscribeRepository postSubscribeRepository;

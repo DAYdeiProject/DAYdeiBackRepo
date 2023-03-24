@@ -14,5 +14,5 @@ public interface PostCustomRepository {
     List<User> findAllUpdateFriend(User user);
     Post findBirthdayPost(User master, User birthdayUser);
     List<Post> findSubscribingPost(User user);
-    /*List<Post> findNofitySchedule();*/
+    List<Post> findNofitySchedule();
 }

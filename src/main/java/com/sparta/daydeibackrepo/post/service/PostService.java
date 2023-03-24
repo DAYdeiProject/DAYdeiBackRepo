@@ -640,6 +640,8 @@ public class PostService {
         return allowedPosts;
     }
 
+
+    //master와 visitor의 관계를 판단하여 허용하는 ScopeEnum을 리스트로 반환
     private List<ScopeEnum> getAllowedScopes(User master, User visitor) {
         List<ScopeEnum> allowedScopes = new ArrayList<>(Arrays.asList(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE));
         if (friendRepository.findFriend(master, visitor) != null) {

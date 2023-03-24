@@ -71,5 +71,3 @@ public class PostResponseDto {
                 post.getColor(), post.getCreatedAt(), post.getModifiedAt());
     }
 }
-
-

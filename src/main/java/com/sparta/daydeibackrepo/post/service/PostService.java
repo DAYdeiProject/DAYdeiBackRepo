@@ -19,6 +19,7 @@ import com.sparta.daydeibackrepo.tag.repository.TagRepository;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
+import com.sun.xml.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -258,76 +259,81 @@ public class PostService {
         }
         throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
     }
+    
+    
+// TODO: 2023/03/24 문제 없는 것 확인되면 삭제하기 
+    
+//    @Transactional
+//    public Object getTodayPost(String date, UserDetailsImpl userDetails) {
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        LocalDate localDate = LocalDate.parse(date, formatter);
+//        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+//                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+//        );
+//        // 내가 구독한 유저의 일정
+//        // 1. 내가 구독한 유저의 리스트를 다 뽑는다.
+//        List<Post> userSubscribePosts = new ArrayList<>();
+//        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingIdAndIsVisible(user, true);
+//        // 2. UserSubscribe 객체에서 구독한 유저 객체를 뽑아주고 그 객체로 오늘의 일정을 뽑아주기
+//
+//        for (UserSubscribe userSubscribe : userSubscribes) {
+//            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), localDate, ScopeEnum.SUBSCRIBE));
+//        }
+//
+//
+//        // 내가 초대 수락한 일정
+//        // 1. 내가 초대 수락한 일정 리스트를 다 뽑는다.
+//        List<Post> postSubscribePosts= new ArrayList<>();
+//        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
+//        // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
+//        LocalDateTime today = LocalDateTime.now();
+//        System.out.println(localDate);
+//
+//        for(PostSubscribe postSubscribe : postSubscribes){ //today.getChronology().dateNow()            //ChronoLocalDate.from(today)
+//            LocalDate startDate = postSubscribe.getPost().getStartDate();
+//            LocalDate endDate = postSubscribe.getPost().getEndDate();
+//            System.out.println(startDate.isBefore(localDate) || startDate.equals(localDate));
+//            System.out.println(endDate.isBefore(localDate) || endDate.equals(localDate));
+//            System.out.println(postSubscribe.getPostSubscribeCheck());
+//            if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate)) && postSubscribe.getPostSubscribeCheck()){
+//                postSubscribePosts.add(postSubscribe.getPost());
+//            }
+//        }
+//        System.out.println(postSubscribePosts);
+//
+//        List<Post> myPosts = postRepository.findAllPostByUser(user);
+//        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
+//                                                        //LocalDate.now()
+//
+//        // dto 타입으로 변경하고 todayPostResponseDtos 리스트에 추가
+//        List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
+//        for (Post post : userSubscribePosts) {
+//            TodayPostResponseDto responseDto = new TodayPostResponseDto(new Post(post, ColorEnum.GRAY));
+//            todayPostResponseDtos.add(responseDto);
+//        }
+//        for (Post post : postSubscribePosts) {
+//            TodayPostResponseDto responseDto = new TodayPostResponseDto(new Post(post, ColorEnum.GRAY));
+//            todayPostResponseDtos.add(responseDto);
+//        }
+//        for (Post post : myPosts) {
+//            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+//            todayPostResponseDtos.add(responseDto);
+//        }
+//
+//        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyyMMddHH");
+//        Collections.sort(todayPostResponseDtos, (o1, o2) -> {
+//            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(),o1.getStartTime());
+//            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(),o2.getStartTime());
+//            return o1DateTime.compareTo(o2DateTime);
+//        });
+//
+//
+//        return todayPostResponseDtos;
+//    }
 
-    @Transactional
-    public Object getTodayPost(String date, UserDetailsImpl userDetails) {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
-        );
-        // 내가 구독한 유저의 일정
-        // 1. 내가 구독한 유저의 리스트를 다 뽑는다.
-        List<Post> userSubscribePosts = new ArrayList<>();
-        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingIdAndIsVisible(user, true);
-        // 2. UserSubscribe 객체에서 구독한 유저 객체를 뽑아주고 그 객체로 오늘의 일정을 뽑아주기
-
-        for (UserSubscribe userSubscribe : userSubscribes) {
-            userSubscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), localDate, ScopeEnum.SUBSCRIBE));
-        }
-
-
-        // 내가 초대 수락한 일정
-        // 1. 내가 초대 수락한 일정 리스트를 다 뽑는다.
-        List<Post> postSubscribePosts= new ArrayList<>();
-        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(user.getId());
-        // 2. PostSubscribe 객체의 true 여부와 연동된 포스트의 일정 확인 후 리스트에 뽑아주기
-        LocalDateTime today = LocalDateTime.now();
-        System.out.println(localDate);
-
-        for(PostSubscribe postSubscribe : postSubscribes){ //today.getChronology().dateNow()            //ChronoLocalDate.from(today)
-            LocalDate startDate = postSubscribe.getPost().getStartDate();
-            LocalDate endDate = postSubscribe.getPost().getEndDate();
-            System.out.println(startDate.isBefore(localDate) || startDate.equals(localDate));
-            System.out.println(endDate.isBefore(localDate) || endDate.equals(localDate));
-            System.out.println(postSubscribe.getPostSubscribeCheck());
-            if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate)) && postSubscribe.getPostSubscribeCheck()){
-                postSubscribePosts.add(postSubscribe.getPost());
-            }
-        }
-        System.out.println(postSubscribePosts);
-
-        List<Post> myPosts = postRepository.findAllPostByUser(user);
-        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
-                                                        //LocalDate.now()
-
-        // dto 타입으로 변경하고 todayPostResponseDtos 리스트에 추가
-        List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
-        for (Post post : userSubscribePosts) {
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(new Post(post, ColorEnum.GRAY));
-            todayPostResponseDtos.add(responseDto);
-        }
-        for (Post post : postSubscribePosts) {
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(new Post(post, ColorEnum.GRAY));
-            todayPostResponseDtos.add(responseDto);
-        }
-        for (Post post : myPosts) {
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
-            todayPostResponseDtos.add(responseDto);
-        }
-
-        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyyMMddHH");
-        Collections.sort(todayPostResponseDtos, (o1, o2) -> {
-            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(),o1.getStartTime());
-            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(),o2.getStartTime());
-            return o1DateTime.compareTo(o2DateTime);
-        });
-
-
-        return todayPostResponseDtos;
-    }
-
+    // TODO: 2023/03/24 리팩토링 예정 (지윤) 
     @Transactional
     public Object getDatePost(Long userId, String date, UserDetailsImpl userDetails) {
 
@@ -375,7 +381,17 @@ public class PostService {
                     todayPostResponseDtos.add(responseDto);
                 }
             }
-        } else { //친구가 아니면
+        } else if (user == visitor){ //자기 자신이면
+            for (PostSubscribe postSubscribe : postSubscribes) {
+                if (postSubscribe.getPostSubscribeCheck()){
+                    postSubscribePosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
+                }
+            } // 캘린더 주인이 직접 작성한 것
+            for (Post post : myPosts){
+                TodayPostResponseDto responseDto = new TodayPostResponseDto(post);
+                todayPostResponseDtos.add(responseDto);
+            }
+        }else { //친구가 아니면
             for (PostSubscribe postSubscribe : postSubscribes) {
                 if ((postSubscribe.getPost().getScope() == ScopeEnum.ALL || postSubscribe.getPost().getScope() == ScopeEnum.SUBSCRIBE)
                     && postSubscribe.getPostSubscribeCheck()){
@@ -402,8 +418,6 @@ public class PostService {
             LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(),o2.getStartTime());
             return o1DateTime.compareTo(o2DateTime);
         });
-
-
         return todayPostResponseDtos;
     }
 

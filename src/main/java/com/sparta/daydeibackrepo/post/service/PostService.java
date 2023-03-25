@@ -276,22 +276,16 @@ public class PostService {
                 .orElseThrow(() -> new NullPointerException("등록된 사용자가 없습니다"));
 
         LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        List<TodayPostResponseDto> todayPostResponseDtos = new ArrayList<>();
 
         List<Post> subscribePosts = getSubscribePosts(master, localDate);
         List<Post> allAllowedPosts = getAllowedPosts(master, visitor, localDate);
 
-        for(Post post : subscribePosts) {
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(post, ColorEnum.GRAY);
-            todayPostResponseDtos.add(responseDto);
-        }
-
-        for(Post post : allAllowedPosts) {
-            TodayPostResponseDto responseDto = new TodayPostResponseDto(post, post.getColor());
-            todayPostResponseDtos.add(responseDto);
-        }
-
-        Collections.sort(todayPostResponseDtos, Comparator.comparing(o -> LocalDateTime.of(o.getStartDate(), o.getStartTime())));
+        List<TodayPostResponseDto> todayPostResponseDtos = Stream.concat(
+                        subscribePosts.stream().map(post -> new TodayPostResponseDto(post, ColorEnum.GRAY)),
+                        allAllowedPosts.stream().map(post -> new TodayPostResponseDto(post, post.getColor()))
+                )
+                .sorted(Comparator.comparing(o -> LocalDateTime.of(o.getStartDate(), o.getStartTime())))
+                .collect(Collectors.toList());
 
         return todayPostResponseDtos;
     }
@@ -374,19 +368,22 @@ public class PostService {
         User master = userRepository.findById(userId)
                 .orElseThrow(() -> new NullPointerException("존재하지 않는 사용자입니다"));
         List<ScopeEnum> allowedScopes = getAllowedScopes(master, visitor);
-        // master가 직접 작성한 것도 최신순으로 5개만 가지고 왔어 .
+        // master가 직접 작성한 것도 최신순으로 5개만 가지고 오기
         List<Post> posts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNotNullOrderByModifiedAtDesc(
                 master, allowedScopes, PageRequest.of(0, 5)
         );
-        // 태그 당했고 수락한 일정 모두 가져오기
+        // 태그 당했고 수락한 일정 최신순으로 5개만 가지고 오기
         List<Post> postSubscribePosts = postSubscribeRepository
                 .findAllByUserIdAndPostSubscribeCheck(master.getId(), true)
                 .stream()
                 .map(PostSubscribe::getPost)
                 .filter(post -> allowedScopes.contains(post.getScope())) // 권한 확인 및 필터링
+                .sorted(Comparator.comparing(Post::getModifiedAt).reversed())
+                .limit(5)
                 .collect(Collectors.toList());
         posts.addAll(postSubscribePosts);
 
+        // 총 10개의 리스트 중에 최종 최신순 5개만 남기고 반환타입으로 변경
         List<PostResponseDto> postResponseDtos = posts.stream()
                 .filter(post -> post.getModifiedAt().toLocalDate().isAfter(LocalDate.now().minusWeeks(1)))
                 .sorted(Comparator.comparing(Post::getModifiedAt).reversed())

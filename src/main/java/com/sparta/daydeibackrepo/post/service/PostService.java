@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -146,6 +147,12 @@ public class PostService {
             participants.add(ParticipantsResponseDto);
         }
 
+        PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
+        Boolean subscribeCheck = null;
+        if (postSubscribe!=null){
+            subscribeCheck = postSubscribe.getPostSubscribeCheck();
+        }
+
 //        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscriberId(post.getUser());
 //        UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(post.getUser(), user);
                                                             //로그인한유저 -> postId의 post의 user(작성자)
@@ -156,7 +163,7 @@ public class PostService {
         } else if (post.getScope() == ScopeEnum.FRIEND && !friends.contains(user) && post.getUser() != user) {
             throw new AccessDeniedException("작성자가 친구공개로 설정한 일정입니다");
         } else {
-            return PostResponseDto.of(post, writerResponseDto, participants);
+            return PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck);
         }
 
 
@@ -198,6 +205,11 @@ public class PostService {
             throw new IllegalArgumentException("일정의 시간 설정이 올바르지 않습니다.");
         }
 
+        PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
+        Boolean subscribeCheck = null;
+        if (postSubscribe!=null){
+            subscribeCheck = postSubscribe.getPostSubscribeCheck();
+        }
 
         //태그당한 친구에게 알림
 
@@ -211,7 +223,7 @@ public class PostService {
             }
             postUpdateCheck(post, user);
             postSubscribeService.updateJoin(postId, joiners, userDetails);
-            return PostResponseDto.of(post, writerResponseDto, participants);
+            return PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck);
         }
         throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
 
@@ -391,7 +403,7 @@ public class PostService {
                 .map(post -> {
                     List<ParticipantsResponseDto> participants = getParticipants(post);
                     WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
-                    return PostResponseDto.create(post, writerResponseDto, participants);
+                    return PostResponseDto.create(post, writerResponseDto, participants, null);
                 })
                 .collect(Collectors.toList());
 
@@ -426,7 +438,7 @@ public class PostService {
                             .map(ps -> new ParticipantsResponseDto(ps.getUser().getId(), ps.getUser().getProfileImage(), ps.getUser().getNickName()))
                             .collect(Collectors.toList());
                     WriterResponseDto writer = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
-                    return PostResponseDto.create(post, writer, participants);
+                    return PostResponseDto.create(post, writer, participants, null);
                 })
                 .collect(Collectors.toList());
     }

@@ -44,7 +44,9 @@ public class PostResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
-    public static PostResponseDto of(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> tagedFriends) {
+    private Boolean postSubscribeCheck;
+
+    public static PostResponseDto of(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> tagedFriends, Boolean postSubscribeCheck) {
         return PostResponseDto.builder()
                 .id(post.getId())
                 .writer(writerResponseDto)
@@ -61,13 +63,14 @@ public class PostResponseDto {
                 .color(post.getColor())
                 .createdAt(post.getCreatedAt())
                 .modifiedAt(post.getModifiedAt())
+                .postSubscribeCheck(postSubscribeCheck)
                 .build();
     }
 
-    public static PostResponseDto create(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> taggedFriends) {
+    public static PostResponseDto create(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> taggedFriends, Boolean postSubscribeCheck) {
         return new PostResponseDto(post.getId(), writerResponseDto, post.getTitle(), post.getStartDate(),
                 post.getEndDate(), post.getStartTime(), post.getEndTime(), post.getContent(),
                 post.getImage(), post.getLocation(), taggedFriends, post.getScope(),
-                post.getColor(), post.getCreatedAt(), post.getModifiedAt());
+                post.getColor(), post.getCreatedAt(), post.getModifiedAt(), postSubscribeCheck);
     }
 }

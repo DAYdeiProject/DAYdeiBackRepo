@@ -100,22 +100,18 @@ public class User {
     }
 
     public void update(UserProfileRequestDto requestDto, String profileImageUrl, String backgroundImageUrl){
-        this.email = requestDto.getEmail();
         this.nickName = requestDto.getNickName();
         this.password = requestDto.getNewPassword();
         this.profileImage = profileImageUrl;
         this.backgroundImage = backgroundImageUrl;
         this.introduction = requestDto.getIntroduction();
-        this.birthday = requestDto.getBirthday();
     }
 
     public void update(UserProfileRequestDto requestDto){
-        this.email = requestDto.getEmail();
         this.nickName = requestDto.getNickName();
         this.password = requestDto.getNewPassword();
 //        this.profileImage = requestDto.getProfileImage();
         this.introduction = requestDto.getIntroduction();
-        this.birthday = requestDto.getBirthday();
     }
     public void addFriendCount(){
         this.friendCount += 1;

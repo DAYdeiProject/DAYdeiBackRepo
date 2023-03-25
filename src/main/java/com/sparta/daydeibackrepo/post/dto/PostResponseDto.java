@@ -67,10 +67,30 @@ public class PostResponseDto {
                 .build();
     }
 
-    public static PostResponseDto create(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> taggedFriends, Boolean postSubscribeCheck) {
-        return new PostResponseDto(post.getId(), writerResponseDto, post.getTitle(), post.getStartDate(),
-                post.getEndDate(), post.getStartTime(), post.getEndTime(), post.getContent(),
-                post.getImage(), post.getLocation(), taggedFriends, post.getScope(),
-                post.getColor(), post.getCreatedAt(), post.getModifiedAt(), postSubscribeCheck);
+//    public static PostResponseDto create(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> taggedFriends, Boolean postSubscribeCheck) {
+//        return new PostResponseDto(post.getId(), writerResponseDto, post.getTitle(), post.getStartDate(),
+//                post.getEndDate(), post.getStartTime(), post.getEndTime(), post.getContent(),
+//                post.getImage(), post.getLocation(), taggedFriends, post.getScope(),
+//                post.getColor(), post.getCreatedAt(), post.getModifiedAt(), postSubscribeCheck);
+//    }
+
+    public static PostResponseDto of(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> tagedFriends) {
+        return PostResponseDto.builder()
+                .id(post.getId())
+                .writer(writerResponseDto)
+                .title(post.getTitle())
+                .startDate(post.getStartDate())
+                .endDate(post.getEndDate())
+                .startTime(post.getStartTime())
+                .endTime(post.getEndTime())
+                .content(post.getContent())
+                .image(post.getImage())
+                .location(post.getLocation())
+                .participant(tagedFriends)
+                .scope(post.getScope())
+                .color(post.getColor())
+                .createdAt(post.getCreatedAt())
+                .modifiedAt(post.getModifiedAt())
+                .build();
     }
 }

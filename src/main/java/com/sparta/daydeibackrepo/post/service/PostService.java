@@ -403,7 +403,7 @@ public class PostService {
                 .map(post -> {
                     List<ParticipantsResponseDto> participants = getParticipants(post);
                     WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
-                    return PostResponseDto.create(post, writerResponseDto, participants, null);
+                    return PostResponseDto.of(post, writerResponseDto, participants, null);
                 })
                 .collect(Collectors.toList());
 
@@ -438,7 +438,7 @@ public class PostService {
                             .map(ps -> new ParticipantsResponseDto(ps.getUser().getId(), ps.getUser().getProfileImage(), ps.getUser().getNickName()))
                             .collect(Collectors.toList());
                     WriterResponseDto writer = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
-                    return PostResponseDto.create(post, writer, participants, null);
+                    return PostResponseDto.of(post, writer, participants);
                 })
                 .collect(Collectors.toList());
     }

@@ -7,6 +7,7 @@ import com.sparta.daydeibackrepo.user.dto.*;
 import com.sparta.daydeibackrepo.user.service.KakaoService;
 import com.sparta.daydeibackrepo.user.service.UserService;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -69,6 +70,7 @@ public class UserController {
 
     @PutMapping("/users/profile")
     public StatusResponseDto<UserProfileResponseDto> updateUser(
+            @Parameter(hidden = true)
             @RequestPart UserProfileRequestDto userProfileRequestDto,
             @RequestPart MultipartFile  multipartFile1,
             @RequestPart MultipartFile multipartFile2,

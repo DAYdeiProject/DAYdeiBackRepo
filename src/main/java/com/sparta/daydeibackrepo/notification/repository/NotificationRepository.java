@@ -21,7 +21,4 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query("select n from Notification n " + "where n.receiver = :user and " + "n.returnId = :postId and " + " n.notificationType = :notificationType")
     Notification findPostSubscribeNotification(User user, Long postId, NotificationType notificationType);
     @Query("select n from Notification n " + "where n.receiver = :responseUser and " + "n.returnId = :requestUserId and " + " n.notificationType = :notificationType")
-    Notification findFriendRequestNotification(User responseUser, Long requestUserId,  NotificationType notificationType);
-    @Query("select n from Notification n " + "where n.receiver = :responseUser and " + "n.returnId = :requestUserId and " + " n.notificationType = :notificationType")
-    Notification findFriendNotification(User responseUser, Long requestUserId, NotificationType notificationType);
-}
+    Notification findFriendNotification(User responseUser, Long requestUserId,  NotificationType notificationType);}

@@ -76,7 +76,7 @@ public class FriendService {
         responseUser.addFriendCount();
         requestUser.addFriendCount();
         postService.createBirthday(requestUser, responseUser);
-        Notification notification = notificationRepository.findFriendRequestNotification(responseUser, requestUser.getId(),NotificationType.FRIEND_REQUEST);
+        Notification notification = notificationRepository.findFriendNotification(responseUser, requestUser.getId(),NotificationType.FRIEND_REQUEST);
         if (notification != null)
         {notificationRepository.delete(notification);}
         notificationService.send(requestUser.getId() , NotificationType.FRIEND_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(responseUser.getNickName()), responseUser.getId());
@@ -106,13 +106,13 @@ public class FriendService {
             if (friend1.getFriendCheck()){
                 user1.substractFriendCount();
                 user2.substractFriendCount();
-                Notification notification = notificationRepository.findFriendRequestNotification(user1, user2.getId(), NotificationType.FRIEND_ACCEPT);
+                Notification notification = notificationRepository.findFriendNotification(user1, user2.getId(), NotificationType.FRIEND_ACCEPT);
                 if (notification != null)
                 {notificationRepository.delete(notification);}
                 return "친구를 삭제했습니다.";
             }
             else {
-                Notification notification = notificationRepository.findFriendRequestNotification(user2, user1.getId(), NotificationType.FRIEND_REQUEST);
+                Notification notification = notificationRepository.findFriendNotification(user2, user1.getId(), NotificationType.FRIEND_REQUEST);
                 if (notification != null)
                 {notificationRepository.delete(notification);}
                 return "친구 신청을 취소하였습니다.";
@@ -124,13 +124,13 @@ public class FriendService {
             if (friend2.getFriendCheck()){
                 user1.substractFriendCount();
                 user2.substractFriendCount();
-                Notification notification = notificationRepository.findFriendRequestNotification(user2, user1.getId(), NotificationType.FRIEND_ACCEPT);
+                Notification notification = notificationRepository.findFriendNotification(user2, user1.getId(), NotificationType.FRIEND_ACCEPT);
                 if (notification != null)
                 {notificationRepository.delete(notification);}
                 return "친구를 삭제했습니다.";
             }
             else {
-                Notification notification = notificationRepository.findFriendRequestNotification(user1, user2.getId(), NotificationType.FRIEND_REQUEST);
+                Notification notification = notificationRepository.findFriendNotification(user1, user2.getId(), NotificationType.FRIEND_REQUEST);
                 if (notification != null)
                 {notificationRepository.delete(notification);}
                 return "친구 신청을 거절하였습니다.";

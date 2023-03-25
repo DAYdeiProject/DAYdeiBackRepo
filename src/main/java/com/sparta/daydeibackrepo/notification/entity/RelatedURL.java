@@ -1,3 +1,4 @@
+/*
 package com.sparta.daydeibackrepo.notification.entity;
 
 import lombok.AccessLevel;
@@ -43,3 +44,4 @@ public class RelatedURL {
         return Objects.hash(getUrl());
     }
 }
+*/

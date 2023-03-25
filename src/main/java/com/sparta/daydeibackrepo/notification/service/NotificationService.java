@@ -6,11 +6,13 @@ import com.sparta.daydeibackrepo.notification.entity.Notification;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.repository.EmitterRepository;
 import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
+import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -18,6 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -113,4 +116,17 @@ public class NotificationService {
                 .isRead(false)
                 .build();
     }
+    // 알림 삭제
+    @Transactional
+    public void deleteNotification(Long recieverId, UserDetailsImpl userDetails){
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+        );
+        if(!Objects.equals(user.getId(), recieverId)){
+            throw new IllegalArgumentException("올바르지 않은 요청입니다.");
+        }
+        List<Notification> notifications = notificationRepository.findAllByUserId(recieverId);
+        notificationRepository.deleteAll(notifications);
+    }
+
 }

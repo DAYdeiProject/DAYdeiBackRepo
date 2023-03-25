@@ -8,10 +8,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
@@ -30,5 +27,10 @@ public class NotificationController {
     @GetMapping("/api/notification")
     public StatusResponseDto<List<NotificationDto>> getNotification(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(notificationService.findAllNotifications(userDetails.getUser().getId()));
+    }
+    @DeleteMapping("/api/notification/{userId}")
+    public StatusResponseDto<String> deleteNotification(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        notificationService.deleteNotification(userId, userDetails);
+        return StatusResponseDto.success("알림 삭제 완료!");
     }
 }

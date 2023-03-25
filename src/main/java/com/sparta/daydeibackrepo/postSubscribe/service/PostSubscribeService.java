@@ -48,7 +48,7 @@ public class PostSubscribeService {
                 throw new IllegalArgumentException("해당 유저는 이미 일정 초대되었습니다.");
             }
             PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
-            Notification notification = notificationRepository.findPostSubscribeNotification(user, postId, NotificationType.JOIN_REQUEST);
+            Notification notification = notificationRepository.findNotification(user, postId, NotificationType.JOIN_REQUEST);
             if (notification != null)
             {notificationRepository.delete(notification);}
             postSubscribeRepository.save(postSubscribe1);
@@ -98,7 +98,7 @@ public class PostSubscribeService {
         }
 
         List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByPostId(postId);
-        Notification notification = notificationRepository.findPostSubscribeNotification(user, postId, NotificationType.JOIN_REQUEST);
+        Notification notification = notificationRepository.findNotification(user, postId, NotificationType.JOIN_REQUEST);
         if (notification != null)
         {notificationRepository.delete(notification);}
         postSubscribeRepository.deleteAll(postSubscribes);

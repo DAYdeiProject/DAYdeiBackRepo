@@ -53,9 +53,9 @@ public class User {
     @JsonIgnore
     private List<UserSubscribe> subscriber;
     @JsonIgnore
-    private Boolean friendUpdateCheck = false;
+    private Boolean friendUpdateCheck;
     @JsonIgnore
-    private Boolean userUpdateCheck  = false;
+    private Boolean userUpdateCheck;
 
 
 //    @ElementCollection(fetch = FetchType.EAGER)
@@ -87,6 +87,8 @@ public class User {
         this.nickName = nickName;
         this.birthday = birthday;
         this.role = UserRoleEnum.USER;
+        this.friendUpdateCheck = false;
+        this.userUpdateCheck = false;
     }
 
     public User kakaoIdUpdate(Long kakaoId) {

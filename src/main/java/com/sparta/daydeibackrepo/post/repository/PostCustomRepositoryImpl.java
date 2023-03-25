@@ -50,28 +50,6 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
                 .where(post.user.eq(master).and(post.scope.in(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE)))
                 .fetch();
     }
-    // 모든 유저 중에서 최근에 글을 올린(친구공개 제외) 유저를 List<User>로 뽑아옴
-    public List<User> findAllUpdateUser(){
-        return  jpaQueryFactory
-                .select(post.user)
-                .from(post)
-                .where(post.modifiedAt.between(LocalDateTime.now().minus(7, ChronoUnit.DAYS), LocalDateTime.now())
-                        .and(post.scope.in(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE)))
-                .orderBy(post.modifiedAt.desc())
-                .distinct()
-                .fetch();
-    }
-    // 모든 유저 중에서 최근에 글을 올린(친구공개 포함) 유저를 List<User>로 뽑아옴
-    public List<User> findAllFriendUpdateUser(){
-        return  jpaQueryFactory
-            .select(post.user)
-            .from(post)
-            .where(post.modifiedAt.between(LocalDateTime.now().minus(7, ChronoUnit.DAYS), LocalDateTime.now())
-                    .and(post.scope.in(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE, ScopeEnum.FRIEND)))
-            .orderBy(post.modifiedAt.desc())
-            .distinct()
-            .fetch();
-    }
     // 본인과 친구인 사람 중에서 최근에 글을 올린 유저를 List<User>로 뽑아옴
     public List<User> findAllUpdateFriend(User user) {
         List<User> friends = friendRepository.findAllFriends(user);

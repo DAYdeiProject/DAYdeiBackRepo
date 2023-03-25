@@ -206,8 +206,8 @@ public class UserService {
     @Transactional
     public void userUpdateStatusCheck(){
         List<User> users = userRepository.findAll();
-        List<User> updateUsers = postRepository.findAllUpdateUser();
-        List<User> updateFriends = postRepository.findAllFriendUpdateUser();
+        List<User> updateUsers = userRepository.findAllUpdateUser();
+        List<User> updateFriends = userRepository.findAllFriendUpdateUser();
         for(User user : users){
             if (updateUsers.contains(user)){
                 user.setUserUpdateCheck(true);

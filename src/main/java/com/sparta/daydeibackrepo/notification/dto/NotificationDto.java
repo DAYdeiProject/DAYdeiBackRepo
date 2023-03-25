@@ -13,10 +13,10 @@ public class NotificationDto {
 
     private String content;
 
-    private String url;
+    private Long returnId;
 
     public static NotificationDto create(Notification notification) {
         return new NotificationDto(notification.getId(), notification.getContent(),
-                notification.getUrl());
+                notification.getReturnId());
     }
 }

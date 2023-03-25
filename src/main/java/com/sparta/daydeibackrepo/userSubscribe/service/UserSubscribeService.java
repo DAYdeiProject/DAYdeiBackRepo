@@ -49,7 +49,7 @@ public class UserSubscribeService {
 
         UserSubscribe userSubscribe1 = new UserSubscribe(subscribing, subscriber);
         userSubscribeRepository.save(userSubscribe1);
-        notificationService.send(userid , NotificationType.SUBSCRIBE_ACCEPT, NotificationType.SUBSCRIBE_ACCEPT.makeContent(subscribing.getNickName()), NotificationType.SUBSCRIBE_ACCEPT.makeUrl(subscribing.getId()));
+        notificationService.send(userid , NotificationType.SUBSCRIBE_ACCEPT, NotificationType.SUBSCRIBE_ACCEPT.makeContent(subscribing.getNickName()), subscribing.getId());
         return new UserSubscribeResponseDto(userSubscribe1);
     }
     @Transactional

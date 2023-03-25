@@ -2,7 +2,9 @@ package com.sparta.daydeibackrepo.userSubscribe.service;
 
 import com.sparta.daydeibackrepo.friend.repository.FriendCustomRepository;
 import com.sparta.daydeibackrepo.friend.service.FriendService;
+import com.sparta.daydeibackrepo.notification.entity.Notification;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
+import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
 import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserSubscribeService {
+    private final NotificationRepository notificationRepository;
     private final FriendCustomRepository friendRepository;
     private final NotificationService notificationService;
     private final UserSubscribeRepository userSubscribeRepository;
@@ -67,7 +70,9 @@ public class UserSubscribeService {
         if (userSubscribe == null){
             throw new IllegalArgumentException("구독 취소 요청이 올바르지 않습니다.");
         }
-
+        Notification notification = notificationRepository.findUserSubscribeNotification(subscriber, subscribing.getId(), NotificationType.SUBSCRIBE_ACCEPT);
+        if (notification != null)
+        {notificationRepository.delete(notification);}
         userSubscribeRepository.delete(userSubscribe);
     }
 

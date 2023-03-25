@@ -1,6 +1,8 @@
 package com.sparta.daydeibackrepo.postSubscribe.service;
 
+import com.sparta.daydeibackrepo.notification.entity.Notification;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
+import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
 import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.repository.PostRepository;
@@ -24,6 +26,7 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class PostSubscribeService {
+    private final NotificationRepository notificationRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostSubscribeRepository postSubscribeRepository;
@@ -45,6 +48,9 @@ public class PostSubscribeService {
                 throw new IllegalArgumentException("해당 유저는 이미 일정 초대되었습니다.");
             }
             PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
+            Notification notification = notificationRepository.findPostSubscribeNotification(user, postId, NotificationType.JOIN_REQUEST);
+            if (notification != null)
+            {notificationRepository.delete(notification);}
             postSubscribeRepository.save(postSubscribe1);
             notificationService.send(joiner.getId() , NotificationType.JOIN_REQUEST, NotificationType.JOIN_REQUEST.makeContent(user.getNickName()), post.getId());
         }
@@ -92,6 +98,9 @@ public class PostSubscribeService {
         }
 
         List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByPostId(postId);
+        Notification notification = notificationRepository.findPostSubscribeNotification(user, postId, NotificationType.JOIN_REQUEST);
+        if (notification != null)
+        {notificationRepository.delete(notification);}
         postSubscribeRepository.deleteAll(postSubscribes);
 
         for(User joiner : joiners){

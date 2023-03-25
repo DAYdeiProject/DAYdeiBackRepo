@@ -5,6 +5,8 @@ import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.mail.dto.MailDto;
 import com.sparta.daydeibackrepo.mail.service.MailService;
+import com.sparta.daydeibackrepo.notification.entity.NotificationType;
+import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.repository.PostRepository;
 import com.sparta.daydeibackrepo.s3.service.S3Service;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
@@ -16,6 +18,7 @@ import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepositor
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -171,8 +174,6 @@ public class UserService {
         List<User> friends = friendRepository.findAllFriends(visitor);
         List<User> responseUsers = friendRepository.findResponseUser(visitor);
         List<User> requestUsers = friendRepository.findRequestUser(visitor);
-        List<User> updateUsers = postRepository.findAllUpdateUser(visitor);
-        List<User> updateFriends = postRepository.findAllUpdateFriend(visitor);
         List<User> mutualFriends = friendRepository.findAllFriends(user);
         mutualFriends.retainAll(friends);
         boolean friendCheck = false;
@@ -185,10 +186,10 @@ public class UserService {
             userSubscribeCheck = true;
         }
         if(friendCheck) {
-            if (updateFriends.contains(user)) {updateCheck = true;}
+            if (user.getFriendUpdateCheck()) {updateCheck = true;}
         }
         else{
-            if (updateUsers.contains(user)) {updateCheck = true;}
+            if (user.getUserUpdateCheck()) {updateCheck = true;}
         }
         if (requestUsers.contains(user)) {
             userResponseDto = new UserResponseDto(user, friendCheck, true, userSubscribeCheck, updateCheck, mutualFriends);
@@ -200,5 +201,22 @@ public class UserService {
             userResponseDto = new UserResponseDto(user, friendCheck, userSubscribeCheck, updateCheck, mutualFriends);
         }
         return userResponseDto;
+    }
+    @Scheduled(cron="0 0 * * * ?")
+    @Transactional
+    public void userUpdateStatusCheck(){
+        List<User> users = userRepository.findAll();
+        List<User> updateUsers = postRepository.findAllUpdateUser();
+        List<User> updateFriends = postRepository.findAllFriendUpdateUser();
+        for(User user : users){
+            if (updateUsers.contains(user)){
+                user.setUserUpdateCheck(true);
+            }
+            else {user.setUserUpdateCheck(false);}
+            if (updateFriends.contains(user)){
+                user.setFriendUpdateCheck(true);
+            }
+            else {user.setFriendUpdateCheck(false);}
+        }
     }
 }

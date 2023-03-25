@@ -106,8 +106,8 @@ public class PostService {
         for(Tag tag : tags) {
             joiners.add(tag.getUser());
         }
+        postUpdateCheck(post, user);
         postSubscribeService.createJoin(savePost.getId(), joiners, userDetails);
-
         return "일정 작성을 완료하였습니다.";
 
 
@@ -209,8 +209,8 @@ public class PostService {
             for(Tag tag : newTags) {
                 joiners.add(tag.getUser());
             }
+            postUpdateCheck(post, user);
             postSubscribeService.updateJoin(postId, joiners, userDetails);
-            
             return PostResponseDto.of(post, writerResponseDto, participants);
         }
         throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
@@ -523,6 +523,12 @@ public class PostService {
         return tagList.stream()
                 .map(postSubscribe -> new ParticipantsResponseDto(postSubscribe.getUser().getId(), postSubscribe.getUser().getProfileImage(), postSubscribe.getUser().getNickName()))
                 .collect(Collectors.toList());
+    }
+    public void postUpdateCheck(Post post, User user){
+        if (post.getScope().equals(ScopeEnum.ALL) || post.getScope().equals(ScopeEnum.SUBSCRIBE))
+        {user.userUpdateCheck();}
+        if (post.getScope().equals(ScopeEnum.ALL) || post.getScope().equals(ScopeEnum.SUBSCRIBE) || post.getScope().equals(ScopeEnum.FRIEND))
+        {user.friendUpdateCheck();}
     }
 
     @Async

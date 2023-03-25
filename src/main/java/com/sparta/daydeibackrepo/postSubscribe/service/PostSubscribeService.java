@@ -7,6 +7,8 @@ import com.sparta.daydeibackrepo.post.repository.PostRepository;
 import com.sparta.daydeibackrepo.postSubscribe.entity.PostSubscribe;
 import com.sparta.daydeibackrepo.postSubscribe.repository.PostSubscribeRepository;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
+import com.sparta.daydeibackrepo.tag.entity.Tag;
+import com.sparta.daydeibackrepo.tag.repository.TagRepository;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ public class PostSubscribeService {
     private final UserRepository userRepository;
     private final PostSubscribeRepository postSubscribeRepository;
     private final NotificationService notificationService;
+    private final TagRepository tagRepository;
+
     @Transactional
     public void createJoin(Long postId, List<User> joiners, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -137,6 +141,8 @@ public class PostSubscribeService {
             throw new EntityNotFoundException("거절 가능한 공유 일정이 없습니다.");
         }
         postSubscribeRepository.delete(postSubscribe);
+        Tag tag = tagRepository.findByPostIdAndUserId(post.getId(), user.getId());
+        tagRepository.delete(tag);
         notificationService.send(post.getUser().getId() , NotificationType.JOIN_REJECT, NotificationType.JOIN_REJECT.makeContent(user.getNickName()), post.getId());
     }
 

@@ -547,7 +547,7 @@ public class PostService {
         List<Post> notifySchedules = postRepository.findNofitySchedule();
         for (Post post : notifySchedules){
                 mailService.sendScheduleNotifyMail(new MailDto(post));
-                notificationService.send(post.getUser().getId(), NotificationType.SCHEDULE_NOTIFY, NotificationType.SCHEDULE_NOTIFY.makeContent(post.getTitle()), NotificationType.SCHEDULE_NOTIFY.makeUrl(post.getId()));
+                notificationService.send(post.getUser().getId(), NotificationType.SCHEDULE_NOTIFY, NotificationType.SCHEDULE_NOTIFY.makeContent(post.getTitle()), post.getId());
         }
     }
 }

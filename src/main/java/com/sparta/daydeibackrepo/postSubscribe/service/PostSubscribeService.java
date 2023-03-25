@@ -40,13 +40,13 @@ public class PostSubscribeService {
             throw new IllegalArgumentException("올바르지 않은 공유일정 생성입니다.");
         }
         for(User joiner : joiners){
-            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getUser().getId(), joiner.getId());
+            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), joiner.getId());
             if(postSubscribe!=null){
                 throw new IllegalArgumentException("해당 유저는 이미 일정 초대되었습니다.");
             }
             PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
             postSubscribeRepository.save(postSubscribe1);
-            notificationService.send(joiner.getId() , NotificationType.JOIN_REQUEST, NotificationType.JOIN_REQUEST.makeContent(user.getNickName()), NotificationType.JOIN_REQUEST.makeUrl(post.getId()));
+            notificationService.send(joiner.getId() , NotificationType.JOIN_REQUEST, NotificationType.JOIN_REQUEST.makeContent(user.getNickName()), post.getId());
         }
     }
 
@@ -75,7 +75,7 @@ public class PostSubscribeService {
 //            }
             PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
             postSubscribeRepository.save(postSubscribe1);
-            notificationService.send(joiner.getId() , NotificationType.JOIN_UPDATE_REQUEST, NotificationType.JOIN_UPDATE_REQUEST.makeContent(user.getNickName()), NotificationType.JOIN_UPDATE_REQUEST.makeUrl(post.getId()));
+            notificationService.send(joiner.getId() , NotificationType.JOIN_UPDATE_REQUEST, NotificationType.JOIN_UPDATE_REQUEST.makeContent(user.getNickName()), post.getId());
         }
     }
 
@@ -104,7 +104,7 @@ public class PostSubscribeService {
 //            }
 //            PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
 //            postSubscribeRepository.save(postSubscribe1);
-            notificationService.send(joiner.getId() , NotificationType.JOIN_DELETE_REQUEST, NotificationType.JOIN_DELETE_REQUEST.makeContent(user.getNickName()), NotificationType.JOIN_DELETE_REQUEST.makeUrl(post.getId()));
+            notificationService.send(joiner.getId() , NotificationType.JOIN_DELETE_REQUEST, NotificationType.JOIN_DELETE_REQUEST.makeContent(user.getNickName()), post.getId());
         }
     }
 
@@ -121,7 +121,7 @@ public class PostSubscribeService {
             throw new EntityNotFoundException("수락 가능한 공유 일정이 없습니다.");
         }
         postSubscribe.update(true);
-        notificationService.send(post.getUser().getId() , NotificationType.JOIN_ACCEPT, NotificationType.JOIN_ACCEPT.makeContent(user.getNickName()), NotificationType.JOIN_ACCEPT.makeUrl(post.getId()));
+        notificationService.send(post.getUser().getId() , NotificationType.JOIN_ACCEPT, NotificationType.JOIN_ACCEPT.makeContent(user.getNickName()), post.getId());
     }
 
     @Transactional
@@ -132,12 +132,12 @@ public class PostSubscribeService {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new EntityNotFoundException("작성글이 존재하지 않습니다.")
         );
-        PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getUser().getId(), user.getId());
+        PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         if (postSubscribe==null){
             throw new EntityNotFoundException("거절 가능한 공유 일정이 없습니다.");
         }
         postSubscribeRepository.delete(postSubscribe);
-        notificationService.send(post.getUser().getId() , NotificationType.JOIN_REJECT, NotificationType.JOIN_REJECT.makeContent(user.getNickName()), NotificationType.JOIN_REJECT.makeUrl(post.getId()));
+        notificationService.send(post.getUser().getId() , NotificationType.JOIN_REJECT, NotificationType.JOIN_REJECT.makeContent(user.getNickName()), post.getId());
     }
 
 

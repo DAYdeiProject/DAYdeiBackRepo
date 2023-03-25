@@ -51,7 +51,7 @@ public class FriendService {
         }
         Friend friend = new Friend(requestUser, responseUser, false);
         friendRepository.save(friend);
-        notificationService.send(responseUser.getId() , NotificationType.FRIEND_REQUEST, NotificationType.FRIEND_REQUEST.makeContent(requestUser.getNickName()), NotificationType.FRIEND_REQUEST.makeUrl(requestUser.getId()));
+        notificationService.send(responseUser.getId() , NotificationType.FRIEND_REQUEST, NotificationType.FRIEND_REQUEST.makeContent(requestUser.getNickName()), requestUser.getId());
         return new FriendResponseDto(friend);
     }
     @Transactional
@@ -73,7 +73,7 @@ public class FriendService {
         responseUser.addFriendCount();
         requestUser.addFriendCount();
         postService.createBirthday(requestUser, responseUser);
-        notificationService.send(requestUser.getId() , NotificationType.FRIEND_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(responseUser.getNickName()), NotificationType.FRIEND_ACCEPT.makeUrl(responseUser.getId()));
+        notificationService.send(requestUser.getId() , NotificationType.FRIEND_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(responseUser.getNickName()), responseUser.getId());
         return new FriendResponseDto(friend);
     }
     @Transactional
@@ -133,7 +133,7 @@ public class FriendService {
         }
         List<User> recommendList = userRepository.findRecommmedList(searchWord, user, categoryEnums);
         List<UserResponseDto> recommendResponseList = makeUserResponseDtos(user, recommendList).stream()
-                .filter(userResponseDto -> !userResponseDto.getFriendCheck() || !userResponseDto.getUserSubscribeCheck())
+                .filter(userResponseDto -> !userResponseDto.getUserSubscribeCheck() && !userResponseDto.getFriendCheck() && userResponseDto.getIsRequestFriend() == null)
                 .collect(Collectors.toList());
         // 특정 조건에 따라 주기적으로 sorting하는 함수 개발 필요
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");

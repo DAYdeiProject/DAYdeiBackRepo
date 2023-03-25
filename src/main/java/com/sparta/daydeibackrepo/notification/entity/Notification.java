@@ -24,7 +24,7 @@ public class Notification extends TimeStamped {
     private NotificationContent content;
 
     @Column
-    private RelatedURL url;
+    private Long returnId;
 
     @Column(nullable = false)
     private Boolean isRead;
@@ -39,22 +39,17 @@ public class Notification extends TimeStamped {
     private User receiver;
 
     @Builder
-    public Notification(User receiver, NotificationType notificationType, String content, String url, Boolean isRead) {
+    public Notification(User receiver, NotificationType notificationType, String content, Long returnId, Boolean isRead) {
         this.receiver = receiver;
         this.notificationType = notificationType;
         this.content = new NotificationContent(content);
-        this.url = new RelatedURL(url);
+        this.returnId = returnId;
         this.isRead = isRead;
     }
 
     public String getContent() {
         return content.getContent();
     }
-
-    public String getUrl() {
-        return url.getUrl();
-    }
-
     public void read() {
         this.isRead = true;
     }

@@ -50,8 +50,8 @@ public class NotificationService {
         return emitter;
     }
     //API 메서드 사이에 껴서 알림 전송
-    public void send(Long userId, NotificationType notificationType, String content, String url) {
-        Notification notification = notificationRepository.save(createNotification(userId, notificationType, content, url));
+    public void send(Long userId, NotificationType notificationType, String content, Long returnId) {
+        Notification notification = notificationRepository.save(createNotification(userId, notificationType, content, returnId));
 
         String receiverId = String.valueOf(userId);
         String eventId = receiverId + "_" + System.currentTimeMillis();
@@ -103,13 +103,13 @@ public class NotificationService {
                 .forEach(entry -> sendNotification(emitter, entry.getKey(), emitterId, entry.getValue()));
     }
     //알림 생성
-    private Notification createNotification(Long receiverId, NotificationType notificationType, String content, String url) {
+    private Notification createNotification(Long receiverId, NotificationType notificationType, String content, Long returnId) {
         User receiver = userRepository.findById(receiverId).orElseThrow();
         return Notification.builder()
                 .receiver(receiver)
                 .notificationType(notificationType)
                 .content(content)
-                .url(url)
+                .returnId(returnId)
                 .isRead(false)
                 .build();
     }

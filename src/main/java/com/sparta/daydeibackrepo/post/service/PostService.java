@@ -43,6 +43,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -293,13 +294,17 @@ public class PostService {
 
         LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        List<Post> subscribePosts = getSubscribePosts(master, localDate);
-        List<Post> allAllowedPosts = getAllowedPosts(master, visitor, localDate);
+        List<Post> subscribePosts = getSubscribePosts(master, localDate); //구독한 포스트들
+        List<Post> allowedTaggedPosts = getAllowedTaggedPosts(master, visitor, localDate); //태그 당한 포스트들
+        List<Post> allowedOwnPosts = getAllowedOwnPosts(master, visitor, localDate); // 직접 작성한 포스트들
 
-        List<TodayPostResponseDto> todayPostResponseDtos = Stream.concat(
+
+        List<TodayPostResponseDto> todayPostResponseDtos = Stream.of(
                         subscribePosts.stream().map(post -> new TodayPostResponseDto(post, ColorEnum.GRAY)),
-                        allAllowedPosts.stream().map(post -> new TodayPostResponseDto(post, post.getColor()))
+                        allowedTaggedPosts.stream().map(post -> new TodayPostResponseDto(post, ColorEnum.GRAY)),
+                        allowedOwnPosts.stream().map(post -> new TodayPostResponseDto(post, post.getColor()))
                 )
+                .flatMap(Function.identity())
                 .sorted(Comparator.comparing(o -> LocalDateTime.of(o.getStartDate(), o.getStartTime())))
                 .collect(Collectors.toList());
 
@@ -393,14 +398,17 @@ public class PostService {
                 .findAllByUserIdAndPostSubscribeCheck(master.getId(), true)
                 .stream()
                 .map(PostSubscribe::getPost)
-                .filter(post -> allowedScopes.contains(post.getScope())) // 권한 확인 및 필터링
+                .filter(post -> allowedScopes.contains(post.getScope()))
                 .sorted(Comparator.comparing(Post::getModifiedAt).reversed())
                 .limit(5)
+                .map(post -> new Post(post, ColorEnum.GRAY))
                 .collect(Collectors.toList());
         posts.addAll(postSubscribePosts);
 
+
         // 총 10개의 리스트 중에 최종 최신순 5개만 남기고 반환타입으로 변경
         List<PostResponseDto> postResponseDtos = posts.stream()
+//                .filter(post -> post.getModifiedAt() != null) // modifiedAt이 null이 아닌 경우에만 필터링
                 .filter(post -> post.getModifiedAt().toLocalDate().isAfter(LocalDate.now().minusWeeks(1)))
                 .sorted(Comparator.comparing(Post::getModifiedAt).reversed())
                 .limit(5)
@@ -483,23 +491,42 @@ public class PostService {
 
     // master가 작성한 일정한 일정 & 태그 당했고 수락한 일정
     // master와 visitor의 관계를 판단하여 scope권한이 있으며 && localDate에 해당하는 일정만 가져오는 메서드
-    private List<Post> getAllowedPosts(User master, User visitor, LocalDate localDate) {
+//    private List<Post> getAllowedPosts(User master, User visitor, LocalDate localDate) {
+//        List<Post> allowedPosts = new ArrayList<>();
+//        List<ScopeEnum> allowedScopes = getAllowedScopes(master, visitor);
+//
+//        // 캘린더 주인이 작성한 일정 중에서 입력받은 날짜에 해당하는 일정만 추출
+//        List<Post> myPosts = postRepository.findAllPostByUser(master);
+//        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
+//
+//        // 반환할 일정 리스트에 추가
+//        for (Post post : myPosts) {
+//            if (allowedScopes.contains(post.getScope())) {
+//                allowedPosts.add(post);
+//            }
+//        }
+//        // 캘린더 주인이 태그당한
+//        List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserIdAndPostSubscribeCheck(master.getId(), true);
+//        // 허용 되는 범위 골라내기
+//        for (PostSubscribe postSubscribe : postSubscribes) {
+//            Post post = postSubscribe.getPost();
+//            if (allowedScopes.contains(post.getScope())) {
+//                // 날짜 필터링
+//                LocalDate startDate = post.getStartDate();
+//                LocalDate endDate = post.getEndDate();
+//                if ((startDate.isBefore(localDate) || startDate.equals(localDate)) && (endDate.isAfter(localDate) || endDate.equals(localDate))) {
+//                    allowedPosts.add(post);
+//                }
+//            }
+//        }
+//        return allowedPosts;
+//    }
+
+    private List<Post> getAllowedTaggedPosts(User master, User visitor, LocalDate localDate) {
         List<Post> allowedPosts = new ArrayList<>();
         List<ScopeEnum> allowedScopes = getAllowedScopes(master, visitor);
 
-        // 캘린더 주인이 작성한 일정 중에서 입력받은 날짜에 해당하는 일정만 추출
-        List<Post> myPosts = postRepository.findAllPostByUser(master);
-        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
-
-        // 반환할 일정 리스트에 추가
-        for (Post post : myPosts) {
-            if (allowedScopes.contains(post.getScope())) {
-                allowedPosts.add(post);
-            }
-        }
-        // 캘린더 주인이 태그당한
         List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserIdAndPostSubscribeCheck(master.getId(), true);
-        // 허용 되는 범위 골라내기
         for (PostSubscribe postSubscribe : postSubscribes) {
             Post post = postSubscribe.getPost();
             if (allowedScopes.contains(post.getScope())) {
@@ -513,6 +540,25 @@ public class PostService {
         }
         return allowedPosts;
     }
+
+    private List<Post> getAllowedOwnPosts(User master, User visitor, LocalDate localDate) {
+        List<Post> allowedPosts = new ArrayList<>();
+        List<ScopeEnum> allowedScopes = getAllowedScopes(master, visitor);
+
+        List<Post> myPosts = postRepository.findAllPostByUser(master);
+        myPosts.removeIf(post -> post.getStartDate().isAfter(localDate) || post.getEndDate().isBefore(localDate));
+
+        for (Post post : myPosts) {
+            if (allowedScopes.contains(post.getScope())) {
+                allowedPosts.add(post);
+            }
+        }
+        return allowedPosts;
+    }
+
+
+
+
 
 
     //master와 visitor의 관계를 판단하여 허용하는 ScopeEnum을 리스트로 반환

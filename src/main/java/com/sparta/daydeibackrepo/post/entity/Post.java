@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -66,6 +67,9 @@ public class Post extends TimeStamped {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<PostSubscribe> PostSubscribe;
+
+    @Column
+    private LocalDateTime modifiedAt;
 
     public Post(PostRequestDto requestDto, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, User user) {
         this.title = requestDto.getTitle();
@@ -126,5 +130,6 @@ public class Post extends TimeStamped {
         this.scope = post.getScope();
         this.color = colorEnum;
         this.user = post.getUser();
+        this.modifiedAt = post.getModifiedAt();
     }
 }

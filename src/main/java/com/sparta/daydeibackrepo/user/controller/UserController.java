@@ -70,11 +70,10 @@ public class UserController {
 
     @PutMapping("/users/profile")
     public StatusResponseDto<UserProfileResponseDto> updateUser(
-            @Parameter(hidden = true)
             @RequestPart UserProfileRequestDto userProfileRequestDto,
             @RequestPart MultipartFile  multipartFile1,
             @RequestPart MultipartFile multipartFile2,
-            @AuthenticationPrincipal UserDetailsImpl userDetails)
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails)
             throws IOException {
         return StatusResponseDto.success(userService.updateUser(userProfileRequestDto, multipartFile1, multipartFile2, userDetails));
     }

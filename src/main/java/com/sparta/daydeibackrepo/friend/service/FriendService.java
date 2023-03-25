@@ -186,8 +186,6 @@ public class FriendService {
         List<User> friends = friendRepository.findAllFriends(user);
         List<User> responseUsers = friendRepository.findResponseUser(user);
         List<User> requestUsers = friendRepository.findRequestUser(user);
-        List<User> updateUsers = postRepository.findAllUpdateUser(user);
-        List<User> updateFriends = postRepository.findAllUpdateFriend(user);
         for (User user1 : users){
             List<User> mutualFriends = friendRepository.findAllFriends(user1);
             mutualFriends.retainAll(friends);
@@ -201,10 +199,10 @@ public class FriendService {
                 userSubscribeCheck = true;
             }
             if(friendCheck) {
-                if (updateFriends.contains(user1)) {updateCheck = true;}
+                if (user.getFriendUpdateCheck()) {updateCheck = true;}
             }
             else{
-                if (updateUsers.contains(user1)) {updateCheck = true;}
+                if (user.getUserUpdateCheck()) {updateCheck = true;}
             }
             if (requestUsers.contains(user1)) {
                     userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck, updateCheck, mutualFriends));

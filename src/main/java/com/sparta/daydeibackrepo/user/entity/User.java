@@ -52,6 +52,10 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscriberId")
     @JsonIgnore
     private List<UserSubscribe> subscriber;
+    @JsonIgnore
+    private Boolean friendUpdateCheck;
+    @JsonIgnore
+    private Boolean userUpdateCheck;
 
 
 //    @ElementCollection(fetch = FetchType.EAGER)
@@ -116,5 +120,11 @@ public class User {
     }
     public void substractFriendCount(){
         this.friendCount -= 1;
+    }
+    public void userUpdateCheck(){
+        this.userUpdateCheck = true;
+    }
+    public void friendUpdateCheck(){
+        this.userUpdateCheck = true;
     }
 }

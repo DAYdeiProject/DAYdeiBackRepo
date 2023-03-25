@@ -10,9 +10,10 @@ public interface PostCustomRepository {
     List<Post> findAllPostByUser(User user);
     List<Post> findFriendPost(User master);
     List<Post> findNotFriendPost(User master);
-    List<User> findAllUpdateUser(User user);
+    List<User> findAllUpdateUser();
     List<User> findAllUpdateFriend(User user);
     Post findBirthdayPost(User master, User birthdayUser);
     List<Post> findSubscribingPost(User user);
     List<Post> findNofitySchedule();
+    List<User> findAllFriendUpdateUser();
 }

@@ -70,7 +70,7 @@ public class UserSubscribeService {
         if (userSubscribe == null){
             throw new IllegalArgumentException("구독 취소 요청이 올바르지 않습니다.");
         }
-        Notification notification = notificationRepository.findUserSubscribeNotification(subscriber, subscribing.getId(), NotificationType.SUBSCRIBE_ACCEPT);
+        Notification notification = notificationRepository.findNotification(subscriber, subscribing.getId(), NotificationType.SUBSCRIBE_ACCEPT);
         if (notification != null)
         {notificationRepository.delete(notification);}
         userSubscribeRepository.delete(userSubscribe);

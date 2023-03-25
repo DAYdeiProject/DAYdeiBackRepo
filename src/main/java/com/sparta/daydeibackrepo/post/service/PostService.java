@@ -149,10 +149,8 @@ public class PostService {
 
         PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         Boolean subscribeCheck = null;
-        ColorEnum colorEnum = post.getColor();
         if (postSubscribe!=null){
             subscribeCheck = postSubscribe.getPostSubscribeCheck();
-            colorEnum = ColorEnum.GRAY;
         }
 
 //        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscriberId(post.getUser());
@@ -165,7 +163,7 @@ public class PostService {
         } else if (post.getScope() == ScopeEnum.FRIEND && !friends.contains(user) && post.getUser() != user) {
             throw new AccessDeniedException("작성자가 친구공개로 설정한 일정입니다");
         } else {
-            return PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck, colorEnum);
+            return PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck);
         }
 
 
@@ -209,10 +207,8 @@ public class PostService {
 
         PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         Boolean subscribeCheck = null;
-        ColorEnum colorEnum = post.getColor();
         if (postSubscribe!=null){
             subscribeCheck = postSubscribe.getPostSubscribeCheck();
-            colorEnum = ColorEnum.GRAY;
         }
 
         //태그당한 친구에게 알림
@@ -227,7 +223,7 @@ public class PostService {
             }
             postUpdateCheck(post, user);
             postSubscribeService.updateJoin(postId, joiners, userDetails);
-            return PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck, colorEnum);
+            return PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck);
         }
         throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
 
@@ -407,7 +403,7 @@ public class PostService {
                 .map(post -> {
                     List<ParticipantsResponseDto> participants = getParticipants(post);
                     WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
-                    return PostResponseDto.of(post, writerResponseDto, participants);
+                    return PostResponseDto.of(post, writerResponseDto, participants, null);
                 })
                 .collect(Collectors.toList());
 

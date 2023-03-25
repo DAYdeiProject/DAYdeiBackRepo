@@ -46,7 +46,7 @@ public class PostResponseDto {
 
     private Boolean postSubscribeCheck;
 
-    public static PostResponseDto of(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> tagedFriends, Boolean postSubscribeCheck, ColorEnum colorEnum) {
+    public static PostResponseDto of(Post post, WriterResponseDto writerResponseDto, List<ParticipantsResponseDto> tagedFriends, Boolean postSubscribeCheck) {
         return PostResponseDto.builder()
                 .id(post.getId())
                 .writer(writerResponseDto)
@@ -60,7 +60,7 @@ public class PostResponseDto {
                 .location(post.getLocation())
                 .participant(tagedFriends)
                 .scope(post.getScope())
-                .color(colorEnum)
+                .color(post.getColor())
                 .createdAt(post.getCreatedAt())
                 .modifiedAt(post.getModifiedAt())
                 .postSubscribeCheck(postSubscribeCheck)

@@ -53,9 +53,9 @@ public class User {
     @JsonIgnore
     private List<UserSubscribe> subscriber;
     @JsonIgnore
-    private Boolean friendUpdateCheck;
+    private Boolean friendUpdateCheck = false;
     @JsonIgnore
-    private Boolean userUpdateCheck;
+    private Boolean userUpdateCheck  = false;
 
 
 //    @ElementCollection(fetch = FetchType.EAGER)

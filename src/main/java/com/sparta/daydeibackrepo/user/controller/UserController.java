@@ -9,6 +9,7 @@ import com.sparta.daydeibackrepo.user.service.UserService;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -68,7 +69,7 @@ public class UserController {
         return StatusResponseDto.success(userService.setCategory(categoryRequestDto, userDetails));
     }
 
-    @PutMapping(value = "/users/profile", consumes = "multipart/form-data")
+    @PutMapping(value = "/users/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public StatusResponseDto<UserProfileResponseDto> updateUser(
             @RequestPart UserProfileRequestDto userProfileRequestDto,
             @RequestPart MultipartFile  profileImage,

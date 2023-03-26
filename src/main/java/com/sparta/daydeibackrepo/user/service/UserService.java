@@ -130,7 +130,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfileResponseDto updateUser(UserProfileRequestDto userProfileRequestDto, MultipartFile multipartFile1, MultipartFile multipartFile2, UserDetailsImpl userDetails) throws IOException {
+    public UserProfileResponseDto updateUser(UserProfileRequestDto userProfileRequestDto, MultipartFile profileImage, MultipartFile backgroundImage, UserDetailsImpl userDetails) throws IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new NullPointerException("인증된 유저가 아닙니다")
         );
@@ -142,12 +142,12 @@ public class UserService {
         String profileImageUrl = null;
         String backgroundImageUrl = null;
 
-        if (multipartFile1 != null && !multipartFile1.isEmpty()) {
-            profileImageUrl = s3Service.uploadFile(multipartFile1, "image");
+        if (profileImage != null && !profileImage.isEmpty()) {
+            profileImageUrl = s3Service.uploadFile(profileImage, "image");
         }
 
-        if (multipartFile2 != null && !multipartFile2.isEmpty()) {
-            backgroundImageUrl = s3Service.uploadFile(multipartFile2, "image");
+        if (backgroundImage != null && !backgroundImage.isEmpty()) {
+            backgroundImageUrl = s3Service.uploadFile(backgroundImage, "image");
         }
 
 

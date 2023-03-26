@@ -71,11 +71,11 @@ public class UserController {
     @PutMapping("/users/profile")
     public StatusResponseDto<UserProfileResponseDto> updateUser(
             @RequestPart UserProfileRequestDto userProfileRequestDto,
-            @RequestPart MultipartFile  multipartFile1,
-            @RequestPart MultipartFile multipartFile2,
+            @RequestPart MultipartFile  profileImage,
+            @RequestPart MultipartFile backgroundImage,
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails)
             throws IOException {
-        return StatusResponseDto.success(userService.updateUser(userProfileRequestDto, multipartFile1, multipartFile2, userDetails));
+        return StatusResponseDto.success(userService.updateUser(userProfileRequestDto, profileImage, backgroundImage, userDetails));
     }
 
     @GetMapping("/home/profile/{userId}")

@@ -68,7 +68,7 @@ public class UserController {
         return StatusResponseDto.success(userService.setCategory(categoryRequestDto, userDetails));
     }
 
-    @PutMapping("/users/profile")
+    @PutMapping(value = "/users/profile", consumes = "multipart/form-data")
     public StatusResponseDto<UserProfileResponseDto> updateUser(
             @RequestPart UserProfileRequestDto userProfileRequestDto,
             @RequestPart MultipartFile  profileImage,

@@ -1,6 +1,5 @@
 package com.sparta.daydeibackrepo.post.entity;
 
-import com.sparta.daydeibackrepo.post.dto.PostDragRequestDto;
 import com.sparta.daydeibackrepo.post.dto.PostRequestDto;
 import com.sparta.daydeibackrepo.postSubscribe.entity.PostSubscribe;
 import com.sparta.daydeibackrepo.tag.entity.Tag;

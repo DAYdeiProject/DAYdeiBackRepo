@@ -85,5 +85,4 @@ public class PostController {
     public StatusResponseDto<List<PostResponseDto>> getSharePost(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(postService.getSharePost(userId, userDetails));
     }
-
 }

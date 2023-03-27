@@ -20,9 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostCustomRep
     List<Post> findSubscribeTodayPost(User subscriberId, LocalDate date, ScopeEnum scope);
     List<Post> findTop5ByUserAndScopeInAndModifiedAtNotNullOrderByModifiedAtDesc(User user, List<ScopeEnum> allowedScopes, Pageable pageable);
 
-    /*@Query(value = "Select p From Post p Where p.user = :user "+" AND "+" p.scope = :SUBSCRIBE ")
-    List<Post> findSubscribePost(User user, ScopeEnum SUBSCRIBE);
-    List<Post> findAllPostByUserId(Long userId);
+    /*
     @Query(value = "Select p From Post p Where p.user = :master "+" AND (p.scope = :ALL OR "+" p.scope = :SUBSCRIBE OR "+" p.scope = :FRIEND )")
     List<Post> findFriendPost(User master, ScopeEnum ALL, ScopeEnum SUBSCRIBE, ScopeEnum FRIEND);
     @Query(value = "Select p From Post p Where p.user = :master "+" AND (p.scope = :ALL OR "+" p.scope = :SUBSCRIBE )")

@@ -18,8 +18,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostCustomRep
     @Query("SELECT p FROM Post p WHERE " +
             "p.user = :subscriberId AND p.startDate <= :date AND p.endDate >= :date AND p.scope = :scope ORDER BY p.startTime DESC")
     List<Post> findSubscribeTodayPost(User subscriberId, LocalDate date, ScopeEnum scope);
-//    List<Post> findTop5ByUserAndModifiedAtNotNullOrderByModifiedAtDesc
-//    List<Post> findTop5ByUserAndModifiedAtNotNullOrderByModifiedAtDesc(User master, Pageable pageable);
     List<Post> findTop5ByUserAndScopeInAndModifiedAtNotNullOrderByModifiedAtDesc(User user, List<ScopeEnum> allowedScopes, Pageable pageable);
     List<Post> findTop5ByUserAndScopeInAndModifiedAtNullOrderByCreatedAtDesc(User user, List<ScopeEnum> allowedScopes, Pageable pageable);
 

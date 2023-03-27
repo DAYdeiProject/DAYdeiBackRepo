@@ -85,6 +85,7 @@ public class Post extends TimeStamped {
     }
 
     public Post(List<String> imageUrl) {
+
         this.image = imageUrl;
     }
 

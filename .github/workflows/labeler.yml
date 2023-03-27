@@ -29,3 +29,6 @@ labels:
   'chore':
     include:
       - '\bchore\b'
+  'style':
+    include:
+      - '\bstyle\b'

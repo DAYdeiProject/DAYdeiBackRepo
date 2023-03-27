@@ -231,8 +231,6 @@ public class KakaoService {
         if (kakaoAccount != null && kakaoAccount.has("birthday")) {
             birthday = jsonNode.get("kakao_account").get("birthday").asText();
         }
-
-        List<String> friendEmailList = new ArrayList<>();
         return new KakaoUserInfoDto(id, nickName, email, img, birthday);
 
 

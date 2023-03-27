@@ -96,11 +96,6 @@ public class PostService {
             );
             Tag tag = new Tag(joiner, savePost);
             tagRepository.save(tag);
-
-//            for(Friend friend : friends) {
-//                UserPost userPost = new UserPost(friend.getFriendResponseId(), savePost);
-//                userPostRepository.save(userPost);
-//            }
         }
         List<User> joiners = new ArrayList<>();
         List<Tag> tags = tagRepository.findAllByPostId(savePost.getId());

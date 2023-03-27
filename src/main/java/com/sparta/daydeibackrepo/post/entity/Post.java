@@ -117,6 +117,7 @@ public class Post extends TimeStamped {
         this.color = requestDto.getColor();
         this.user = user;
     }
+
     public Post(Post post, ColorEnum colorEnum) {
         this.id = post.getId();
         this.title = post.getTitle();

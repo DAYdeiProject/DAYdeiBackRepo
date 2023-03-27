@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableJpaAuditing
 @EnableScheduling
-//@OpenAPIDefinition(servers = {@Server(url = "https://daydei.shop", description = "Default Server URL") ,@Server(url = "http://localhost:8080", description = "Local Server URL")})
+@OpenAPIDefinition(servers = {@Server(url = "https://daydei.shop", description = "Default Server URL") ,@Server(url = "http://localhost:8080", description = "Local Server URL")})
 @EnableAsync
 @SpringBootApplication
 public class DaydeiBackRepoApplication {

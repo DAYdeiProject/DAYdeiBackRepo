@@ -72,8 +72,8 @@ public class UserController {
     @PatchMapping(value = "/users/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public StatusResponseDto<UserProfileResponseDto> updateUser(
             @RequestPart UserProfileRequestDto userProfileRequestDto,
-            @RequestPart(value="file",required = false) MultipartFile  profileImage,
-            @RequestPart(value="file",required = false) MultipartFile backgroundImage,
+            @RequestPart(value="profileImage",required = false) MultipartFile  profileImage,
+            @RequestPart(value="backgroundImage",required = false) MultipartFile backgroundImage,
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails)
             throws IOException {
         return StatusResponseDto.success(userService.updateUser(userProfileRequestDto, profileImage, backgroundImage, userDetails));

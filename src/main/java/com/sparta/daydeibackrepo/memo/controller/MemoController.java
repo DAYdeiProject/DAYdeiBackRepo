@@ -21,7 +21,7 @@ public class MemoController {
 
     @PostMapping("/memos")
     public StatusResponseDto<?> createMemo(@RequestBody MemoRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return StatusResponseDto.success(memoService.createMemo(requestDto, userDetails));
+        return memoService.createMemo(requestDto, userDetails);
     }
 
     @GetMapping("/memos")
@@ -30,13 +30,13 @@ public class MemoController {
     }
 
     @PatchMapping("/memos/{memoId}")
-    public StatusResponseDto<?> updateMemo(@PathVariable Long memoId, @RequestBody MemoRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
-        return StatusResponseDto.success(memoService.updateMemo(memoId, requestDto, userDetails));
+    public StatusResponseDto<?> updateMemo(@PathVariable Long memoId, @RequestBody MemoRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return memoService.updateMemo(memoId, requestDto, userDetails);
     }
 
     @DeleteMapping("/memos/{memoId}")
-    public StatusResponseDto<?> deleteMemo(@PathVariable Long memoId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
-        return StatusResponseDto.success(memoService.deleteMemo(memoId, userDetails));
+    public StatusResponseDto<?> deleteMemo(@PathVariable Long memoId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return memoService.deleteMemo(memoId, userDetails);
     }
 
 }

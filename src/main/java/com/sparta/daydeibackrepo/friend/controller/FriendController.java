@@ -28,7 +28,7 @@ public class FriendController {
         return StatusResponseDto.success(friendService.setFriend(userId, userDetails));
     }
     @DeleteMapping("/{userId}")
-    public StatusResponseDto<ResponseEntity<StatusResponseDto>> deleteFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<?> deleteFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.deleteFriend(userId, userDetails));
     }
     @GetMapping("/list/{userId}")

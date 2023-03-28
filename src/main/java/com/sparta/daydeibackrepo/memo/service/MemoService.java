@@ -32,7 +32,7 @@ public class MemoService {
         return user.getId().equals(memo.getUser().getId()) || user.getRole().equals(UserRoleEnum.ADMIN);
     }
 
-    public Object createMemo(MemoRequestDto requestDto, UserDetailsImpl userDetails) {
+    public StatusResponseDto createMemo(MemoRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -59,7 +59,7 @@ public class MemoService {
     }
 
     @Transactional
-    public Object updateMemo(Long memoId, MemoRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
+    public StatusResponseDto updateMemo(Long memoId, MemoRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -77,7 +77,7 @@ public class MemoService {
     }
 
     @Transactional
-    public Object deleteMemo(Long memoId, UserDetailsImpl userDetails) throws IllegalAccessException {
+    public StatusResponseDto deleteMemo(Long memoId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );

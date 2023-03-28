@@ -28,13 +28,13 @@ public class UserController {
 
 
     @PostMapping("/users/signup")
-    public StatusResponseDto<ResponseEntity<StatusResponseDto>> signup(@RequestBody @Valid SignupRequestDto signupRequestDto) {
+    public StatusResponseDto signup(@RequestBody @Valid SignupRequestDto signupRequestDto) {
         System.out.println("test");
         return StatusResponseDto.success(userService.signup(signupRequestDto));
     }
 
     @PostMapping("/users/signup/{email}")
-    public StatusResponseDto<ResponseEntity<StatusResponseDto>> checkEmail(@PathVariable String email) {
+    public StatusResponseDto checkEmail(@PathVariable String email) {
         return StatusResponseDto.success(userService.emailCheck(email));
     }
 
@@ -60,12 +60,12 @@ public class UserController {
         return kakaoService.kakaoFriends(code, userDetails);
     }
     @PostMapping("/users/reset/password")
-    public StatusResponseDto<ResponseEntity<StatusResponseDto>> resetPassword(@RequestBody UserRequestDto userRequestDto){
+    public StatusResponseDto resetPassword(@RequestBody UserRequestDto userRequestDto){
         return StatusResponseDto.success(userService.resetPassword(userRequestDto));
     }
 
     @PostMapping("/users/categories")
-    public StatusResponseDto<ResponseEntity<StatusResponseDto>> setCategory(@RequestBody CategoryRequestDto categoryRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto setCategory(@RequestBody CategoryRequestDto categoryRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(userService.setCategory(categoryRequestDto, userDetails));
     }
 

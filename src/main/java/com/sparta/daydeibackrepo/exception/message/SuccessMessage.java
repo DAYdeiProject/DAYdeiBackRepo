@@ -21,8 +21,8 @@ public enum SuccessMessage {
     FRIEND_REQUEST_CANCEL_SUCCESS(HttpStatus.OK, "친구 신청을 취소하였습니다."),
     FRIEND_REQUEST_REJACT_SUCCESS(HttpStatus.OK, "친구 신청을 거절하였습니다."),
     SUBSCRIBE_PUST_VIEW_SUCCESS(HttpStatus.OK,"구독한 일정을 표시합니다"),
-    SUBSCRIBE_NOT_PUST_VIEW_SUCCESS(HttpStatus.OK,"구독한 일정을 표시하지 않습니다");
-
+    SUBSCRIBE_NOT_PUST_VIEW_SUCCESS(HttpStatus.OK,"구독한 일정을 표시하지 않습니다"),
+    NOTIFICATION_DELETED(HttpStatus.OK,"알림 삭제 완료!");
     private final HttpStatus httpStatus;
     private final String detail;
 }

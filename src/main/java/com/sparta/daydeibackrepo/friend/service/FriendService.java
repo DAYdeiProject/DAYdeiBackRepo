@@ -89,7 +89,7 @@ public class FriendService {
         return new FriendResponseDto(friend);
     }
     @Transactional
-    public ResponseEntity<StatusResponseDto> deleteFriend(Long userId, UserDetailsImpl userDetails) {
+    public StatusResponseDto deleteFriend(Long userId, UserDetailsImpl userDetails) {
         User user1 = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );

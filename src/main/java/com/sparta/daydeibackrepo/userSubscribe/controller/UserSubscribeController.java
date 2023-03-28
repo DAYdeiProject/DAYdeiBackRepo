@@ -43,7 +43,7 @@ public class UserSubscribeController {
     }
 
     @PutMapping("/show/{userId}")
-    public StatusResponseDto<ResponseEntity<StatusResponseDto>> setSubscrbeVisibility(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<?> setSubscrbeVisibility(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(userSubscribeService.setSubscrbeVisibility(userId, userDetails));
     }
 

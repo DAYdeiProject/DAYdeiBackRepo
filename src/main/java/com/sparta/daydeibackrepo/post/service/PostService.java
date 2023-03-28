@@ -1,7 +1,6 @@
 package com.sparta.daydeibackrepo.post.service;
 
 import com.sparta.daydeibackrepo.exception.CustomException;
-import com.sparta.daydeibackrepo.exception.message.ExceptionMessage;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.mail.dto.MailDto;
 import com.sparta.daydeibackrepo.mail.service.MailService;
@@ -25,7 +24,6 @@ import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
-import com.sun.xml.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
@@ -33,17 +31,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -76,7 +69,7 @@ public class PostService {
     }
 
     @Transactional
-    public ResponseEntity<StatusResponseDto> createPost(PostRequestDto requestDto, UserDetailsImpl userDetails) {
+    public StatusResponseDto createPost(PostRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -175,7 +168,7 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponseDto updatePost(Long postId, PostRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException, IOException {
+    public PostResponseDto updatePost(Long postId, PostRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -237,7 +230,7 @@ public class PostService {
     }
 
     @Transactional
-    public ResponseEntity<StatusResponseDto> dragUpdatePost(Long postId, PostDragRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
+    public StatusResponseDto dragUpdatePost(Long postId, PostDragRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -262,7 +255,7 @@ public class PostService {
     }
 
     @Transactional
-    public ResponseEntity<StatusResponseDto> deletePost(Long postId, UserDetailsImpl userDetails) {
+    public StatusResponseDto deletePost(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );

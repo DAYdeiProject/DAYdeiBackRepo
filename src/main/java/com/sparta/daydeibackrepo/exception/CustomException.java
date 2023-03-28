@@ -1,6 +1,6 @@
 package com.sparta.daydeibackrepo.exception;
 
-import com.sparta.daydeibackrepo.exception.dto.ExceptionMessage;
+import com.sparta.daydeibackrepo.exception.message.ExceptionMessage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

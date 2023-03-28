@@ -1,5 +1,7 @@
 package com.sparta.daydeibackrepo.post.service;
 
+import com.sparta.daydeibackrepo.exception.CustomException;
+import com.sparta.daydeibackrepo.exception.message.ExceptionMessage;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.mail.dto.MailDto;
 import com.sparta.daydeibackrepo.mail.service.MailService;
@@ -22,6 +24,7 @@ import com.sparta.daydeibackrepo.tag.repository.TagRepository;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
+import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import com.sun.xml.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
 
@@ -47,6 +50,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
+import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.*;
+
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -71,7 +77,7 @@ public class PostService {
     @Transactional
     public Object createPost(PostRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
 //        List<String> imageUrl = s3Service.uploadFiles(requestDto.getImage(), "images");
 
@@ -86,13 +92,13 @@ public class PostService {
 
         if (startDate.isAfter(endDate) || (startDate.isEqual(endDate) && startTime.isAfter(endTime)) ||
                 (startDate.isEqual(endDate) && (startTime.equals(endTime) && !startTime.equals(LocalTime.parse("00:00"))))) {
-            throw new IllegalArgumentException("일정의 시간 설정이 올바르지 않습니다.");
+            throw new CustomException(TIME_SETTING_IS_INCORRECT);
         }
 
         for(Long participant : requestDto.getParticipant()) {
 //            List<Friend> friends = friendRepository.findidFriendList(participant, user);
             User joiner = userRepository.findById(participant).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+                    () -> new CustomException(USER_NOT_FOUND)
             );
             Tag tag = new Tag(joiner, savePost);
             tagRepository.save(tag);
@@ -105,14 +111,14 @@ public class PostService {
         }
         postUpdateCheck(post, user);
         postSubscribeService.createJoin(savePost.getId(), joiners, userDetails);
-        return "일정 작성을 완료하였습니다.";
+        return StatusResponseDto.toResponseEntity(POST_CREATED_SUCCESS);
 
 
     }
 
     public List<String> createPostImages(List<MultipartFile> multipartFiles, UserDetailsImpl userDetails) throws IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
 
         List<String> imageUrl = s3Service.uploadFiles(multipartFiles, "images");
@@ -123,10 +129,10 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostResponseDto getPostOne(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new NullPointerException("존재하지 않는 게시물입니다.")
+                () -> new CustomException(POST_NOT_FOUND)
         );
 
         WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
@@ -157,9 +163,9 @@ public class PostService {
         List<User> friends = friendRepository.findAllFriends(post.getUser());
 
         if(post.getScope() == ScopeEnum.ME && !Objects.equals(post.getUser().getId(), user.getId())) {
-            throw new AccessDeniedException("작성자가 나만 보기로 설정한 일정입니다.");
+            throw new CustomException(POST_VIEW_ONLY_CREATOR_FORBIDDEN);
         } else if (post.getScope() == ScopeEnum.FRIEND && !friends.contains(user) && post.getUser() != user) {
-            throw new AccessDeniedException("작성자가 친구공개로 설정한 일정입니다");
+            throw new CustomException(POST_VIEW_ONLY_FRIEND_FORBIDDEN);
         } else {
             return PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck, colorEnum);
         }
@@ -170,10 +176,10 @@ public class PostService {
     @Transactional
     public PostResponseDto updatePost(Long postId, PostRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException, IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new NullPointerException("존재하지 않는 게시물입니다.")
+                () -> new CustomException(POST_NOT_FOUND)
         );
 
         WriterResponseDto writerResponseDto = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
@@ -200,7 +206,7 @@ public class PostService {
 
         if (startDate.isAfter(endDate) || (startDate.isEqual(endDate) && startTime.isAfter(endTime)) ||
                 (startDate.isEqual(endDate) && (startTime.equals(endTime) && !startTime.equals(LocalTime.parse("00:00"))))) {
-            throw new IllegalArgumentException("일정의 시간 설정이 올바르지 않습니다.");
+            throw new CustomException(TIME_SETTING_IS_INCORRECT);
         }
 
         PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
@@ -225,42 +231,42 @@ public class PostService {
             postSubscribeService.updateJoin(postId, joiners, userDetails);
             return PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck, colorEnum);
         }
-        throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
+        throw new CustomException(UNAUTHORIZED_UPDATE_OR_DELETE);
 
     }
 
     @Transactional
     public Object dragUpdatePost(Long postId, PostDragRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new NullPointerException("존재하지 않는 게시물입니다.")
+                () -> new CustomException(POST_NOT_FOUND)
         );
 
         LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
         LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
 
         if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("일정의 시작 일자는 끝나는 일자보다 빠른 일자여야 합니다.");
+            throw new CustomException(START_DATE_MUST_BE_EARLY_END_DATE);
         }
 
         if (hasAuthority(user, post)) {
             post.dragUpdate(startDate, endDate);
 
-            return "일정의 일자가 변경되었습니다.";
+            return StatusResponseDto.toResponseEntity(POST_DATE_PUT_SUCCESS);
         }
-        throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
+        throw new CustomException(UNAUTHORIZED_UPDATE_OR_DELETE);
 
     }
 
     @Transactional
-    public Object deletePost(Long postId, UserDetailsImpl userDetails) throws IllegalAccessException {
+    public Object deletePost(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new NullPointerException("존재하지 않는 게시물입니다.")
+                () -> new CustomException(POST_NOT_FOUND)
         );
         //태그당한 친구에게 알림
         if (hasAuthority(user, post)) {
@@ -273,19 +279,21 @@ public class PostService {
             postSubscribeService.deleteJoin(post.getId(), joiners, userDetails);
             postRepository.delete(post);
 
-            return "일정이 삭제되었습니다.";
+            return StatusResponseDto.toResponseEntity(POST_DELETE_SUCCESS);
         }
-        throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
+        throw new CustomException(UNAUTHORIZED_UPDATE_OR_DELETE);
     }
 
     @Transactional(readOnly = true)
     public List<TodayPostResponseDto> getPostByDate(Long userId, String date, UserDetailsImpl userDetails) {
 
-        User visitor = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("인증된 유저가 아닙니다"));
+        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
+        );
 
-        User master = userRepository.findById(userId)
-                .orElseThrow(() -> new NullPointerException("등록된 사용자가 없습니다"));
+        User master = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
 
         LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
@@ -310,10 +318,10 @@ public class PostService {
     @Transactional
     public List<HomeResponseDto> getHomePost(Long userId, UserDetailsImpl userDetails) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User master = userRepository.findById(userId).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         List<HomeResponseDto> homeResponseDtos = new ArrayList<>();
         // 홈페이지 주인이 본인인경우 (작성한 일정 : 다 보이게 / 구독하는 일정 : 다 보이게 / 공유 일정 : 다 보이게)
@@ -379,10 +387,12 @@ public class PostService {
 
     @Transactional // 업데이트 된 일정 (최근 일주일)
     public List<PostResponseDto> getUpdatePost(Long userId, UserDetailsImpl userDetails) {
-        User visitor = userRepository.findById(userDetails.getUser().getId())
-                .orElseThrow(() -> new NullPointerException("인증되지 않은 사용자입니다"));
-        User master = userRepository.findById(userId)
-                .orElseThrow(() -> new NullPointerException("존재하지 않는 사용자입니다"));
+        User visitor = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
+        );
+        User master = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
         List<ScopeEnum> allowedScopes = getAllowedScopes(master, visitor);
         // master가 직접 작성한 것도 최신순으로 5개만 가지고 오기
         List<Post> posts = postRepository.findTop5ByUserAndScopeInAndModifiedAtNotNullOrderByModifiedAtDesc(
@@ -420,10 +430,10 @@ public class PostService {
     @Transactional //나와 공유한 일정
     public List<PostResponseDto> getSharePost(Long userId, UserDetailsImpl userDetails){
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증되지 않은 사용자입니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User master = userRepository.findById(userId).orElseThrow(
-                () -> new NullPointerException("존재하지 않는 사용자입니다")
+                () -> new CustomException(USER_NOT_FOUND)
         );
         List<Post> visitorPosts = postRepository.findAllPostByUser(visitor);
         List<Post> masterPosts = postRepository.findAllPostByUser(master);

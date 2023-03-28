@@ -1,6 +1,8 @@
 package com.sparta.daydeibackrepo.util;
 
-import com.sparta.daydeibackrepo.exception.dto.ExceptionMessage;
+import com.sparta.daydeibackrepo.exception.message.ExceptionMessage;
+import com.sparta.daydeibackrepo.exception.message.SuccessMessage;
+import com.sun.net.httpserver.Authenticator;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,7 +40,7 @@ public class StatusResponseDto<T> {
                 );
     }
 
-    public static ResponseEntity<StatusResponseDto> toResponseEntity(String message) {
+    public static ResponseEntity<StatusResponseDto> toResponseEntity(SuccessMessage message) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(StatusResponseDto.builder()

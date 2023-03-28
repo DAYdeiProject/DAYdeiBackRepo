@@ -1,6 +1,7 @@
 package com.sparta.daydeibackrepo.user.service;
 
-import com.sparta.daydeibackrepo.exception.dto.ExceptionMessage;
+import com.sparta.daydeibackrepo.exception.CustomException;
+import com.sparta.daydeibackrepo.exception.message.ExceptionMessage;
 import com.sparta.daydeibackrepo.friend.repository.FriendCustomRepository;
 import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
@@ -32,6 +33,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
+import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.*;
+
 @Service
 @Validated
 @RequiredArgsConstructor
@@ -49,7 +53,7 @@ public class UserService {
 
 
     @Transactional
-    public String signup(@Valid SignupRequestDto signupRequestDto){
+    public ResponseEntity<StatusResponseDto> signup(@Valid SignupRequestDto signupRequestDto){
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String passwordCheck = passwordEncoder.encode(signupRequestDto.getPasswordCheck());
@@ -58,21 +62,21 @@ public class UserService {
 
         Optional<User> foundUsername = userRepository.findByEmail(email);
         if (foundUsername.isPresent()) {
-            throw new IllegalArgumentException("이미 가입된 사용자입니다.");
+            throw new CustomException(DUPLICATE_USER);
         }
         if (password.equals(passwordCheck)){
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new CustomException(PASSWORD_INCORRECT_MISMATCH);
         }
         User user = new User(email, password, nickName, birthday);
         userRepository.save(user);
-        return "회원가입 완료";
+        return StatusResponseDto.toResponseEntity(SIGN_UP_SUCCESS);
     }
 
     public ResponseEntity<StatusResponseDto> emailCheck(String email) {
         if(userRepository.findByEmail(email).isPresent()) {
-            return StatusResponseDto.toAllExceptionResponseEntity(ExceptionMessage.valueOf("중복된 이메일 입니다."));
+            return StatusResponseDto.toAllExceptionResponseEntity(DUPLICATE_EMAIL);
         }
-        return StatusResponseDto.toResponseEntity("사용 가능한 이메일입니다.");
+        return StatusResponseDto.toResponseEntity(EMAIL_CHECK_SUCCESS);
     }
 
     @Transactional
@@ -82,11 +86,11 @@ public class UserService {
         Boolean isLogin = false;
 
         User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
+                () -> new CustomException(USER_NOT_FOUND)
         );
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("비밀 번호가 옳지 않습니다.");
+            throw new CustomException(PASSWORD_INCORRECT);
         }
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getEmail(), UserRoleEnum.USER));
@@ -95,47 +99,47 @@ public class UserService {
     }
 
     @Transactional
-    public String resetPassword(UserRequestDto userRequestDto) {
+    public ResponseEntity<StatusResponseDto> resetPassword(UserRequestDto userRequestDto) {
         User user = userRepository.findByEmail(userRequestDto.getEmail()).orElseThrow(
-                () -> new IllegalArgumentException("등록된 사용자가 없습니다.")
+                () -> new CustomException(USER_NOT_FOUND)
         );
         if (!user.getBirthday().equals(userRequestDto.getBirthday())){
-            throw new IllegalArgumentException("생일이 일치하지 않습니다.");
+            throw new CustomException(BIRTHDAY_INCORRECT);
         }
         String newPassword = UUID.randomUUID().toString().substring(0,8);
         mailService.sendFindPasswordMail(new MailDto(user, newPassword));
         user.updatePassword(passwordEncoder.encode(newPassword));
-        return "임시 비밀번호가 이메일로 전송되었습니다.";
+        return StatusResponseDto.toResponseEntity(TEMPORARY_PASSWORD_HAS_BEEN_EMAILED);
     }
 
     @Transactional
-    public String setCategory(CategoryRequestDto categoryRequestDto, UserDetailsImpl userDetails) {
+    public ResponseEntity<StatusResponseDto> setCategory(CategoryRequestDto categoryRequestDto, UserDetailsImpl userDetails) {
 
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new NullPointerException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
 
         List<CategoryEnum> categoryList = categoryRequestDto.getCategory();
         for (CategoryEnum category : categoryList) {
             if (user.getCategoryEnum().contains(category)){
-                return "이미 등록된 카테고리입니다.";
+                return StatusResponseDto.toAllExceptionResponseEntity(DUPLICATE_CATEGORY);
             }
             else {
                 user.getCategoryEnum().add(category);
             }
         }
         userRepository.save(user);
-        return "카테고리 등록 완료";
+        return StatusResponseDto.toResponseEntity(CATAGORY_CREATED_SUCCESS);
     }
 
     @Transactional
     public UserProfileResponseDto updateUser(UserProfileRequestDto userProfileRequestDto, MultipartFile profileImage, MultipartFile backgroundImage, UserDetailsImpl userDetails) throws IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new NullPointerException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
 
         if (!userProfileRequestDto.getNewPassword().equals(userProfileRequestDto.getNewPasswordConfirm())){
-            throw new IllegalArgumentException("비밀번호가 다릅니다.");
+            throw new CustomException(PASSWORD_INCORRECT);
         }
 
         String profileImageUrl = null;
@@ -160,10 +164,10 @@ public class UserService {
     @Transactional
     public UserResponseDto getUser(Long userId, UserDetailsImpl userDetails){
         User visitor = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
-                () -> new NullPointerException("인증되지 않은 사용자입니다.")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User user = userRepository.findById(userId).orElseThrow(
-                ()-> new NullPointerException("등록된 사용자가 없습니다.")
+                ()-> new CustomException(USER_NOT_FOUND)
         );
         if (visitor == user){
             return new UserResponseDto(user);

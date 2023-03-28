@@ -28,9 +28,9 @@ public class UserController {
 
 
     @PostMapping("/users/signup")
-    public StatusResponseDto<String> signup(@RequestBody @Valid SignupRequestDto signupRequestDto) {
+    public ResponseEntity<StatusResponseDto> signup(@RequestBody @Valid SignupRequestDto signupRequestDto) {
         System.out.println("test");
-        return StatusResponseDto.success(userService.signup(signupRequestDto));
+        return userService.signup(signupRequestDto);
     }
 
     @PostMapping("/users/signup/{email}")
@@ -60,13 +60,13 @@ public class UserController {
         return kakaoService.kakaoFriends(code, userDetails);
     }
     @PostMapping("/users/reset/password")
-    public StatusResponseDto<String> resetPassword(@RequestBody UserRequestDto userRequestDto){
-        return StatusResponseDto.success(userService.resetPassword(userRequestDto));
+    public ResponseEntity<StatusResponseDto> resetPassword(@RequestBody UserRequestDto userRequestDto){
+        return userService.resetPassword(userRequestDto);
     }
 
     @PostMapping("/users/categories")
-    public StatusResponseDto<String> setCategory(@RequestBody CategoryRequestDto categoryRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(userService.setCategory(categoryRequestDto, userDetails));
+    public ResponseEntity<StatusResponseDto> setCategory(@RequestBody CategoryRequestDto categoryRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return userService.setCategory(categoryRequestDto, userDetails);
     }
 
     @PutMapping(value = "/users/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

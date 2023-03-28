@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.util;
 
+import com.sparta.daydeibackrepo.exception.dto.ExceptionMessage;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,16 @@ public class StatusResponseDto<T> {
         return new StatusResponseDto<>(httpStatus.value(), data);
     }
 
+    public static ResponseEntity<StatusResponseDto> toExceptionResponseEntity(ExceptionMessage exceptionMessage) {
+        return ResponseEntity
+                .status(exceptionMessage.getHttpStatus())
+                .body(StatusResponseDto.builder()
+                        .statusCode(exceptionMessage.getHttpStatus().value())
+                        .data(exceptionMessage)
+                        .build()
+                );
+    }
+
     public static ResponseEntity<StatusResponseDto> toResponseEntity(String message) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -38,11 +49,21 @@ public class StatusResponseDto<T> {
     }
 
 
-    public static ResponseEntity<StatusResponseDto> toAllExceptionResponseEntity(String message) {
+    public static ResponseEntity<StatusResponseDto> toAllExceptionResponseEntity(ExceptionMessage exceptionMessage) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(StatusResponseDto.builder()
-                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .statusCode(exceptionMessage.getHttpStatus().value())
+                        .data(exceptionMessage)
+                        .build()
+                );
+    }
+
+    public static ResponseEntity<StatusResponseDto> toAllExceptionResponseEntity(HttpStatus httpStatus,String message) {
+        return ResponseEntity
+                .status(httpStatus)
+                .body(StatusResponseDto.builder()
+                        .statusCode(httpStatus.value())
                         .data(message)
                         .build()
                 );

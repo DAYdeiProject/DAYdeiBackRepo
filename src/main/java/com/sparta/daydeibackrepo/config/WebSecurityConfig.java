@@ -54,10 +54,10 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         //회원가입, 로그인,조회까지는 security 인증 없이도 가능함
         http.authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                .antMatchers("**").permitAll()                // TODO: 2023/03/11 나중에 지워야됨 테스트용
-//                .antMatchers("/docs").permitAll()
-//                .antMatchers("/api/users/signup").permitAll()
-//                .antMatchers("/api/users/login").permitAll()
+//                .antMatchers("**").permitAll()                // TODO: 2023/03/11 나중에 지워야됨 테스트용
+                .antMatchers("/docs").permitAll()
+                .antMatchers("/api/users/signup").permitAll()
+                .antMatchers("/api/users/login").permitAll()
                 .anyRequest().authenticated()
 
                 // JWT 인증/인가를 사용하기 위한 설정
@@ -83,6 +83,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         config.addAllowedOriginPattern("*");
 //        config.addAllowedOrigin("http://localhost:3001");
 //        config.addAllowedOrigin("http://daydei.s3-website.ap-northeast-2.amazonaws.com");
+//        config.addAllowedOrigin("https://daydei-ifcgoipf0-daaaj.vercel.app/");
 //        //채팅 테스트용 origin
 //        config.addAllowedOrigin("http://localhost:8080");
 

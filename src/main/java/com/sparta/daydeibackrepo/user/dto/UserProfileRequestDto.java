@@ -8,8 +8,6 @@ import lombok.Setter;
 public class UserProfileRequestDto {
     private String nickName;
     private String newPassword;
-    private String newPasswordConfirm;
-//    private ImageFileDto profileImage;
-//    private ImageFileDto backgroundImage;
+//    private String newPasswordConfirm;
     private String introduction;
 }

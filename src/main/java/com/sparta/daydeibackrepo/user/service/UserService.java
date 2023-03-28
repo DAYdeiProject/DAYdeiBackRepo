@@ -138,9 +138,9 @@ public class UserService {
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
 
-        if (!userProfileRequestDto.getNewPassword().equals(userProfileRequestDto.getNewPasswordConfirm())){
-            throw new CustomException(PASSWORD_INCORRECT);
-        }
+//        if (!userProfileRequestDto.getNewPassword().equals(userProfileRequestDto.getNewPasswordConfirm())){
+//            throw new CustomException(PASSWORD_INCORRECT);
+//        }
 
         String profileImageUrl = null;
         String backgroundImageUrl = null;
@@ -154,8 +154,13 @@ public class UserService {
         }
 
 
-        String password = passwordEncoder.encode(userProfileRequestDto.getNewPassword());
-        userProfileRequestDto.setNewPassword(password);
+        if (userProfileRequestDto.getNewPassword() != null){
+            String password = passwordEncoder.encode(userProfileRequestDto.getNewPassword());
+            userProfileRequestDto.setNewPassword(password);
+        }
+        else {
+            userProfileRequestDto.setNewPassword(user.getPassword());
+        }
         user.update(userProfileRequestDto, profileImageUrl, backgroundImageUrl);
         userRepository.save(user);
         return new UserProfileResponseDto(user);

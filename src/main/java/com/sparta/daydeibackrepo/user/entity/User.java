@@ -99,17 +99,17 @@ public class User {
         this.password = newPassword;
     }
 
-    public void update(String nickName, String newPassword, String introduction, String profileImageUrl, String backgroundImageUrl){
-//        this.nickName = requestDto.getNickName();
-//        this.password = requestDto.getNewPassword();
-//        this.profileImage = profileImageUrl;
-//        this.backgroundImage = backgroundImageUrl;
-//        this.introduction = requestDto.getIntroduction();
-        this.nickName = nickName;
-        this.password = newPassword;
-        this.introduction = introduction;
+    public void update(UserProfileRequestDto requestDto, String profileImageUrl, String backgroundImageUrl){
+        this.nickName = requestDto.getNickName();
+        this.password = requestDto.getNewPassword();
         this.profileImage = profileImageUrl;
         this.backgroundImage = backgroundImageUrl;
+        this.introduction = requestDto.getIntroduction();
+//        this.nickName = nickName;
+//        this.password = newPassword;
+//        this.introduction = introduction;
+//        this.profileImage = profileImageUrl;
+//        this.backgroundImage = backgroundImageUrl;
     }
 
     public void update(UserProfileRequestDto requestDto){

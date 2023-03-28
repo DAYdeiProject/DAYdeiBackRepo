@@ -146,6 +146,7 @@ public class FriendService {
             throw new CustomException(INVALID_FRIEND_DELETE_REQUEST);
         }
     }
+
     @Transactional(readOnly = true)
     public List<UserResponseDto> getRecommendList(List<String> categories, String searchWord, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(

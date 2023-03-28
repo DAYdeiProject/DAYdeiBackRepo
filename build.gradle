@@ -60,6 +60,9 @@ dependencies {
 
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
+	//sentry
+	implementation 'io.sentry:sentry-spring-boot-starter:6.16.0'
+
 }
 
 //tasks.named('test') {

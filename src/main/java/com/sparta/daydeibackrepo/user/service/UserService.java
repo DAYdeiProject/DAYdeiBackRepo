@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.user.service;
 
+import com.sparta.daydeibackrepo.exception.dto.ExceptionMessage;
 import com.sparta.daydeibackrepo.friend.repository.FriendCustomRepository;
 import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
@@ -69,7 +70,7 @@ public class UserService {
 
     public ResponseEntity<StatusResponseDto> emailCheck(String email) {
         if(userRepository.findByEmail(email).isPresent()) {
-            return StatusResponseDto.toAllExceptionResponseEntity("중복된 이메일 입니다.");
+            return StatusResponseDto.toAllExceptionResponseEntity(ExceptionMessage.valueOf("중복된 이메일 입니다."));
         }
         return StatusResponseDto.toResponseEntity("사용 가능한 이메일입니다.");
     }

@@ -11,6 +11,7 @@ import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +27,7 @@ public class PostController {
 
     //일정 작성
     @PostMapping("/posts")
-    public StatusResponseDto<?> createPost(@RequestBody PostRequestDto requestDto,@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public StatusResponseDto<ResponseEntity<StatusResponseDto>> createPost(@RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(postService.createPost(requestDto, userDetails));
     }
 
@@ -48,13 +49,13 @@ public class PostController {
     }
 
     @PatchMapping("/posts/drag/{postId}")
-    public StatusResponseDto<?> dragUpdatePost(@PathVariable Long postId, @RequestBody PostDragRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException, IOException {
+    public StatusResponseDto<ResponseEntity<StatusResponseDto>> dragUpdatePost(@PathVariable Long postId, @RequestBody PostDragRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException, IOException {
         return StatusResponseDto.success(postService.dragUpdatePost(postId, requestDto, userDetails));
     }
 
     //일정 삭제
     @DeleteMapping("/posts/{postId}")
-    public StatusResponseDto<?> deletePost(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
+    public StatusResponseDto<ResponseEntity<StatusResponseDto>> deletePost(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IllegalAccessException {
         return StatusResponseDto.success(postService.deletePost(postId, userDetails));
     }
 

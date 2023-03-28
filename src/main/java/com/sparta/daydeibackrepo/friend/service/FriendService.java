@@ -121,7 +121,7 @@ public class FriendService {
                 Notification notification = notificationRepository.findNotification(user2, user1.getId(), NotificationType.FRIEND_REQUEST);
                 if (notification != null)
                 {notificationRepository.delete(notification);}
-                return StatusResponseDto.toResponseEntity(FRIEND_REQUEST_DELETE_SUCCESS);
+                return StatusResponseDto.toResponseEntity(FRIEND_REQUEST_CANCEL_SUCCESS);
             }
         }
         else if (friend2 != null){

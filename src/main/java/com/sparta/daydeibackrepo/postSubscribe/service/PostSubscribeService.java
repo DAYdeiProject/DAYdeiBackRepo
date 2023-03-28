@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.postSubscribe.service;
 
+import com.sparta.daydeibackrepo.exception.CustomException;
 import com.sparta.daydeibackrepo.notification.entity.Notification;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
@@ -24,6 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
+import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -38,18 +42,18 @@ public class PostSubscribeService {
     @Transactional
     public void createJoin(Long postId, List<User> joiners, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new EntityNotFoundException("작성글이 존재하지 않습니다.")
+                () -> new CustomException(POST_NOT_FOUND)
         );
         if (!Objects.equals(user.getId(), post.getUser().getId())){
-            throw new IllegalArgumentException("올바르지 않은 공유일정 생성입니다.");
+            throw new CustomException(INVALID_SHARED_POST_CREATE);
         }
         for(User joiner : joiners){
             PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), joiner.getId());
             if(postSubscribe!=null){
-                throw new IllegalArgumentException("해당 유저는 이미 일정 초대되었습니다.");
+                throw new CustomException(DUPLICATE_TAG_USER_JOIN_POST);
             }
             PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
             Notification notification = notificationRepository.findNotification(user, postId, NotificationType.JOIN_REQUEST);
@@ -63,13 +67,13 @@ public class PostSubscribeService {
     @Transactional
     public void updateJoin(Long postId, List<User> joiners, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new EntityNotFoundException("작성글이 존재하지 않습니다.")
+                () -> new CustomException(POST_NOT_FOUND)
         );
         if (!Objects.equals(user.getId(), post.getUser().getId())){
-            throw new IllegalArgumentException("올바르지 않은 공유일정 수정입니다.");
+            throw new CustomException(INVALID_SHARED_POST_MODIFY);
         }
 
         List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByPostId(postId);
@@ -92,13 +96,13 @@ public class PostSubscribeService {
     @Transactional
     public void deleteJoin(Long postId, List<User> joiners, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new EntityNotFoundException("작성글이 존재하지 않습니다.")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         if (!Objects.equals(user.getId(), post.getUser().getId())){
-            throw new IllegalArgumentException("올바르지 않은 공유일정 삭제요청입니다.");
+            throw new CustomException(INVALID_SHARED_POST_DELETE);
         }
 
         List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByPostId(postId);
@@ -124,14 +128,14 @@ public class PostSubscribeService {
     @Transactional
     public void approveJoin(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new EntityNotFoundException("작성글이 존재하지 않습니다.")
+                () -> new CustomException(POST_NOT_FOUND)
         );
         PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         if (postSubscribe==null){
-            throw new EntityNotFoundException("수락 가능한 공유 일정이 없습니다.");
+            throw new CustomException(NO_APPROVE_POST_JOIN_REQUEST);
         }
         postSubscribe.update(true);
         notificationService.send(post.getUser().getId() , NotificationType.JOIN_ACCEPT, NotificationType.JOIN_ACCEPT.makeContent(user.getNickName()), post.getId());
@@ -140,14 +144,14 @@ public class PostSubscribeService {
     @Transactional
     public void rejectJoin(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Post post = postRepository.findById(postId).orElseThrow(
-                () -> new EntityNotFoundException("작성글이 존재하지 않습니다.")
+                () -> new CustomException(POST_NOT_FOUND)
         );
         PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         if (postSubscribe==null){
-            throw new EntityNotFoundException("거절 가능한 공유 일정이 없습니다.");
+            throw new CustomException(NO_REJACT_POST_JOIN_REQUEST);
         }
         postSubscribeRepository.delete(postSubscribe);
         Tag tag = tagRepository.findByPostIdAndUserId(post.getId(), user.getId());

@@ -28,14 +28,14 @@ public class UserController {
 
 
     @PostMapping("/users/signup")
-    public ResponseEntity<StatusResponseDto> signup(@RequestBody @Valid SignupRequestDto signupRequestDto) {
+    public StatusResponseDto<ResponseEntity<StatusResponseDto>> signup(@RequestBody @Valid SignupRequestDto signupRequestDto) {
         System.out.println("test");
-        return userService.signup(signupRequestDto);
+        return StatusResponseDto.success(userService.signup(signupRequestDto));
     }
 
     @PostMapping("/users/signup/{email}")
-    public ResponseEntity<StatusResponseDto> checkEmail(@PathVariable String email) {
-        return userService.emailCheck(email);
+    public StatusResponseDto<ResponseEntity<StatusResponseDto>> checkEmail(@PathVariable String email) {
+        return StatusResponseDto.success(userService.emailCheck(email));
     }
 
     @PostMapping("/users/login")
@@ -60,13 +60,13 @@ public class UserController {
         return kakaoService.kakaoFriends(code, userDetails);
     }
     @PostMapping("/users/reset/password")
-    public ResponseEntity<StatusResponseDto> resetPassword(@RequestBody UserRequestDto userRequestDto){
-        return userService.resetPassword(userRequestDto);
+    public StatusResponseDto<ResponseEntity<StatusResponseDto>> resetPassword(@RequestBody UserRequestDto userRequestDto){
+        return StatusResponseDto.success(userService.resetPassword(userRequestDto));
     }
 
     @PostMapping("/users/categories")
-    public ResponseEntity<StatusResponseDto> setCategory(@RequestBody CategoryRequestDto categoryRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return userService.setCategory(categoryRequestDto, userDetails);
+    public StatusResponseDto<ResponseEntity<StatusResponseDto>> setCategory(@RequestBody CategoryRequestDto categoryRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(userService.setCategory(categoryRequestDto, userDetails));
     }
 
     @PutMapping(value = "/users/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.userSubscribe.service;
 
+import com.sparta.daydeibackrepo.exception.CustomException;
 import com.sparta.daydeibackrepo.friend.repository.FriendCustomRepository;
 import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.notification.entity.Notification;
@@ -14,8 +15,10 @@ import com.sparta.daydeibackrepo.userSubscribe.dto.UserSubscribeResponseDto;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import com.sparta.daydeibackrepo.util.SortEnum;
+import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
+import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.*;
 
 @Slf4j
 @Service
@@ -37,17 +43,17 @@ public class UserSubscribeService {
     @Transactional
     public UserSubscribeResponseDto createSubscribe(Long userid, UserDetailsImpl userDetails) {
         User subscribing = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다.")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User subscriber = userRepository.findById(userid).orElseThrow(
-                () -> new EntityNotFoundException("유저를 조회할 수 없습니다.")
+                () -> new CustomException(USER_NOT_VIEW)
         );
         if(subscribing==subscriber){
-            throw new IllegalArgumentException("구독 요청이 올바르지 않습니다.");
+            throw new CustomException(INVALID_SUBSCRIBE_REQUEST);
         }
         UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(subscribing, subscriber);
         if (userSubscribe != null){
-            throw new IllegalArgumentException("이미 구독하고 있는 유저입니다.");
+            throw new CustomException(DUPLICATE_SUBSCRIBE_USER);
         }
 
         UserSubscribe userSubscribe1 = new UserSubscribe(subscribing, subscriber);
@@ -58,17 +64,17 @@ public class UserSubscribeService {
     @Transactional
     public void deleteSubscribe(Long userid, UserDetailsImpl userDetails) {
         User subscribing = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다.")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User subscriber = userRepository.findById(userid).orElseThrow(
-                () -> new EntityNotFoundException("유저를 조회할 수 없습니다.")
+                () -> new CustomException(USER_NOT_VIEW)
         );
         if(subscribing==subscriber){
-            throw new IllegalArgumentException("구독 취소 요청이 올바르지 않습니다.");
+            throw new CustomException(INVALID_SUBSCRIBE_CANCEL);
         }
         UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(subscribing, subscriber);
         if (userSubscribe == null){
-            throw new IllegalArgumentException("구독 취소 요청이 올바르지 않습니다.");
+            throw new CustomException(INVALID_SUBSCRIBE_CANCEL);
         }
         Notification notification = notificationRepository.findNotification(subscriber, subscribing.getId(), NotificationType.SUBSCRIBE_ACCEPT);
         if (notification != null)
@@ -78,10 +84,12 @@ public class UserSubscribeService {
 
     @Transactional(readOnly = true)
     public List<UserResponseDto> getUserSubscribeList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
-        User visitor = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("인증된 유저가 아닙니다"));
-        User master = userRepository.findById(userId)
-                .orElseThrow(() -> new NullPointerException("사용자를 찾을 수 없습니다"));
+        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
+        );
+        User master = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
         if (visitor == master || friendRepository.findFriend(visitor, master) != null){ // 친구이면
             List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUserBySort(master, SortEnum.valueOf(sort.toUpperCase()));
             List<UserResponseDto> userSubscribeList = friendService.makeUserResponseDtos(master, userSubscribers)
@@ -90,16 +98,18 @@ public class UserSubscribeService {
                     .collect(Collectors.toList());
             return userSubscribeList;
         }
-        throw new IllegalArgumentException("권한이 없습니다.");
+        throw new CustomException(USER_FORBIDDEN);
 
     }
 
     @Transactional
     public List<UserResponseDto> getUserFollowerList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
-        User visitor = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("인증된 유저가 아닙니다"));
-        User master = userRepository.findById(userId)
-                .orElseThrow(() -> new NullPointerException("사용자를 찾을 수 없습니다"));
+        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
+        );
+        User master = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
         if (visitor == master || friendRepository.findFriend(visitor, master) != null) { // 친구이면
             List<User> userSubscribers = userSubscribeRepository.findAllSubscribingUserBySort(master, SortEnum.valueOf(sort.toUpperCase()));
             List<UserResponseDto> userSubscribeList = friendService.makeUserResponseDtos(visitor, userSubscribers)
@@ -108,27 +118,27 @@ public class UserSubscribeService {
                     .collect(Collectors.toList());
             return userSubscribeList;
         }
-        throw new IllegalArgumentException("권한이 없습니다.");
+        throw new CustomException(USER_FORBIDDEN);
     }
     @Transactional
-    public String setSubscrbeVisibility(Long userId, UserDetailsImpl userDetails){
+    public ResponseEntity<StatusResponseDto> setSubscrbeVisibility(Long userId, UserDetailsImpl userDetails){
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증되지 않은 사용자입니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User subscribe = userRepository.findById(userId).orElseThrow(
-                () -> new NullPointerException("존재하지 않는 사용자입니다")
+                () -> new CustomException(USER_NOT_FOUND)
         );
         //user가 subscribe를 구독하고 있다면. (테이블에 존재한다면)
         UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, subscribe);
         if (userSubscribe != null){
             if (userSubscribe.getIsVisible()) { // true였다면
                 userSubscribe.update(user, subscribe, false);
-                return "구독한 일정을 표시하지 않습니다";
+                return StatusResponseDto.toResponseEntity(SUBSCRIBE_NOT_PUST_VIEW_SUCCESS);
             } else { //false였다면
                 userSubscribe.update(user, subscribe, true);
-                return "구독한 일정을 표시합니다";
+                return StatusResponseDto.toResponseEntity(SUBSCRIBE_PUST_VIEW_SUCCESS);
             }
         }
-        throw new NullPointerException("구독하지 않은 계정입니다");
+        throw new CustomException(NOT_SUBSCRIBE_USER);
     }
 }

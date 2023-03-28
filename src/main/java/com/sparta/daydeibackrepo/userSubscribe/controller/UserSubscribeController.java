@@ -7,6 +7,7 @@ import com.sparta.daydeibackrepo.userSubscribe.service.UserSubscribeService;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +43,7 @@ public class UserSubscribeController {
     }
 
     @PutMapping("/show/{userId}")
-    public StatusResponseDto<String> setSubscrbeVisibility(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<ResponseEntity<StatusResponseDto>> setSubscrbeVisibility(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(userSubscribeService.setSubscrbeVisibility(userId, userDetails));
     }
 

@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.notification.service;
 
+import com.sparta.daydeibackrepo.exception.CustomException;
 import com.sparta.daydeibackrepo.notification.dto.NotificationDto;
 import com.sparta.daydeibackrepo.notification.dto.NotificationResponseDto;
 import com.sparta.daydeibackrepo.notification.entity.Notification;
@@ -12,7 +13,6 @@ import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
 
 @Slf4j
 @Service
@@ -120,10 +122,10 @@ public class NotificationService {
     @Transactional
     public void deleteNotification(Long recieverId, UserDetailsImpl userDetails){
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         if(!Objects.equals(user.getId(), recieverId)){
-            throw new IllegalArgumentException("올바르지 않은 요청입니다.");
+            throw new CustomException(INVALID_REQUEST);
         }
         List<Notification> notifications = notificationRepository.findAllByUserId(recieverId);
         notificationRepository.deleteAll(notifications);

@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
@@ -75,7 +76,7 @@ public class PostService {
     }
 
     @Transactional
-    public Object createPost(PostRequestDto requestDto, UserDetailsImpl userDetails) {
+    public ResponseEntity<StatusResponseDto> createPost(PostRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -236,7 +237,7 @@ public class PostService {
     }
 
     @Transactional
-    public Object dragUpdatePost(Long postId, PostDragRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
+    public ResponseEntity<StatusResponseDto> dragUpdatePost(Long postId, PostDragRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -261,7 +262,7 @@ public class PostService {
     }
 
     @Transactional
-    public Object deletePost(Long postId, UserDetailsImpl userDetails) {
+    public ResponseEntity<StatusResponseDto> deletePost(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );

@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.memo.service;
 
+import com.sparta.daydeibackrepo.exception.CustomException;
 import com.sparta.daydeibackrepo.memo.dto.MemoRequestDto;
 import com.sparta.daydeibackrepo.memo.dto.MemoResponseDto;
 import com.sparta.daydeibackrepo.memo.entity.Memo;
@@ -9,6 +10,7 @@ import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.entity.UserRoleEnum;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
+import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
+import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,18 +34,18 @@ public class MemoService {
 
     public Object createMemo(MemoRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
 
         Memo memo = new Memo(requestDto, user);
         memoRepository.save(memo);
 
-        return "메모 작성이 완료되었습니다.";
+        return StatusResponseDto.toResponseEntity(MEMO_POST_SUCCESS);
     }
 
     public List<MemoResponseDto> getAllMemo(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         List<Memo> memos = memoRepository.findAllByUserOrderByCreatedAtDesc(user);
         List<MemoResponseDto> memoResponseDtos= new ArrayList<>();
@@ -56,17 +61,17 @@ public class MemoService {
     @Transactional
     public Object updateMemo(Long memoId, MemoRequestDto requestDto, UserDetailsImpl userDetails) throws IllegalAccessException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Memo memo = memoRepository.findById(memoId).orElseThrow(
-                () -> new NullPointerException("존재하지 않는 메모입니다.")
+                () -> new CustomException(MEMO_NOT_FOUND)
         );
 
         if(hasAuthority(user, memo)) {
             memo.update(requestDto);
-            return "메모가 수정되었습니다.";
+            return StatusResponseDto.toResponseEntity(MEMO_PUT_SUCCESS);
         }
-        throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
+        throw new CustomException(UNAUTHORIZED_UPDATE_OR_DELETE);
 
 
     }
@@ -74,15 +79,15 @@ public class MemoService {
     @Transactional
     public Object deleteMemo(Long memoId, UserDetailsImpl userDetails) throws IllegalAccessException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         Memo memo = memoRepository.findById(memoId).orElseThrow(
-                () -> new NullPointerException("존재하지 않는 메모입니다.")
+                () -> new CustomException(MEMO_NOT_FOUND)
         );
         if(hasAuthority(user, memo)) {
             memoRepository.deleteById(memoId);
-            return "메모가 삭제되었습니다.";
+            return StatusResponseDto.toResponseEntity(MEMO_DELETE_SUCCESS);
         }
-        throw new IllegalAccessException("작성자만 삭제/수정할 수 있습니다.");
+        throw new CustomException(UNAUTHORIZED_UPDATE_OR_DELETE);
     }
 }

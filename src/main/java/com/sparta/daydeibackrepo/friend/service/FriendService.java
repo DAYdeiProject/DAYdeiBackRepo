@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.friend.service;
 
+import com.sparta.daydeibackrepo.exception.CustomException;
 import com.sparta.daydeibackrepo.friend.dto.FriendResponseDto;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
@@ -16,8 +17,10 @@ import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import com.sparta.daydeibackrepo.util.SortEnum;
+import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
+import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.*;
 
 @Slf4j
 @Service
@@ -41,16 +47,16 @@ public class FriendService {
     @Transactional
     public FriendResponseDto requestFriend(Long userId, UserDetailsImpl userDetails) {
         User requestUser = userRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User responseUser = userRepository.findById(userId).orElseThrow(
-                () -> new UsernameNotFoundException("유저가 존재하지 않습니다.")
+                () -> new CustomException(USER_NOT_FOUND)
         );
         if(Objects.equals(requestUser, responseUser)){
-            throw new IllegalArgumentException("올바르지 않은 친구 요청입니다.");
+            throw new CustomException(INVALID_FRIEND_REQUEST);
         }
         if(friendRepository.isFriendOrRequest(requestUser, responseUser)){
-            throw new IllegalArgumentException("이미 친구 상태이거나 처리 되지 않은 친구 신청이 있습니다.");
+            throw new CustomException(ALREADY_FRIEND_OR_HAVE_UNPROCESSED_FRIEND_REQUEST);
         }
         Friend friend = new Friend(requestUser, responseUser, false);
         friendRepository.save(friend);
@@ -60,17 +66,17 @@ public class FriendService {
     @Transactional
     public FriendResponseDto setFriend(Long userId, UserDetailsImpl userDetails) {
         User responseUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User requestUser = userRepository.findById(userId).orElseThrow(
-                () -> new UsernameNotFoundException("유저가 존재하지 않습니다.")
+                () -> new CustomException(USER_NOT_FOUND)
         );
         if(Objects.equals(requestUser, responseUser)){
-            throw new IllegalArgumentException("올바르지 않은 친구 요청입니다.");
+            throw new CustomException(INVALID_FRIEND_REQUEST);
         }
         Friend friend = friendRepository.findByFriendRequestIdAndFriendResponseId(requestUser, responseUser);
         if (friend == null){
-            throw new IllegalArgumentException("승인 가능한 친구 요청이 없습니다.");
+            throw new CustomException(NO_ACCEPTABLE_FRIEND_REQUEST);
         }
         friend.update(requestUser, responseUser, true);
         responseUser.addFriendCount();
@@ -83,21 +89,21 @@ public class FriendService {
         return new FriendResponseDto(friend);
     }
     @Transactional
-    public String deleteFriend(Long userId, UserDetailsImpl userDetails) {
+    public ResponseEntity<StatusResponseDto> deleteFriend(Long userId, UserDetailsImpl userDetails) {
         User user1 = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User user2 = userRepository.findById(userId).orElseThrow(
-                () -> new UsernameNotFoundException("유저가 존재하지 않습니다.")
+                () -> new CustomException(USER_NOT_FOUND)
         );
         if(Objects.equals(user1, user2)){
-            throw new IllegalArgumentException("올바르지 않은 친구 요청입니다.");
+            throw new CustomException(INVALID_FRIEND_REQUEST);
         }
         Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(user1, user2);
         Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(user2, user1);
 
         if (friend1 != null && friend2 != null){
-            throw new IllegalArgumentException("친구 상태가 올바르지 않습니다.");
+            throw new CustomException(FRIEND_STATUS_INCORRECT);
         }
 
         else if (friend1 != null){
@@ -109,13 +115,13 @@ public class FriendService {
                 Notification notification = notificationRepository.findNotification(user1, user2.getId(), NotificationType.FRIEND_ACCEPT);
                 if (notification != null)
                 {notificationRepository.delete(notification);}
-                return "친구를 삭제했습니다.";
+                return StatusResponseDto.toResponseEntity(FRIEND_DELETE_SUCCESS);
             }
             else {
                 Notification notification = notificationRepository.findNotification(user2, user1.getId(), NotificationType.FRIEND_REQUEST);
                 if (notification != null)
                 {notificationRepository.delete(notification);}
-                return "친구 신청을 취소하였습니다.";
+                return StatusResponseDto.toResponseEntity(FRIEND_REQUEST_DELETE_SUCCESS);
             }
         }
         else if (friend2 != null){
@@ -127,23 +133,23 @@ public class FriendService {
                 Notification notification = notificationRepository.findNotification(user2, user1.getId(), NotificationType.FRIEND_ACCEPT);
                 if (notification != null)
                 {notificationRepository.delete(notification);}
-                return "친구를 삭제했습니다.";
+                return StatusResponseDto.toResponseEntity(FRIEND_DELETE_SUCCESS);
             }
             else {
                 Notification notification = notificationRepository.findNotification(user1, user2.getId(), NotificationType.FRIEND_REQUEST);
                 if (notification != null)
                 {notificationRepository.delete(notification);}
-                return "친구 신청을 거절하였습니다.";
+                return StatusResponseDto.toResponseEntity(FRIEND_REQUEST_REJACT_SUCCESS);
             }
         }
         else {
-            throw new IllegalArgumentException("삭제 요청이 올바르지 않습니다.");
+            throw new CustomException(INVALID_FRIEND_DELETE_REQUEST);
         }
     }
     @Transactional(readOnly = true)
     public List<UserResponseDto> getRecommendList(List<String> categories, String searchWord, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
                 List<CategoryEnum> categoryEnums = new ArrayList<>();
         for (String category : categories) {
@@ -167,7 +173,7 @@ public class FriendService {
     @Transactional(readOnly = true)
     public List<UserResponseDto> getUpdateFriend(UserDetailsImpl userDetails){
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("사용자를 찾을 수 없습니다")
+                () -> new CustomException(USER_NOT_FOUND)
         );
         List<User> updateUsers = postRepository.findAllUpdateFriend(user);
 
@@ -177,7 +183,7 @@ public class FriendService {
     @Transactional(readOnly = true)
     public List<UserResponseDto> getFamousList(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("인증된 유저가 아닙니다")
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         List<User> users = userRepository.findFamousList(user);
         List<UserResponseDto> famousList = makeUserResponseDtos(user, users);
@@ -187,7 +193,7 @@ public class FriendService {
     @Transactional(readOnly = true)
     public List<UserResponseDto> getPendingResponseList(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("사용자를 찾을 수 없습니다")
+                () -> new CustomException(USER_NOT_FOUND)
         );
         List<User> pendingResponses = friendRepository.findRequestUser(user);
         List<UserResponseDto> pendingResponseList = makeUserResponseDtos(user, pendingResponses);
@@ -236,10 +242,12 @@ public class FriendService {
     }
     @Transactional(readOnly = true)
     public List<UserResponseDto> getFriendList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
-        User visitor = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("인증된 유저가 아닙니다"));
-        User master = userRepository.findById(userId)
-                .orElseThrow(() -> new NullPointerException("사용자를 찾을 수 없습니다"));
+        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new CustomException(UNAUTHORIZED_MEMBER)
+        );
+        User master = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
 
         List<User> friends = friendRepository.findAllFriendsBySort(master, SortEnum.valueOf(sort.toUpperCase()));
         List<UserResponseDto> friendList = makeUserResponseDtos(master, friends).stream()

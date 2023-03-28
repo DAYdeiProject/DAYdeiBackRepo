@@ -7,6 +7,7 @@ import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public class FriendController {
         return StatusResponseDto.success(friendService.setFriend(userId, userDetails));
     }
     @DeleteMapping("/{userId}")
-    public StatusResponseDto<String> deleteFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<ResponseEntity<StatusResponseDto>> deleteFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.deleteFriend(userId, userDetails));
     }
     @GetMapping("/list/{userId}")

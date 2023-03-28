@@ -67,8 +67,6 @@ public class Post extends TimeStamped {
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<PostSubscribe> PostSubscribe;
 
-    @Column
-    private LocalDateTime modifiedAt;
 
     public Post(PostRequestDto requestDto, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, User user) {
         this.title = requestDto.getTitle();

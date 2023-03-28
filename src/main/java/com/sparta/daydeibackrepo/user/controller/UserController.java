@@ -71,12 +71,15 @@ public class UserController {
 
     @PatchMapping(value = "/users/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public StatusResponseDto<UserProfileResponseDto> updateUser(
-            @RequestPart UserProfileRequestDto userProfileRequestDto,
+//            @RequestPart UserProfileRequestDto userProfileRequestDto,
+            @RequestPart String nickName,
+            @RequestPart String newPassword,
+            @RequestPart String introduction,
             @RequestPart MultipartFile  profileImage,
             @RequestPart MultipartFile backgroundImage,
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails)
             throws IOException {
-        return StatusResponseDto.success(userService.updateUser(userProfileRequestDto, profileImage, backgroundImage, userDetails));
+        return StatusResponseDto.success(userService.updateUser(nickName, newPassword, introduction, profileImage, backgroundImage, userDetails));
     }
 
     @GetMapping("/home/profile/{userId}")

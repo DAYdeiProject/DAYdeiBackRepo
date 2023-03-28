@@ -133,7 +133,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfileResponseDto updateUser(UserProfileRequestDto userProfileRequestDto, MultipartFile profileImage, MultipartFile backgroundImage, UserDetailsImpl userDetails) throws IOException {
+    public UserProfileResponseDto updateUser(String nickName, String newPassword, String introduction, MultipartFile profileImage, MultipartFile backgroundImage, UserDetailsImpl userDetails) throws IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -156,16 +156,22 @@ public class UserService {
         } else if (profileImage == null) {
             backgroundImageUrl = user.getBackgroundImage();
         }
-
-
-        if (userProfileRequestDto.getNewPassword().equals("")){
-            userProfileRequestDto.setNewPassword(user.getPassword());
+//
+//
+//        if (userProfileRequestDto.getNewPassword().equals("")){
+//            userProfileRequestDto.setNewPassword(user.getPassword());
+//        }
+        if (newPassword== null){
+            newPassword = user.getPassword();
         }
+//        else {
+//            String password = passwordEncoder.encode(userProfileRequestDto.getNewPassword());
+//            userProfileRequestDto.setNewPassword(password);
+//        }
         else {
-            String password = passwordEncoder.encode(userProfileRequestDto.getNewPassword());
-            userProfileRequestDto.setNewPassword(password);
+            newPassword = passwordEncoder.encode(newPassword);
         }
-        user.update(userProfileRequestDto, profileImageUrl, backgroundImageUrl);
+        user.update(nickName, newPassword, introduction, profileImageUrl, backgroundImageUrl);
         userRepository.save(user);
         return new UserProfileResponseDto(user);
     }

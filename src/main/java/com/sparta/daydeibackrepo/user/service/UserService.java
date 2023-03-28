@@ -147,10 +147,14 @@ public class UserService {
 
         if (profileImage != null && !profileImage.isEmpty()) {
             profileImageUrl = s3Service.uploadFile(profileImage, "image");
+        } else if (profileImage == null) {
+            profileImageUrl = user.getProfileImage();
         }
 
         if (backgroundImage != null && !backgroundImage.isEmpty()) {
             backgroundImageUrl = s3Service.uploadFile(backgroundImage, "image");
+        } else if (profileImage == null) {
+            backgroundImageUrl = user.getBackgroundImage();
         }
 
 

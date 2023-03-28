@@ -75,8 +75,8 @@ public class UserController {
             @RequestPart String nickName,
             @RequestPart String newPassword,
             @RequestPart String introduction,
-            @RequestPart MultipartFile  profileImage,
-            @RequestPart MultipartFile backgroundImage,
+            @RequestPart(value="file",required = false) MultipartFile  profileImage,
+            @RequestPart(value="file",required = false) MultipartFile backgroundImage,
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails)
             throws IOException {
         return StatusResponseDto.success(userService.updateUser(nickName, newPassword, introduction, profileImage, backgroundImage, userDetails));

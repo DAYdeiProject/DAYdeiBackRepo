@@ -154,12 +154,12 @@ public class UserService {
         }
 
 
-        if (userProfileRequestDto.getNewPassword() != null){
-            String password = passwordEncoder.encode(userProfileRequestDto.getNewPassword());
-            userProfileRequestDto.setNewPassword(password);
+        if (userProfileRequestDto.getNewPassword().equals("")){
+            userProfileRequestDto.setNewPassword(user.getPassword());
         }
         else {
-            userProfileRequestDto.setNewPassword(user.getPassword());
+            String password = passwordEncoder.encode(userProfileRequestDto.getNewPassword());
+            userProfileRequestDto.setNewPassword(password);
         }
         user.update(userProfileRequestDto, profileImageUrl, backgroundImageUrl);
         userRepository.save(user);

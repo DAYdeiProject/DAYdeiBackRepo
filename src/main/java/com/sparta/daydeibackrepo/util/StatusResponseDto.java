@@ -35,39 +35,30 @@ public class StatusResponseDto<T> {
                 .status(exceptionMessage.getHttpStatus())
                 .body(StatusResponseDto.builder()
                         .statusCode(exceptionMessage.getHttpStatus().value())
-                        .data(exceptionMessage)
+                        .data(exceptionMessage.getDetail())
                         .build()
                 );
     }
 
-    public static ResponseEntity<StatusResponseDto> toResponseEntity(SuccessMessage message) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(StatusResponseDto.builder()
-                        .statusCode(HttpStatus.OK.value())
-                        .data(message)
-                        .build()
-                );
+    public static StatusResponseDto toResponseEntity(SuccessMessage message) {
+        return StatusResponseDto.builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .data(message.getDetail())
+                    .build();
     }
 
 
-    public static ResponseEntity<StatusResponseDto> toAllExceptionResponseEntity(ExceptionMessage exceptionMessage) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(StatusResponseDto.builder()
-                        .statusCode(exceptionMessage.getHttpStatus().value())
-                        .data(exceptionMessage)
-                        .build()
-                );
+    public static StatusResponseDto toAllExceptionResponseEntity(ExceptionMessage exceptionMessage) {
+        return StatusResponseDto.builder()
+                    .statusCode(exceptionMessage.getHttpStatus().value())
+                    .data(exceptionMessage.getDetail())
+                    .build();
     }
 
-    public static ResponseEntity<StatusResponseDto> toAllExceptionResponseEntity(HttpStatus httpStatus,String message) {
-        return ResponseEntity
-                .status(httpStatus)
-                .body(StatusResponseDto.builder()
-                        .statusCode(httpStatus.value())
-                        .data(message)
-                        .build()
-                );
+    public static StatusResponseDto toAllExceptionResponseEntity(HttpStatus httpStatus,String message) {
+        return StatusResponseDto.builder()
+                    .statusCode(httpStatus.value())
+                    .data(message)
+                    .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.sparta.daydeibackrepo.notification.controller;
 
+import com.sparta.daydeibackrepo.exception.message.SuccessMessage;
 import com.sparta.daydeibackrepo.notification.dto.NotificationDto;
 import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.NOTIFICATION_DELETED;
 
 import java.util.List;
 
@@ -29,8 +32,8 @@ public class NotificationController {
         return StatusResponseDto.success(notificationService.findAllNotifications(userDetails.getUser().getId()));
     }
     @DeleteMapping("/api/notification/{userId}")
-    public StatusResponseDto<String> deleteNotification(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public StatusResponseDto<SuccessMessage> deleteNotification(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         notificationService.deleteNotification(userId, userDetails);
-        return StatusResponseDto.success("알림 삭제 완료!");
+        return StatusResponseDto.success(NOTIFICATION_DELETED);
     }
 }

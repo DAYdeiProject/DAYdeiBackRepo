@@ -121,7 +121,7 @@ public class UserSubscribeService {
         throw new CustomException(USER_FORBIDDEN);
     }
     @Transactional
-    public ResponseEntity<StatusResponseDto> setSubscrbeVisibility(Long userId, UserDetailsImpl userDetails){
+    public StatusResponseDto setSubscrbeVisibility(Long userId, UserDetailsImpl userDetails){
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );

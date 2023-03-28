@@ -53,7 +53,7 @@ public class UserService {
 
 
     @Transactional
-    public ResponseEntity<StatusResponseDto> signup(@Valid SignupRequestDto signupRequestDto){
+    public StatusResponseDto signup(@Valid SignupRequestDto signupRequestDto){
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String passwordCheck = passwordEncoder.encode(signupRequestDto.getPasswordCheck());
@@ -72,7 +72,7 @@ public class UserService {
         return StatusResponseDto.toResponseEntity(SIGN_UP_SUCCESS);
     }
 
-    public ResponseEntity<StatusResponseDto> emailCheck(String email) {
+    public StatusResponseDto emailCheck(String email) {
         if(userRepository.findByEmail(email).isPresent()) {
             return StatusResponseDto.toAllExceptionResponseEntity(DUPLICATE_EMAIL);
         }
@@ -99,7 +99,7 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseEntity<StatusResponseDto> resetPassword(UserRequestDto userRequestDto) {
+    public StatusResponseDto resetPassword(UserRequestDto userRequestDto) {
         User user = userRepository.findByEmail(userRequestDto.getEmail()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
@@ -113,7 +113,7 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseEntity<StatusResponseDto> setCategory(CategoryRequestDto categoryRequestDto, UserDetailsImpl userDetails) {
+    public StatusResponseDto setCategory(CategoryRequestDto categoryRequestDto, UserDetailsImpl userDetails) {
 
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)

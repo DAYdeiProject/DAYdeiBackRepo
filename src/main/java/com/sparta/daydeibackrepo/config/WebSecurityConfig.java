@@ -78,14 +78,14 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         CorsConfiguration config = new CorsConfiguration();
 
         // 사전에 약속된 출처를 명시
-//        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin("http://localhost:3000");
 //        config.addAllowedOrigin("*");
-        config.addAllowedOriginPattern("*");
+//        config.addAllowedOriginPattern("*");
 //        config.addAllowedOrigin("http://localhost:3001");
 //        config.addAllowedOrigin("http://daydei.s3-website.ap-northeast-2.amazonaws.com");
-//        config.addAllowedOrigin("https://daydei-ifcgoipf0-daaaj.vercel.app/");
+        config.addAllowedOrigin("https://daydei-ifcgoipf0-daaaj.vercel.app/");
 //        //채팅 테스트용 origin
-//        config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://localhost:8080");
 
 
         // 특정 헤더를 클라이언트 측에서 사용할 수 있게 지정

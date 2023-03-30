@@ -212,6 +212,7 @@ public class FriendService {
         List<User> friends = friendRepository.findAllFriends(user);
         List<User> responseUsers = friendRepository.findResponseUser(user);
         List<User> requestUsers = friendRepository.findRequestUser(user);
+        List<User> visibleList = userSubscribeRepository.findVisibleUserSubscribe(user);
         for (User user1 : users){
             List<User> mutualFriends = friendRepository.findAllFriends(user1);
             mutualFriends.retainAll(friends);
@@ -224,8 +225,7 @@ public class FriendService {
             }
             if (userSubscribers.contains(user1)) {
                 userSubscribeCheck = true;
-                UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user,user1);
-                if (userSubscribe.getIsVisible()){
+                if (visibleList.contains(user1)){
                     isVisible = true;
                 }
             }

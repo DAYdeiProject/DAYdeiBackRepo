@@ -19,6 +19,7 @@ public enum ExceptionMessage {
     PASSWORD_INCORRECT_MISMATCH(BAD_REQUEST,"비밀번호가 일치하지 않습니다."),
     PASSWORD_INCORRECT(BAD_REQUEST,"비밀번호가 옳지 않습니다."),
     BIRTHDAY_INCORRECT(BAD_REQUEST,"생일이 일치하지 않습니다."),
+    INVALID_IMAGE(BAD_REQUEST, "파일이 올바르지 않습니다."),
     INVALID_FRIEND_REQUEST(BAD_REQUEST,"올바르지 않은 친구 요청입니다."),
     INVALID_FRIEND_DELETE_REQUEST(BAD_REQUEST,"삭제 요청이 올바르지 않습니다."),
     ALREADY_FRIEND_OR_HAVE_UNPROCESSED_FRIEND_REQUEST(BAD_REQUEST,"이미 친구 상태이거나 처리 되지 않은 친구 신청이 있습니다"),

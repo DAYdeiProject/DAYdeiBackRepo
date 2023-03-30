@@ -99,7 +99,6 @@ public class UserSubscribeService {
             return userSubscribeList;
         }
         throw new CustomException(USER_FORBIDDEN);
-
     }
 
     @Transactional

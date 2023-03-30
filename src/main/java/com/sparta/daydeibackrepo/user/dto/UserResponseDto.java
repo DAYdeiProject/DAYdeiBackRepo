@@ -24,11 +24,51 @@ public class UserResponseDto {
     private Boolean isRequestFriend;
     private Boolean userSubscribeCheck;
     private Boolean updateCheck;
+    private Boolean isVisible;
     private int friendCount;
     private int subscribingCount;
     private int subscriberCount;
     private List<User> mutualFriends;
     private int mutualFriendsCount;
+    public UserResponseDto(User user, boolean friendCheck,boolean isRequestFriend, boolean userSubscribeCheck, boolean updateCheck, List<User> mutualFriends, boolean isVisible){
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.nickName = user.getNickName();
+        this.profileImage = user.getProfileImage();
+        this.backgroundImage = user.getBackgroundImage();
+        this.introduction = user.getIntroduction();
+        this.categoryList = user.getCategoryEnum();
+        this.birthday = user.getBirthday();
+        this.friendCheck = friendCheck;
+        this.isRequestFriend = isRequestFriend;
+        this.userSubscribeCheck = userSubscribeCheck;
+        this.updateCheck = updateCheck;
+        this.isVisible = isVisible;
+        this.friendCount = user.getFriendCount();
+        this.subscribingCount = user.getSubscribing().size();
+        this.subscriberCount = user.getSubscriber().size();
+        //this.mutualFriends = mutualFriends; 열면 큰일나는 지옥문입니다.
+        this.mutualFriendsCount = mutualFriends.size();
+    }
+    public UserResponseDto(User user, boolean friendCheck, boolean userSubscribeCheck, boolean updateCheck, List<User> mutualFriends, boolean isVisible){
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.nickName = user.getNickName();
+        this.profileImage = user.getProfileImage();
+        this.backgroundImage = user.getBackgroundImage();
+        this.introduction = user.getIntroduction();
+        this.categoryList = user.getCategoryEnum();
+        this.birthday = user.getBirthday();
+        this.friendCheck = friendCheck;
+        this.userSubscribeCheck = userSubscribeCheck;
+        this.updateCheck = updateCheck;
+        this.isVisible = isVisible;
+        this.friendCount = user.getFriendCount();
+        this.subscribingCount = user.getSubscribing().size();
+        this.subscriberCount = user.getSubscriber().size();
+        //this.mutualFriends = mutualFriends;
+        this.mutualFriendsCount = mutualFriends.size();
+    }
     public UserResponseDto(User user, boolean friendCheck,boolean isRequestFriend, boolean userSubscribeCheck, boolean updateCheck, List<User> mutualFriends){
         this.id = user.getId();
         this.email = user.getEmail();

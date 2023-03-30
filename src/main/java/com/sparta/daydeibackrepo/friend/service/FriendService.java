@@ -15,6 +15,7 @@ import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
 import com.sparta.daydeibackrepo.user.entity.CategoryEnum;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
+import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import com.sparta.daydeibackrepo.util.SortEnum;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
@@ -217,11 +218,16 @@ public class FriendService {
             boolean friendCheck = false;
             boolean userSubscribeCheck = false;
             boolean updateCheck = false;
+            boolean isVisible = false;
             if (friends.contains(user1)) {
                 friendCheck = true;
             }
             if (userSubscribers.contains(user1)) {
                 userSubscribeCheck = true;
+                UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user,user1);
+                if (userSubscribe.getIsVisible()){
+                    isVisible = true;
+                }
             }
             if(friendCheck) {
                 if (user.getFriendUpdateCheck()) {updateCheck = true;}
@@ -230,13 +236,13 @@ public class FriendService {
                 if (user.getUserUpdateCheck()) {updateCheck = true;}
             }
             if (requestUsers.contains(user1)) {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck, updateCheck, mutualFriends));
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, true, userSubscribeCheck, updateCheck, mutualFriends, isVisible));
             }
             else if (responseUsers.contains(user1)) {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck, updateCheck, mutualFriends));
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, false, userSubscribeCheck, updateCheck, mutualFriends, isVisible));
             }
             else {
-                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, updateCheck, mutualFriends));
+                    userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, updateCheck, mutualFriends, isVisible));
             }
         }
         return userResponseDtos;

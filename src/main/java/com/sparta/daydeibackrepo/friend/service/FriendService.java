@@ -261,4 +261,15 @@ public class FriendService {
                 .filter(user -> user.getNickName().contains(searchWord) || user.getEmail().contains(searchWord)).collect(Collectors.toList());
         return friendList;
     }
+
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getPendingRequestList(UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
+        List<User> pendingRequests = friendRepository.findResponseUser(user);
+        List<UserResponseDto> pendingRequestList = makeUserResponseDtos(user, pendingRequests);
+        Collections.sort(pendingRequestList, Comparator.comparing(UserResponseDto::getId));
+        return pendingRequestList;
+    }
 }

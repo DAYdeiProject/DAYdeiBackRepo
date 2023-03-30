@@ -73,8 +73,8 @@ public class UserSubscribeCustomRepositoryImpl implements UserSubscribeCustomRep
     /*public List<Post> findSubscribingPost(User user){
 
         return jpaQueryFactory.selectFrom(post)
-                .leftJoin(userSubscribe).on(post.user.eq(userSubscribe.subscriberId))
-                .where(userSubscribe.subscribingId.eq(user))
+                    .leftJoin(userSubscribe).on(post.user.eq(userSubscribe.subscriberId))
+                    .where(userSubscribe.subscribingId.eq(user))
                         //.and(userSubscribe.isVisibile.eq(true)))
                 .fetch();
     }*/

@@ -18,6 +18,7 @@ public class LoginResponseDto {
     private String introduction;
     private List<CategoryEnum> categoryList;
     private Boolean isLogin;
+    private Boolean isNewNotification;
 
     public LoginResponseDto(User user, Boolean isLogin){
         this.userId = user.getId();
@@ -28,6 +29,7 @@ public class LoginResponseDto {
         this.introduction = user.getIntroduction();
         this.categoryList = user.getCategoryEnum();
         this.isLogin = isLogin;
+        this.isNewNotification = user.getIsNewNotification();
 
     }
 }

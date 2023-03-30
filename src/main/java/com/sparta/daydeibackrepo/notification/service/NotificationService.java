@@ -7,6 +7,7 @@ import com.sparta.daydeibackrepo.notification.entity.Notification;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.repository.EmitterRepository;
 import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
+import com.sparta.daydeibackrepo.post.repository.PostRepository;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
@@ -30,6 +31,7 @@ import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
 @RequiredArgsConstructor
 public class NotificationService {
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
     @Value("${spring.sse.time}")
     private Long timeout;

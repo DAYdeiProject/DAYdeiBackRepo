@@ -79,11 +79,14 @@ public class FriendService {
         if (friend == null){
             throw new CustomException(NO_ACCEPTABLE_FRIEND_REQUEST);
         }
+
         friend.update(requestUser, responseUser, true);
         responseUser.addFriendCount();
         requestUser.addFriendCount();
+
         postService.createBirthday(requestUser, responseUser);
         Notification notification = notificationRepository.findNotification(responseUser, requestUser.getId(),NotificationType.FRIEND_REQUEST);
+
         if (notification != null)
         {notificationRepository.delete(notification);}
         notificationService.send(requestUser.getId() , NotificationType.FRIEND_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(responseUser.getNickName()), responseUser.getId());

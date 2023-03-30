@@ -7,6 +7,7 @@ import com.sparta.daydeibackrepo.friend.service.FriendService;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.mail.dto.MailDto;
 import com.sparta.daydeibackrepo.mail.service.MailService;
+import com.sparta.daydeibackrepo.notification.entity.Notification;
 import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
 import com.sparta.daydeibackrepo.post.repository.PostRepository;
 import com.sparta.daydeibackrepo.s3.service.S3Service;
@@ -94,7 +95,13 @@ public class UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new CustomException(PASSWORD_INCORRECT);
         }
-        notificationRepository.
+        Optional<Notification> notification = notificationRepository.findByIdAndIsRead(user.getId(), false);
+
+        if(notification.isPresent()) {
+            user.setIsNewNotification();
+        }
+
+
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getEmail(), UserRoleEnum.USER));
         isLogin = true;
         return new LoginResponseDto(user, isLogin);

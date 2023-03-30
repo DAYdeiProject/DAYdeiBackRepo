@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,12 +16,16 @@ public class NotificationResponseDto {
 
     private String content;
 
-    private Long returnId;
+//    private Long returnId;
+    private Long postId;
+    private Long userId;
     private Boolean isRead;
+
+    private LocalDateTime createdAt;
 
     public static NotificationResponseDto create(Notification notification) {
         return new NotificationResponseDto(notification.getId(), notification.getContent(),
-                notification.getReturnId(), notification.getIsRead());
+                postId, userId, notification.getIsRead(), notification.getCreatedAt());
     }
 }
 

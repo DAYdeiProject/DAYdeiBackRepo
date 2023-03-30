@@ -134,4 +134,8 @@ public class User {
     public void friendUpdateCheck(){
         this.userUpdateCheck = true;
     }
+    public void setIsNewNotification() {
+        this.isNewNotification = true;
+    }
+
 }

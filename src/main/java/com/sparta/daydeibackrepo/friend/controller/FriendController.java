@@ -56,4 +56,8 @@ public class FriendController {
     public StatusResponseDto<List<UserResponseDto>> getPendingResponseList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.getPendingResponseList(userDetails));
     }
+    @GetMapping("/list/request")
+    public StatusResponseDto<List<UserResponseDto>> getPendingRequestList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return StatusResponseDto.success(friendService.getPendingRequestList(userDetails));
+    }
 }

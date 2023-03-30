@@ -78,4 +78,10 @@ public class UserSubscribeCustomRepositoryImpl implements UserSubscribeCustomRep
                         //.and(userSubscribe.isVisibile.eq(true)))
                 .fetch();
     }*/
+    public List<User> findVisibleUserSubscribe(User user){
+        return jpaQueryFactory.select(userSubscribe.subscriberId)
+                .from(userSubscribe)
+                .where(userSubscribe.isVisible.eq(true).and(userSubscribe.subscribingId.eq(user)))
+                .fetch();
+    }
 }

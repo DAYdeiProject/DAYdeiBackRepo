@@ -11,4 +11,5 @@ public interface UserSubscribeCustomRepository {
     List<User> findAllSubscribingUserBySort(User user, SortEnum sortEnum);
 
     List<User> findAllSubscriberUserBySort(User user, SortEnum sortEnum);
+    List<User> findVisibleUserSubscribe(User user);
 }

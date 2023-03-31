@@ -42,19 +42,14 @@ public class User {
     private String introduction;
 
     private Long kakaoId;
-    @JsonIgnore
     private int friendCount;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscribingId")
-    @JsonIgnore
     private List<UserSubscribe> subscribing;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscriberId")
-    @JsonIgnore
     private List<UserSubscribe> subscriber;
-    @JsonIgnore
     private Boolean friendUpdateCheck;
-    @JsonIgnore
     private Boolean userUpdateCheck;
 
     private Boolean isNewNotification;

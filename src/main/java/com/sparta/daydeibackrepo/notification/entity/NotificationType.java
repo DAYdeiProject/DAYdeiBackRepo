@@ -1,5 +1,8 @@
 package com.sparta.daydeibackrepo.notification.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum NotificationType {
     FRIEND_ACCEPT("님이 @ 회원님의 친구 신청을 승인하였습니다."), SUBSCRIBE_ACCEPT("님이 @ 구독하기 시작하였습니다."),
     JOIN_REQUEST("님의 @ 일정 참여 요청이 도착하였습니다."), JOIN_REJECT("님이 @ 회원님의 일정 참여 요청을 거절하였습니다."),
@@ -15,6 +18,14 @@ public enum NotificationType {
 
     public String makeContent(String title) {
         return "'" + title + "'" + content;
+    }
+
+    public static List<NotificationType> userContent() {
+        List<NotificationType> notificationTypes = new ArrayList<>();
+        notificationTypes.add(FRIEND_ACCEPT);
+        notificationTypes.add(SUBSCRIBE_ACCEPT);
+        notificationTypes.add(FRIEND_REQUEST);
+        return notificationTypes;
     }
 
 }

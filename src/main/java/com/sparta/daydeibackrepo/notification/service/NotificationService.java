@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -63,10 +64,24 @@ public class NotificationService {
         String receiverId = String.valueOf(userId);
         String eventId = receiverId + "_" + System.currentTimeMillis();
         Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByUserId(receiverId);
+
+        Long user = null;
+        Long post = null;
+        if(userRepository.findById(returnId).isPresent()) {
+            user = returnId;
+            post = null;
+        }
+        if(postRepository.findById(returnId).isPresent()) {
+            post = returnId;
+            user = null;
+        }
+
+        Long finalPost = post;
+        Long finalUser = user;
         emitters.forEach(
                 (key, emitter) -> {
                     emitterRepository.saveEventCache(key, notification);
-                    sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
+                    sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification, finalPost, finalUser));
                 }
         );
     }
@@ -74,11 +89,31 @@ public class NotificationService {
     @Transactional
     public List<NotificationDto> findAllNotifications(Long userId) {
         List<Notification> notifications = notificationRepository.findAllByUserId(userId);
+        Long user = null;
+        Long post = null;
+
         notifications.stream()
                 .forEach(notification -> notification.read());
-        return notifications.stream()
-                .map(NotificationDto::create)
-                .collect(Collectors.toList());
+
+        List<NotificationDto> notificationDtos = new ArrayList<>();
+        for (Notification notification : notifications) {
+            String content = notification.getContent();
+            if(userRepository.findById(notification.getReturnId()).isPresent() && content.contains(NotificationType.userContent().toString())) {
+                user = notification.getReturnId();
+                post = null;
+
+            }
+            if(postRepository.findById(notification.getReturnId()).isPresent() && !(content.contains(NotificationType.userContent().toString()))) {
+                post = notification.getReturnId();
+                user = null;
+            }
+            notificationDtos.add(NotificationDto.create(notification, post, user));
+        }
+        return notificationDtos;
+
+//        return notifications.stream()
+//                .map(notification -> NotificationDto.create(notification, post, user))
+//                .collect(Collectors.toList());
     }
     //읽지 않은 알림 갯수 Count
     public Long countUnReadNotifications(Long userId) {

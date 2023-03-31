@@ -23,7 +23,7 @@ public class NotificationResponseDto {
 
     private LocalDateTime createdAt;
 
-    public static NotificationResponseDto create(Notification notification) {
+    public static NotificationResponseDto create(Notification notification, Long postId, Long userId) {
         return new NotificationResponseDto(notification.getId(), notification.getContent(),
                 postId, userId, notification.getIsRead(), notification.getCreatedAt());
     }

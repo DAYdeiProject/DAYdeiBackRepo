@@ -39,7 +39,6 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
 
-
     public SseEmitter connect(Long userId, String lastEventId) {
         String emitterId = makeTimeIncludeId(userId);
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(timeout));

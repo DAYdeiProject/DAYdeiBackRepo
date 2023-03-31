@@ -18,7 +18,6 @@ import java.util.List;
 @RequestMapping("/api/friends")
 public class FriendController {
     private final FriendService friendService;
-
     @PostMapping("/{userId}")
     public StatusResponseDto<FriendResponseDto> requestFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return StatusResponseDto.success(friendService.requestFriend(userId, userDetails));

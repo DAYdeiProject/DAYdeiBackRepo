@@ -2,6 +2,7 @@ package com.sparta.daydeibackrepo.notification.service;
 
 import com.sparta.daydeibackrepo.exception.CustomException;
 import com.sparta.daydeibackrepo.notification.dto.NotificationDto;
+import com.sparta.daydeibackrepo.notification.dto.NotificationGetDto;
 import com.sparta.daydeibackrepo.notification.dto.NotificationResponseDto;
 import com.sparta.daydeibackrepo.notification.entity.Notification;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
@@ -83,7 +84,7 @@ public class NotificationService {
     }
     //나한테 온 모든 알림 GET + 알림 다 읽은 것으로 변경
     @Transactional
-    public List<NotificationDto> findAllNotifications(Long userId) {
+    public NotificationGetDto findAllNotifications(Long userId) {
         List<Notification> notifications = notificationRepository.findAllByUserId(userId);
 
         notifications.stream()
@@ -103,7 +104,9 @@ public class NotificationService {
             }
             notificationDtos.add(NotificationDto.create(notification, post, user));
         }
-        return notificationDtos;
+
+        return new NotificationGetDto(countUnReadNotifications(userId), notificationDtos);
+
 
 //        return notifications.stream()
 //                .map(notification -> NotificationDto.create(notification, post, user))

@@ -249,6 +249,7 @@ public class FriendService {
                     userResponseDtos.add(new UserResponseDto(user1, friendCheck, userSubscribeCheck, updateCheck, mutualFriends, isVisible));
             }
         }
+
         return userResponseDtos;
     }
     @Transactional(readOnly = true)

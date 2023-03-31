@@ -54,7 +54,6 @@ public class NotificationService {
         if (hasLostData(lastEventId)) {
             sendLostData(lastEventId, userId, emitterId, emitter);
         }
-
         return emitter;
     }
     //API 메서드 사이에 껴서 알림 전송

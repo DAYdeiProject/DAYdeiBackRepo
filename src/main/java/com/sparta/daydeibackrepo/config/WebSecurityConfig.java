@@ -83,7 +83,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 //        config.addAllowedOriginPattern("*");
 //        config.addAllowedOrigin("http://localhost:3001");
 //        config.addAllowedOrigin("http://daydei.s3-website.ap-northeast-2.amazonaws.com");
-        config.addAllowedOrigin("http://day-dei.s3-website.ap-northeast-2.amazonaws.com/");
+        config.addAllowedOrigin("http://daydei.s3-website.ap-northeast-2.amazonaws.com/");
         config.addAllowedOrigin("https://daydei.vercel.app/");
         config.addAllowedOrigin("https://jeongda.shop/");
         config.addAllowedOrigin("https://daydei.shop/");

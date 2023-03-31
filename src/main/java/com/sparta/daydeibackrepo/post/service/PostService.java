@@ -89,7 +89,7 @@ public class PostService {
             throw new CustomException(TIME_SETTING_IS_INCORRECT);
         }
 
-        for(Long participant : requestDto.getParticipant()) {
+        for (Long participant : requestDto.getParticipant()) {
 //            List<Friend> friends = friendRepository.findidFriendList(participant, user);
             User joiner = userRepository.findById(participant).orElseThrow(
                     () -> new CustomException(USER_NOT_FOUND)
@@ -100,7 +100,7 @@ public class PostService {
         List<User> joiners = new ArrayList<>();
         List<Tag> tags = tagRepository.findAllByPostId(savePost.getId());
 
-        for(Tag tag : tags) {
+        for (Tag tag : tags) {
             joiners.add(tag.getUser());
         }
         postUpdateCheck(post, user);
@@ -136,7 +136,7 @@ public class PostService {
 //        List<Long> participantsId = new ArrayList<>();
 
         List<ParticipantsResponseDto> participants = new ArrayList<>();
-        for(Tag tag : tags) {
+        for (Tag tag : tags) {
 //            participantsName.add(tag.getUser().getNickName());
 //            participantsId.add(tag.getUser().getId());
             ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(tag.getUser().getId(), tag.getUser().getProfileImage(), tag.getUser().getNickName());
@@ -146,17 +146,17 @@ public class PostService {
         PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         Boolean subscribeCheck = null;
         ColorEnum colorEnum = post.getColor();
-        if (postSubscribe!=null){
+        if (postSubscribe != null) {
             subscribeCheck = postSubscribe.getPostSubscribeCheck();
             colorEnum = ColorEnum.GRAY;
         }
 
 //        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscriberId(post.getUser());
 //        UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(post.getUser(), user);
-                                                            //로그인한유저 -> postId의 post의 user(작성자)
+        //로그인한유저 -> postId의 post의 user(작성자)
         List<User> friends = friendRepository.findAllFriends(post.getUser());
 
-        if(post.getScope() == ScopeEnum.ME && !Objects.equals(post.getUser().getId(), user.getId())) {
+        if (post.getScope() == ScopeEnum.ME && !Objects.equals(post.getUser().getId(), user.getId())) {
             throw new CustomException(POST_VIEW_ONLY_CREATOR_FORBIDDEN);
         } else if (post.getScope() == ScopeEnum.FRIEND && !friends.contains(user) && post.getUser() != user) {
             throw new CustomException(POST_VIEW_ONLY_FRIEND_FORBIDDEN);
@@ -185,7 +185,7 @@ public class PostService {
 
         tagRepository.deleteAll(tags);
 
-        for(Long friend : friends) {
+        for (Long friend : friends) {
             ParticipantsResponseDto ParticipantsResponseDto = new ParticipantsResponseDto(friend, userRepository.findById(friend).get().getProfileImage(), userRepository.findById(friend).get().getNickName());
             Tag tag = new Tag(userRepository.findById(friend).get(), post);
             tagRepository.save(tag);
@@ -206,7 +206,7 @@ public class PostService {
         PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         Boolean subscribeCheck = null;
         ColorEnum colorEnum = post.getColor();
-        if (postSubscribe!=null){
+        if (postSubscribe != null) {
             subscribeCheck = postSubscribe.getPostSubscribeCheck();
             colorEnum = ColorEnum.GRAY;
         }
@@ -218,7 +218,7 @@ public class PostService {
             List<User> joiners = new ArrayList<>();
             List<Tag> newTags = tagRepository.findAllByPostId(post.getId());
 
-            for(Tag tag : newTags) {
+            for (Tag tag : newTags) {
                 joiners.add(tag.getUser());
             }
             postUpdateCheck(post, user);
@@ -267,7 +267,7 @@ public class PostService {
             List<User> joiners = new ArrayList<>();
             List<Tag> tags = tagRepository.findAllByPostId(post.getId());
 
-            for(Tag tag : tags) {
+            for (Tag tag : tags) {
                 joiners.add(tag.getUser());
             }
             postSubscribeService.deleteJoin(post.getId(), joiners, userDetails);
@@ -308,7 +308,7 @@ public class PostService {
         return todayPostResponseDtos;
     }
 
-        //내가 구독하는 유저가 스크랩 가능으로 글을 올리고 나를 태그했다. > 현재는 2번 불러옴 > 1번만 불러올 수 있도록 고쳐야함.
+    //내가 구독하는 유저가 스크랩 가능으로 글을 올리고 나를 태그했다. > 현재는 2번 불러옴 > 1번만 불러올 수 있도록 고쳐야함.
     @Transactional
     public List<HomeResponseDto> getHomePost(Long userId, UserDetailsImpl userDetails) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -348,8 +348,7 @@ public class PostService {
             // Master가 작성한 일정
             if (friendRepository.findFriend(master, visitor) != null) {
                 AllPosts = postRepository.findFriendPost(master);
-            }
-            else{
+            } else {
                 AllPosts = postRepository.findNotFriendPost(master);
             }
             // Master가 구독하는 일정
@@ -360,10 +359,9 @@ public class PostService {
             // Master를 태그한 공유일정
             List<PostSubscribe> postSubscribes = postSubscribeRepository.findAllByUserId(master.getId());
             for (PostSubscribe postSubscribe : postSubscribes) {
-                if (postSubscribe.getPostSubscribeCheck()&&(postSubscribe.getPost().getScope() == ScopeEnum.ALL || postSubscribe.getPost().getScope() == ScopeEnum.SUBSCRIBE)){
+                if (postSubscribe.getPostSubscribeCheck() && (postSubscribe.getPost().getScope() == ScopeEnum.ALL || postSubscribe.getPost().getScope() == ScopeEnum.SUBSCRIBE)) {
                     AllPosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
-                }
-                else if (postSubscribe.getPostSubscribeCheck() && postSubscribe.getPost().getScope() == ScopeEnum.FRIEND && friendRepository.findFriend(master, visitor) != null) {
+                } else if (postSubscribe.getPostSubscribeCheck() && postSubscribe.getPost().getScope() == ScopeEnum.FRIEND && friendRepository.findFriend(master, visitor) != null) {
                     AllPosts.add(new Post(postSubscribe.getPost(), ColorEnum.GRAY));
                 }
             }
@@ -372,8 +370,8 @@ public class PostService {
             }
         }
         Collections.sort(homeResponseDtos, (o1, o2) -> {
-            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(),o1.getStartTime());
-            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(),o2.getStartTime());
+            LocalDateTime o1DateTime = LocalDateTime.of(o1.getStartDate(), o1.getStartTime());
+            LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(), o2.getStartTime());
             return o1DateTime.compareTo(o2DateTime);
         });
         return homeResponseDtos;
@@ -422,7 +420,7 @@ public class PostService {
     }
 
     @Transactional //나와 공유한 일정
-    public List<PostResponseDto> getSharePost(Long userId, UserDetailsImpl userDetails){
+    public List<PostResponseDto> getSharePost(Long userId, UserDetailsImpl userDetails) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -455,21 +453,27 @@ public class PostService {
     }
 
     public void createBirthday(User user1, User user2) {
-        PostRequestDto postRequestDto1 = new PostRequestDto(user2);
-        PostRequestDto postRequestDto2 = new PostRequestDto(user1);
-        createBirthdayPost(postRequestDto1, user1);
-        createBirthdayPost(postRequestDto2, user2);
+        if (validBirthday(user1)){
+            PostRequestDto postRequestDto2 = new PostRequestDto(user1);
+            createBirthdayPost(postRequestDto2, user2);
+        }
+        if (validBirthday(user2)){
+            PostRequestDto postRequestDto1 = new PostRequestDto(user2);
+            createBirthdayPost(postRequestDto1, user1);
+        }
     }
+
     public void deleteBirthday(User user1, User user2) {
         Post post1 = postRepository.findBirthdayPost(user1, user2);
         Post post2 = postRepository.findBirthdayPost(user2, user1);
-        if(post1 != null) {
+        if (post1 != null) {
             postRepository.delete(post1);
         }
-        if(post2 != null) {
+        if (post2 != null) {
             postRepository.delete(post2);
         }
     }
+
     public void createBirthdayPost(PostRequestDto requestDto, User user) {
         LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
         LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
@@ -478,11 +482,40 @@ public class PostService {
         postRepository.save(post);
     }
 
+    public boolean validBirthday(User user) {
+        if (user.getBirthday().length() == 4) {
+            int month = Integer.parseInt(user.getBirthday().substring(0, 2));
+            int day = Integer.parseInt(user.getBirthday().substring(2, 4));
+            if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
+                if (day >= 1 && day <= 31) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+                if (day >= 1 && day <= 30) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (month == 2) {
+                if (day >= 1 && day <= 29) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return false;
+}
+
     // 구독한 계정의 일정 중에서 subscribe허용 && date에 해당하는 일정들 가져오는 메서드
     private List<Post> getSubscribePosts(User user, LocalDate localDate) {
         List<Post> subscribePosts = new ArrayList<>();
         List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingIdAndIsVisible(user, true);
-        for(UserSubscribe userSubscribe : userSubscribes) {
+        for (UserSubscribe userSubscribe : userSubscribes) {
             subscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), localDate, ScopeEnum.SUBSCRIBE));
         }
         return subscribePosts;
@@ -556,10 +589,6 @@ public class PostService {
     }
 
 
-
-
-
-
     //master와 visitor의 관계를 판단하여 허용하는 ScopeEnum을 리스트로 반환
     private List<ScopeEnum> getAllowedScopes(User master, User visitor) {
         List<ScopeEnum> allowedScopes = new ArrayList<>(Arrays.asList(ScopeEnum.ALL, ScopeEnum.SUBSCRIBE));
@@ -582,21 +611,24 @@ public class PostService {
                 .map(postSubscribe -> new ParticipantsResponseDto(postSubscribe.getUser().getId(), postSubscribe.getUser().getProfileImage(), postSubscribe.getUser().getNickName()))
                 .collect(Collectors.toList());
     }
-    public void postUpdateCheck(Post post, User user){
-        if (post.getScope().equals(ScopeEnum.ALL) || post.getScope().equals(ScopeEnum.SUBSCRIBE))
-        {user.userUpdateCheck();}
-        if (post.getScope().equals(ScopeEnum.ALL) || post.getScope().equals(ScopeEnum.SUBSCRIBE) || post.getScope().equals(ScopeEnum.FRIEND))
-        {user.friendUpdateCheck();}
+
+    public void postUpdateCheck(Post post, User user) {
+        if (post.getScope().equals(ScopeEnum.ALL) || post.getScope().equals(ScopeEnum.SUBSCRIBE)) {
+            user.userUpdateCheck();
+        }
+        if (post.getScope().equals(ScopeEnum.ALL) || post.getScope().equals(ScopeEnum.SUBSCRIBE) || post.getScope().equals(ScopeEnum.FRIEND)) {
+            user.friendUpdateCheck();
+        }
     }
 
     @Async
-    @Scheduled(cron="0 0 * * * ?")
+    @Scheduled(cron = "0 0 * * * ?")
     @Transactional
-    public void notifySchedule(){
+    public void notifySchedule() {
         List<Post> notifySchedules = postRepository.findNofitySchedule();
-        for (Post post : notifySchedules){
-                mailService.sendScheduleNotifyMail(new MailDto(post));
-                notificationService.send(post.getUser().getId(), NotificationType.SCHEDULE_NOTIFY, NotificationType.SCHEDULE_NOTIFY.makeContent(post.getTitle()), post.getId());
+        for (Post post : notifySchedules) {
+            mailService.sendScheduleNotifyMail(new MailDto(post));
+            notificationService.send(post.getUser().getId(), NotificationType.SCHEDULE_NOTIFY, NotificationType.SCHEDULE_NOTIFY.makeContent(post.getTitle()), post.getId());
         }
     }
 }

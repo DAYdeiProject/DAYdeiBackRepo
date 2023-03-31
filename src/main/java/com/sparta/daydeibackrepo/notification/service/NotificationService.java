@@ -67,13 +67,11 @@ public class NotificationService {
 
         Long user = null;
         Long post = null;
-        if(userRepository.findById(returnId).isPresent()) {
+
+        if(NotificationType.userContent().contains(notificationType)) {
             user = returnId;
-            post = null;
-        }
-        if(postRepository.findById(returnId).isPresent()) {
+        } else {
             post = returnId;
-            user = null;
         }
 
         Long finalPost = post;
@@ -89,23 +87,21 @@ public class NotificationService {
     @Transactional
     public List<NotificationDto> findAllNotifications(Long userId) {
         List<Notification> notifications = notificationRepository.findAllByUserId(userId);
-        Long user = null;
-        Long post = null;
 
         notifications.stream()
                 .forEach(notification -> notification.read());
 
         List<NotificationDto> notificationDtos = new ArrayList<>();
         for (Notification notification : notifications) {
-            String content = notification.getContent();
-            if(userRepository.findById(notification.getReturnId()).isPresent() && content.contains(NotificationType.userContent().toString())) {
-                user = notification.getReturnId();
-                post = null;
+            NotificationType notificationType = notification.getNotificationType();
+            Long user = null;
+            Long post = null;
 
-            }
-            if(postRepository.findById(notification.getReturnId()).isPresent() && !(content.contains(NotificationType.userContent().toString()))) {
+            if(NotificationType.userContent().contains(notificationType)) {
+                user = notification.getReturnId();
+
+            } else {
                 post = notification.getReturnId();
-                user = null;
             }
             notificationDtos.add(NotificationDto.create(notification, post, user));
         }

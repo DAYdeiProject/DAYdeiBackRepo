@@ -31,7 +31,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository{
         }
         return jpaQueryFactory
                 .selectFrom(user)
-                .where(user.email.contains(searchWord).or(user.nickName.like(searchWord))
+                .where(user.email.contains(searchWord).or(user.nickName.contains(searchWord))
                         .and(user.ne(user1)).and(categoryExpression))
                 .fetch();
     }

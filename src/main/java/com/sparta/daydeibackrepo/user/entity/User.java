@@ -57,6 +57,8 @@ public class User {
     @JsonIgnore
     private Boolean userUpdateCheck;
 
+    private Boolean isNewNotification;
+
 
 //    @ElementCollection(fetch = FetchType.EAGER)
 //    @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -78,6 +80,7 @@ public class User {
         this.profileImage = img;
         this.birthday = birthday;
         this.role = UserRoleEnum.USER;
+        this.isNewNotification = false;
     }
 
     //일반 회원가입
@@ -89,6 +92,7 @@ public class User {
         this.role = UserRoleEnum.USER;
         this.friendUpdateCheck = false;
         this.userUpdateCheck = false;
+        this.isNewNotification = false;
     }
 
     public User kakaoIdUpdate(Long kakaoId) {
@@ -130,4 +134,8 @@ public class User {
     public void friendUpdateCheck(){
         this.userUpdateCheck = true;
     }
+    public void setIsNewNotification() {
+        this.isNewNotification = true;
+    }
+
 }

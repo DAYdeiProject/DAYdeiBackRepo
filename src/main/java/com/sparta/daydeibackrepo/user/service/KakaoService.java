@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
+import com.sparta.daydeibackrepo.notification.entity.Notification;
+import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.KakaoUserInfoDto;
 import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
@@ -31,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -41,6 +44,7 @@ public class KakaoService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final JwtUtil jwtUtil;
+    private final NotificationRepository notificationRepository;
 
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
@@ -55,6 +59,12 @@ public class KakaoService {
 
         // 3. 필요시에 회원가입
         User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
+
+        Optional<Notification> notification = notificationRepository.findByIdAndIsRead(kakaoUser.getId(), false);
+
+        if(notification.isPresent()) {
+            kakaoUser.setIsNewNotification();
+        }
 
         // 4. JWT 토큰 반환
         HttpHeaders headers = new HttpHeaders();

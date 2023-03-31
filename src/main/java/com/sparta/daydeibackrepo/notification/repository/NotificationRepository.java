@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
@@ -18,4 +19,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     Long countUnReadNotifications(@Param("userId") Long userId);
 
     @Query("select n from Notification n " + "where n.receiver = :user and " + "n.returnId = :returnId and " + " n.notificationType = :notificationType")
-    Notification findNotification(User user, Long returnId,  NotificationType notificationType);}
+    Notification findNotification(User user, Long returnId,  NotificationType notificationType);
+
+    Optional<Notification> findByIdAndIsRead(Long user, Boolean bool);
+
+
+}

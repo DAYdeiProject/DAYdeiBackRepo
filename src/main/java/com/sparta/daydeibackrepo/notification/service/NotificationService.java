@@ -7,6 +7,7 @@ import com.sparta.daydeibackrepo.notification.entity.Notification;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.repository.EmitterRepository;
 import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
+import com.sparta.daydeibackrepo.post.repository.PostRepository;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,6 +32,7 @@ import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
 @RequiredArgsConstructor
 public class NotificationService {
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
     @Value("${spring.sse.time}")
     private Long timeout;
@@ -61,10 +64,22 @@ public class NotificationService {
         String receiverId = String.valueOf(userId);
         String eventId = receiverId + "_" + System.currentTimeMillis();
         Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithByUserId(receiverId);
+
+        Long user = null;
+        Long post = null;
+
+        if(NotificationType.userContent().contains(notificationType)) {
+            user = returnId;
+        } else {
+            post = returnId;
+        }
+
+        Long finalPost = post;
+        Long finalUser = user;
         emitters.forEach(
                 (key, emitter) -> {
                     emitterRepository.saveEventCache(key, notification);
-                    sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification));
+                    sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification, finalPost, finalUser));
                 }
         );
     }
@@ -72,11 +87,29 @@ public class NotificationService {
     @Transactional
     public List<NotificationDto> findAllNotifications(Long userId) {
         List<Notification> notifications = notificationRepository.findAllByUserId(userId);
+
         notifications.stream()
                 .forEach(notification -> notification.read());
-        return notifications.stream()
-                .map(NotificationDto::create)
-                .collect(Collectors.toList());
+
+        List<NotificationDto> notificationDtos = new ArrayList<>();
+        for (Notification notification : notifications) {
+            NotificationType notificationType = notification.getNotificationType();
+            Long user = null;
+            Long post = null;
+
+            if(NotificationType.userContent().contains(notificationType)) {
+                user = notification.getReturnId();
+
+            } else {
+                post = notification.getReturnId();
+            }
+            notificationDtos.add(NotificationDto.create(notification, post, user));
+        }
+        return notificationDtos;
+
+//        return notifications.stream()
+//                .map(notification -> NotificationDto.create(notification, post, user))
+//                .collect(Collectors.toList());
     }
     //읽지 않은 알림 갯수 Count
     public Long countUnReadNotifications(Long userId) {

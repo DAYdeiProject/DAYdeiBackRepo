@@ -2,6 +2,7 @@ package com.sparta.daydeibackrepo.notification.controller;
 
 import com.sparta.daydeibackrepo.exception.message.SuccessMessage;
 import com.sparta.daydeibackrepo.notification.dto.NotificationDto;
+import com.sparta.daydeibackrepo.notification.dto.NotificationGetDto;
 import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
@@ -28,7 +29,7 @@ public class NotificationController {
         return notificationService.connect(userDetails.getUser().getId(), lastEventId);
     }
     @GetMapping("/api/notification")
-    public StatusResponseDto<List<NotificationDto>> getNotification(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public StatusResponseDto<NotificationGetDto> getNotification(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(notificationService.findAllNotifications(userDetails.getUser().getId()));
     }
     @DeleteMapping("/api/notification/{userId}")

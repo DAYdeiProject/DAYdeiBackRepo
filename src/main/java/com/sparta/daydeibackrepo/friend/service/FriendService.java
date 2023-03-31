@@ -211,6 +211,7 @@ public class FriendService {
         if (users==null){
             return userResponseDtos;
         }
+
         List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(user);
         List<User> friends = friendRepository.findAllFriends(user);
         List<User> responseUsers = friendRepository.findResponseUser(user);

@@ -24,6 +24,7 @@ public class UserSubscribeController {
     ) {
         return StatusResponseDto.success(userSubscribeService.createSubscribe(userid, userDetails));
     }
+
     @DeleteMapping("/{userid}")
     public StatusResponseDto<String> deleteSubscribe(@PathVariable Long userid,  @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
     ) throws AccessDeniedException {

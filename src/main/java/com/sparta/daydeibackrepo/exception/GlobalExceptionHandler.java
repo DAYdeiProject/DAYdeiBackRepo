@@ -46,5 +46,4 @@ public class GlobalExceptionHandler {
         return StatusResponseDto.toAllExceptionResponseEntity(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-
 }

@@ -60,11 +60,11 @@ public class KakaoService {
         // 3. 필요시에 회원가입
         User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
 
-        Optional<Notification> notification = notificationRepository.findByIdAndIsRead(kakaoUser.getId(), false);
-
-        if(notification.isPresent()) {
-            kakaoUser.setIsNewNotification();
-        }
+//        Optional<Notification> notification = notificationRepository.findByIdAndIsRead(kakaoUser.getId(), false);
+//
+//        if(notification.isPresent()) {
+//            kakaoUser.setIsNewNotification();
+//        }
 
         // 4. JWT 토큰 반환
         HttpHeaders headers = new HttpHeaders();

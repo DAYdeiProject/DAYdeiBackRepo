@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/tags")
 public class TagController {
     private final TagService tagService;
+
     @GetMapping("/find/{searchWord}")
     public StatusResponseDto<List<UserResponseDto>> getFriendTagList(@PathVariable String searchWord, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(tagService.getFriendTagList(searchWord, userDetails));

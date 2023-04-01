@@ -51,14 +51,14 @@ public class KakaoService {
 
     @Transactional //ResponseEntity<StatusResponseDto<LoginResponseDto>>
     public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, UserDetailsImpl userDetails) throws JsonProcessingException {
-
+//        User user = userDetails.getUser();
 
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
         User kakaoUser = null;
-        if (userDetails != null && kakaoUserInfo.getId() == null && userDetails.getUsername() != kakaoUser.getEmail()){
+        if (userDetails != null && userDetails.getUser().getKakaoId() == null){
             kakaoUser = kakaoUser.emailUpdate(kakaoUserInfo.getEmail());
             kakaoUser = kakaoUser.kakaoIdUpdate(kakaoUser.getKakaoId());
             userRepository.save(kakaoUser);

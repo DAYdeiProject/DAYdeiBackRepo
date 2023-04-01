@@ -17,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class MemoController {
+
     private final MemoService memoService;
 
     @PostMapping("/memos")

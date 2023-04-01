@@ -58,9 +58,11 @@ public class KakaoService {
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
         User kakaoUser = null;
-        if (userDetails != null){
+        if (userDetails != null && kakaoUserInfo.getId() == null && userDetails.getUsername() != kakaoUser.getEmail()){
             kakaoUser = kakaoUser.emailUpdate(kakaoUserInfo.getEmail());
             kakaoUser = kakaoUser.kakaoIdUpdate(kakaoUser.getKakaoId());
+            userRepository.save(kakaoUser);
+
         }
         // 3. 필요시에 회원가입
         else {
@@ -77,18 +79,10 @@ public class KakaoService {
         // 4. JWT 토큰 반환
         HttpHeaders headers = new HttpHeaders();
         String createToken = jwtUtil.createToken(kakaoUser.getEmail(), UserRoleEnum.USER);
-        log.warn("createToken nick: "+createToken);
-        System.out.println("createToken>>>>>>>>>>>>>>>\n" + createToken);
         headers.set("Authorization", createToken);
         LoginResponseDto loginResponseDto = new LoginResponseDto(kakaoUser, true);
 
         StatusResponseDto<LoginResponseDto> responseDto = StatusResponseDto.success(loginResponseDto);
-        System.out.println("loginResponseDto\n"+loginResponseDto.getEmail());
-        System.out.println("responseDto\n"+responseDto.getData());
-
-        System.out.println("ResponseEntity>>>>>>>>>>>>>\n"+ResponseEntity.ok()
-                .headers(headers)
-                .body(responseDto));
 
         return ResponseEntity.ok()
                 .headers(headers)

@@ -50,7 +50,7 @@ public class KakaoService {
     private String kakaoApiKey;
 
     @Transactional //ResponseEntity<StatusResponseDto<LoginResponseDto>>
-    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, UserDetailsImpl userDetails) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
 
 
         // 1. "인가 코드"로 "액세스 토큰" 요청
@@ -58,7 +58,7 @@ public class KakaoService {
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
         // 3. 필요시에 회원가입
-        User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo, userDetails);
+        User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
 
 //        Optional<Notification> notification = notificationRepository.findByIdAndIsRead(kakaoUser.getId(), false);
 //
@@ -255,7 +255,7 @@ public class KakaoService {
 
 
     // 3. 필요시에 회원가입
-    private User registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo, UserDetailsImpl userDetails) {
+    private User registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
         // DB 에 중복된 Kakao Id 가 있는지 확인
         Long kakaoId = kakaoUserInfo.getId();
         User kakaoUser = userRepository.findByKakaoId(kakaoId)
@@ -265,15 +265,10 @@ public class KakaoService {
             String kakaoEmail = kakaoUserInfo.getEmail();
             User sameEmailUser = userRepository.findByEmail(kakaoEmail).orElse(null);
 
-            log.warn(userDetails.getUsername());
 
             if (sameEmailUser != null) { // 같은 이메일로 로그인한 일반 회원이 카카오 로그인을 시도했을 때
                 kakaoUser = sameEmailUser;
                 // 기존 회원정보에 카카오 Id 추가
-                kakaoUser = kakaoUser.kakaoIdUpdate(kakaoId);
-            } else if (userDetails != null){ // 다른 이메일로 로그인한 일반 회원이 카카오 로그인을 시도했을 때
-//                kakaoUser.setEmail(kakaoUserInfo.getEmail());
-                kakaoUser = kakaoUser.emailUpdate(kakaoUserInfo.getEmail());
                 kakaoUser = kakaoUser.kakaoIdUpdate(kakaoId);
             } else {
                 // 신규 회원가입

@@ -265,6 +265,8 @@ public class KakaoService {
             String kakaoEmail = kakaoUserInfo.getEmail();
             User sameEmailUser = userRepository.findByEmail(kakaoEmail).orElse(null);
 
+            log.warn(userDetails.getUsername());
+
             if (sameEmailUser != null) { // 같은 이메일로 로그인한 일반 회원이 카카오 로그인을 시도했을 때
                 kakaoUser = sameEmailUser;
                 // 기존 회원정보에 카카오 Id 추가
@@ -290,6 +292,7 @@ public class KakaoService {
             }
 
             userRepository.save(kakaoUser);
+            log.warn(kakaoUser.getEmail());
         }
         return kakaoUser;
     }

@@ -76,6 +76,8 @@ public class User {
         this.birthday = birthday;
         this.role = UserRoleEnum.USER;
         this.isNewNotification = false;
+        this.friendUpdateCheck = false;
+        this.userUpdateCheck = false;
     }
 
     //일반 회원가입

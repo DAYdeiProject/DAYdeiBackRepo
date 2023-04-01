@@ -58,11 +58,13 @@ public class KakaoService {
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
         User kakaoUser = null;
+//        Long kakaoId = kakaoUserInfo.getId();
+//        User kakaoUser = userRepository.findByKakaoId(kakaoId);
         if (userDetails.getUser() != null){
             if (userDetails.getUser().getKakaoId() == null) {
                 kakaoUser = kakaoUser.emailUpdate(kakaoUserInfo.getEmail());
                 kakaoUser = kakaoUser.kakaoIdUpdate(kakaoUser.getKakaoId());
-                userDetails.getUser().updateEmailAndKakaoId(kakaoUserInfo.getEmail(), kakaoUser.getKakaoId());
+//                userDetails.getUser().updateEmailAndKakaoId(kakaoUserInfo.getEmail(), kakaoUser.getKakaoId());
                 userRepository.save(kakaoUser);
             }
         }

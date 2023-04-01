@@ -184,7 +184,6 @@ public class KakaoService {
 //        body.add("redirect_uri", "http://localhost:8080/api/users/kakao/callback");
         body.add("code", code);
 
-
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
                 new HttpEntity<>(body, headers);

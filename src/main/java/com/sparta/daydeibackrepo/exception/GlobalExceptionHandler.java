@@ -11,6 +11,8 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
+
 import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.NOT_LOGGED_ID;
 
 @Slf4j
@@ -44,6 +46,12 @@ public class GlobalExceptionHandler {
     public StatusResponseDto handleAll(final Exception ex) {
         Sentry.captureException(ex); // Sentry로 예외를 보냅니다.
         return StatusResponseDto.toAllExceptionResponseEntity(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(value = {IOException.class})
+    public StatusResponseDto handleIOException(IOException ex) {
+        Sentry.captureException(ex);
+        return StatusResponseDto.toAllExceptionResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
 }

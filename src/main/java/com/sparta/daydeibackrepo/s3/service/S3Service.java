@@ -26,7 +26,7 @@ public class S3Service {
     @Transactional
     public List<String> uploadFiles(List<MultipartFile> multipartFiles, String dirName) throws IOException {
         List<String> imageUrls = new ArrayList<>();
-        if (multipartFiles.size() > 4) {
+        if (multipartFiles.size() > 3) {
             throw new IllegalArgumentException("error: 파일은 최대 4개까지 첨부가능합니다.");
         }
         for (MultipartFile multipartfile : multipartFiles){

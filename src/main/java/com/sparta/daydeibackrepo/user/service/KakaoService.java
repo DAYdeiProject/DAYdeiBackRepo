@@ -65,7 +65,6 @@ public class KakaoService {
 //        if(notification.isPresent()) {
 //            kakaoUser.setIsNewNotification();
 //        }
-
         // 4. JWT 토큰 반환
         HttpHeaders headers = new HttpHeaders();
         String createToken = jwtUtil.createToken(kakaoUser.getEmail(), UserRoleEnum.USER);

@@ -44,7 +44,7 @@ public class UserController {
     }
 //    ResponseEntity<StatusResponseDto<String>>
     @GetMapping("/users/kakao/callback") //ResponseEntity<StatusResponseDto<LoginResponseDto>>
-    public ResponseEntity<String> kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
 //        String createToken = kakaoService.kakaoLogin(code, response);
 //        // Cookie 생성 및 직접 브라우저에 Set
 //        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));

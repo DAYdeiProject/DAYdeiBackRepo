@@ -96,6 +96,12 @@ public class User {
         this.kakaoId = kakaoId;
         return this;
     }
+
+    public User emailUpdate(String email){
+        this.email = email;
+        return this;
+    }
+
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }

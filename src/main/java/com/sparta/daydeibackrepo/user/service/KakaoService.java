@@ -50,17 +50,15 @@ public class KakaoService {
     private String kakaoApiKey;
 
     @Transactional //ResponseEntity<StatusResponseDto<LoginResponseDto>>
-    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
-//        System.out.println("code>>>>>>>>>>>>>\n" + code);
-        log.warn("code: "+code);
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, UserDetailsImpl userDetails) throws JsonProcessingException {
+
+
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
-        System.out.println("accessToken>>>>>>>>>>>>>>>\n" + accessToken);
-        log.warn("accessToken: "+accessToken);
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
         // 3. 필요시에 회원가입
-        User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
+        User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo, userDetails);
 
 //        Optional<Notification> notification = notificationRepository.findByIdAndIsRead(kakaoUser.getId(), false);
 //
@@ -193,7 +191,7 @@ public class KakaoService {
         body.add("client_id", kakaoApiKey);
 //        body.add("redirect_uri", "http://3.34.137.234:8080/api/users/kakao/callback");
 //        body.add("redirect_uri", "http://54.180.94.139/api/users/kakao/callback");
-        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/kakao/callback");
+        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/kakao");
 //        body.add("redirect_uri", "http://localhost:3000/kakao");
 //        body.add("redirect_uri", "http://localhost:8080/api/users/kakao/callback");
         body.add("code", code);
@@ -257,7 +255,7 @@ public class KakaoService {
 
 
     // 3. 필요시에 회원가입
-    private User registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
+    private User registerKakaoUserIfNeeded(KakaoUserInfoDto kakaoUserInfo, UserDetailsImpl userDetails) {
         // DB 에 중복된 Kakao Id 가 있는지 확인
         Long kakaoId = kakaoUserInfo.getId();
         User kakaoUser = userRepository.findByKakaoId(kakaoId)
@@ -266,9 +264,14 @@ public class KakaoService {
             // 카카오 사용자 email 동일한 email 가진 회원이 있는지 확인
             String kakaoEmail = kakaoUserInfo.getEmail();
             User sameEmailUser = userRepository.findByEmail(kakaoEmail).orElse(null);
-            if (sameEmailUser != null) {
+
+            if (sameEmailUser != null) { // 같은 이메일로 로그인한 일반 회원이 카카오 로그인을 시도했을 때
                 kakaoUser = sameEmailUser;
                 // 기존 회원정보에 카카오 Id 추가
+                kakaoUser = kakaoUser.kakaoIdUpdate(kakaoId);
+            } else if (userDetails != null){ // 다른 이메일로 로그인한 일반 회원이 카카오 로그인을 시도했을 때
+//                kakaoUser.setEmail(kakaoUserInfo.getEmail());
+                kakaoUser = kakaoUser.emailUpdate(kakaoUserInfo.getEmail());
                 kakaoUser = kakaoUser.kakaoIdUpdate(kakaoId);
             } else {
                 // 신규 회원가입

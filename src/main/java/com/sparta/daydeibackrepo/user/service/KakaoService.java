@@ -49,8 +49,9 @@ public class KakaoService {
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
 
-    @Transactional
-    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    @Transactional //ResponseEntity<StatusResponseDto<LoginResponseDto>>
+    public ResponseEntity<String> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+        System.out.println("code>>>>>>>>>>>>>\n" + code);
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
         System.out.println("accessToken>>>>>>>>>>>>>>>\n" + accessToken);
@@ -77,6 +78,8 @@ public class KakaoService {
         LoginResponseDto loginResponseDto = new LoginResponseDto(kakaoUser, true);
 
         StatusResponseDto<LoginResponseDto> responseDto = StatusResponseDto.success(loginResponseDto);
+        System.out.println("loginResponseDto\n"+loginResponseDto.getEmail());
+        System.out.println("responseDto\n"+responseDto.getData());
 
         System.out.println("ResponseEntity>>>>>>>>>>>>>\n"+ResponseEntity.ok()
                 .headers(headers)
@@ -84,7 +87,9 @@ public class KakaoService {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(responseDto);
+                .body("왜안돼");
+
+//        return loginResponseDto;
     }
 
     @Transactional

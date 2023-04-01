@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UserResponseDto {
     private Long id;
+    private Long kakaoId;
     private String email;
     private String nickName;
     private String profileImage;
@@ -32,6 +33,7 @@ public class UserResponseDto {
     private int mutualFriendsCount;
     public UserResponseDto(User user, boolean friendCheck,boolean isRequestFriend, boolean userSubscribeCheck, boolean updateCheck, List<User> mutualFriends, boolean isVisible){
         this.id = user.getId();
+        this.kakaoId = user.getKakaoId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
@@ -52,6 +54,7 @@ public class UserResponseDto {
     }
     public UserResponseDto(User user, boolean friendCheck, boolean userSubscribeCheck, boolean updateCheck, List<User> mutualFriends, boolean isVisible){
         this.id = user.getId();
+        this.kakaoId = user.getKakaoId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
@@ -71,6 +74,7 @@ public class UserResponseDto {
     }
     public UserResponseDto(User user, boolean friendCheck,boolean isRequestFriend, boolean userSubscribeCheck, boolean updateCheck, List<User> mutualFriends){
         this.id = user.getId();
+        this.kakaoId = user.getKakaoId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
@@ -90,6 +94,7 @@ public class UserResponseDto {
     }
     public UserResponseDto(User user, boolean friendCheck, boolean userSubscribeCheck, boolean updateCheck, List<User> mutualFriends){
         this.id = user.getId();
+        this.kakaoId = user.getKakaoId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();
@@ -108,6 +113,7 @@ public class UserResponseDto {
     }
     public UserResponseDto(User user){
         this.id = user.getId();
+        this.kakaoId = user.getKakaoId();
         this.email = user.getEmail();
         this.nickName = user.getNickName();
         this.profileImage = user.getProfileImage();

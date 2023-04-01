@@ -15,7 +15,7 @@ public class UserProfileResponseDto {
     private String backgroundImage;
     private String introduction;
     private String birthday;
-    private Long kakaoId;
+
 
     public UserProfileResponseDto(User user){
         this.email = user.getEmail();
@@ -24,7 +24,6 @@ public class UserProfileResponseDto {
         this.backgroundImage = user.getBackgroundImage();
         this.introduction = user.getIntroduction();
         this.birthday = user.getBirthday();
-        this.kakaoId = user.getKakaoId();
     }
 
 }

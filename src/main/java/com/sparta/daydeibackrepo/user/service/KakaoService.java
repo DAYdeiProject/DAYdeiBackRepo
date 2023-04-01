@@ -50,15 +50,23 @@ public class KakaoService {
     private String kakaoApiKey;
 
     @Transactional //ResponseEntity<StatusResponseDto<LoginResponseDto>>
-    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, UserDetailsImpl userDetails) throws JsonProcessingException {
 
 
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
+        User kakaoUser = null;
+        if (userDetails != null){
+            kakaoUser = kakaoUser.emailUpdate(kakaoUserInfo.getEmail());
+            kakaoUser = kakaoUser.kakaoIdUpdate(kakaoUser.getKakaoId());
+        }
         // 3. 필요시에 회원가입
-        User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
+        else {
+            kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
+        }
+//        kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
 
 //        Optional<Notification> notification = notificationRepository.findByIdAndIsRead(kakaoUser.getId(), false);
 //

@@ -53,25 +53,35 @@ public class KakaoService {
     public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
+        System.out.println("accessToken>>>>>>>>>>>>>>>\n" + accessToken);
 
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
-
+        System.out.println("kakaouserInfo nick>>>>>>>>>>>>>>>\n" + kakaoUserInfo.getNickName());
         // 3. 필요시에 회원가입
         User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
+        System.out.println("kakaoUser id>>>>>>>>>>>>>>>\n" + kakaoUser.getId());
+        System.out.println("kakaoUser nick>>>>>>>>>>>>>>>\n" + kakaoUser.getNickName());
 
 //        Optional<Notification> notification = notificationRepository.findByIdAndIsRead(kakaoUser.getId(), false);
 //
 //        if(notification.isPresent()) {
 //            kakaoUser.setIsNewNotification();
 //        }
+
         // 4. JWT 토큰 반환
         HttpHeaders headers = new HttpHeaders();
         String createToken = jwtUtil.createToken(kakaoUser.getEmail(), UserRoleEnum.USER);
+        System.out.println("createToken>>>>>>>>>>>>>>>\n" + createToken);
         headers.set("Authorization", createToken);
         LoginResponseDto loginResponseDto = new LoginResponseDto(kakaoUser, true);
 
         StatusResponseDto<LoginResponseDto> responseDto = StatusResponseDto.success(loginResponseDto);
+
+        System.out.println("ResponseEntity>>>>>>>>>>>>>\n"+ResponseEntity.ok()
+                .headers(headers)
+                .body(responseDto));
+
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(responseDto);

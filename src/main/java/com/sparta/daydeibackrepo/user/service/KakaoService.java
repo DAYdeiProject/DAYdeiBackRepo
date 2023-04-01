@@ -62,6 +62,7 @@ public class KakaoService {
             if (userDetails.getUser().getKakaoId() == null) {
                 kakaoUser = kakaoUser.emailUpdate(kakaoUserInfo.getEmail());
                 kakaoUser = kakaoUser.kakaoIdUpdate(kakaoUser.getKakaoId());
+                userDetails.getUser().updateEmailAndKakaoId(kakaoUserInfo.getEmail(), kakaoUser.getKakaoId());
                 userRepository.save(kakaoUser);
             }
         }

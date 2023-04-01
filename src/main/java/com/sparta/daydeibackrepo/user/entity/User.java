@@ -125,6 +125,11 @@ public class User {
 //        this.profileImage = requestDto.getProfileImage();
         this.introduction = requestDto.getIntroduction();
     }
+
+    public void updateEmailAndKakaoId(String email, Long kakaoId){
+        this.email = email;
+        this.kakaoId = kakaoId;
+    }
     public void addFriendCount(){
         this.friendCount += 1;
     }

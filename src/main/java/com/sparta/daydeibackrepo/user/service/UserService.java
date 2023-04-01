@@ -158,16 +158,12 @@ public class UserService {
             profileImageUrl = s3Service.uploadFile(profileImage, "image");
         } else if (profileImage == null) {
             profileImageUrl = user.getProfileImage();
-        } else {
-            throw new CustomException(INVALID_IMAGE);
         }
 
         if (backgroundImage != null && !backgroundImage.isEmpty()) {
             backgroundImageUrl = s3Service.uploadFile(backgroundImage, "image");
         } else if (profileImage == null) {
             backgroundImageUrl = user.getBackgroundImage();
-        } else {
-            throw new CustomException(INVALID_IMAGE);
         }
 //
 //

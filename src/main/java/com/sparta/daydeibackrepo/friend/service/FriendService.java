@@ -185,6 +185,7 @@ public class FriendService {
         List<UserResponseDto> updateList = makeUserResponseDtos(user,updateUsers);
         return updateList.stream().limit(10).collect(Collectors.toList());
     }
+
     @Transactional(readOnly = true)
     public List<UserResponseDto> getFamousList(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(

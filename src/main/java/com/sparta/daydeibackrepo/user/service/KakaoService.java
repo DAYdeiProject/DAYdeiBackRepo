@@ -59,13 +59,8 @@ public class KakaoService {
         log.warn("accessToken: "+accessToken);
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
-        System.out.println("kakaouserInfo nick>>>>>>>>>>>>>>>\n" + kakaoUserInfo.getNickName());
         // 3. 필요시에 회원가입
         User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
-        System.out.println("kakaoUser id>>>>>>>>>>>>>>>\n" + kakaoUser.getId());
-        System.out.println("kakaoUser nick>>>>>>>>>>>>>>>\n" + kakaoUser.getNickName());
-
-        log.warn("kakaoUserInfo nick: "+kakaoUserInfo.getNickName());
 
 //        Optional<Notification> notification = notificationRepository.findByIdAndIsRead(kakaoUser.getId(), false);
 //

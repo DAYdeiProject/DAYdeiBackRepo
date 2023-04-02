@@ -32,7 +32,6 @@ import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
-
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 

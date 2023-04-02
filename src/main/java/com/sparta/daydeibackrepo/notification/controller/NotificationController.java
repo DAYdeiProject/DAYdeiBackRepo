@@ -20,7 +20,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class NotificationController {
-
     private final NotificationService notificationService;
 
     @GetMapping(value = "/api/connect", produces = "text/event-stream")

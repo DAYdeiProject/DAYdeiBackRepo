@@ -46,8 +46,11 @@ public class TagService {
         LocalTime startTime = LocalTime.parse(tagRequestDto.getStartTime());
         LocalTime endTime = LocalTime.parse(tagRequestDto.getEndTime());
         List<User> postUsers = postRepository.findAll().stream()
-                .filter(Post -> LocalDateTime.of(startDate,startTime).isBefore(LocalDateTime.now()) && LocalDateTime.of(endDate,endTime).isAfter(LocalDateTime.now()))
-                .map(post -> post.getUser())
+                .filter(post -> (LocalDateTime.of(startDate,startTime).isAfter(LocalDateTime.of(post.getStartDate(),post.getStartTime()))
+                        && LocalDateTime.of(startDate,startTime).isBefore(LocalDateTime.of(post.getEndDate(),post.getEndTime())))
+                        || (LocalDateTime.of(endDate,endTime).isAfter(LocalDateTime.of(post.getStartDate(),post.getStartTime()))
+                        && LocalDateTime.of(endDate,endTime).isBefore(LocalDateTime.of(post.getEndDate(),post.getEndTime()))))
+                        .map(post -> post.getUser())
                 .collect(Collectors.toList());
         List<User> tagList = friendRepository.findTagUser(user, tagRequestDto.getSearchWord());
         for (User user1 : tagList){

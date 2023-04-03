@@ -17,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/friends")
 public class FriendController {
+
     private final FriendService friendService;
 
     @PostMapping("/{userId}")

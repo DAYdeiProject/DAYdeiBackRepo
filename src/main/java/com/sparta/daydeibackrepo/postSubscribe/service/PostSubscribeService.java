@@ -89,6 +89,9 @@ public class PostSubscribeService {
 //            }
             PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
             postSubscribeRepository.save(postSubscribe1);
+            Notification notification = notificationRepository.findNotification(user, postId, NotificationType.JOIN_REQUEST);
+            if (notification != null)
+            {notificationRepository.delete(notification);}
             notificationService.send(joiner.getId() , NotificationType.JOIN_UPDATE_REQUEST, NotificationType.JOIN_UPDATE_REQUEST.makeContent(user.getNickName()), post.getId());
         }
     }
@@ -137,6 +140,9 @@ public class PostSubscribeService {
         if (postSubscribe==null){
             throw new CustomException(NO_APPROVE_POST_JOIN_REQUEST);
         }
+        Notification notification = notificationRepository.findNotification(user, postId, NotificationType.JOIN_REQUEST);
+        if (notification != null)
+        {notificationRepository.delete(notification);}
         postSubscribe.update(true);
         notificationService.send(post.getUser().getId() , NotificationType.JOIN_ACCEPT, NotificationType.JOIN_ACCEPT.makeContent(user.getNickName()), post.getId());
     }
@@ -156,6 +162,9 @@ public class PostSubscribeService {
         postSubscribeRepository.delete(postSubscribe);
         Tag tag = tagRepository.findByPostIdAndUserId(post.getId(), user.getId());
         tagRepository.delete(tag);
+        Notification notification = notificationRepository.findNotification(user, postId, NotificationType.JOIN_REQUEST);
+        if (notification != null)
+        {notificationRepository.delete(notification);}
         notificationService.send(post.getUser().getId() , NotificationType.JOIN_REJECT, NotificationType.JOIN_REJECT.makeContent(user.getNickName()), post.getId());
     }
 

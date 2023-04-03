@@ -85,6 +85,7 @@ public class NotificationService {
     //나한테 온 모든 알림 GET + 알림 다 읽은 것으로 변경
     @Transactional
     public NotificationGetDto findAllNotifications(Long userId) {
+        Long countNum = countUnReadNotifications(userId);
         List<Notification> notifications = notificationRepository.findAllByUserId(userId);
 
         notifications.stream()
@@ -105,7 +106,7 @@ public class NotificationService {
             notificationDtos.add(NotificationDto.create(notification, post, user));
         }
 
-        return new NotificationGetDto(countUnReadNotifications(userId), notificationDtos);
+        return new NotificationGetDto(countNum, notificationDtos);
 
 
 //        return notifications.stream()

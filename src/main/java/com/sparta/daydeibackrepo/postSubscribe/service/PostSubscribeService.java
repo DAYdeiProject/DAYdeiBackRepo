@@ -162,6 +162,9 @@ public class PostSubscribeService {
         postSubscribeRepository.delete(postSubscribe);
         Tag tag = tagRepository.findByPostIdAndUserId(post.getId(), user.getId());
         tagRepository.delete(tag);
+        Notification notification = notificationRepository.findNotification(user, postId, NotificationType.JOIN_REQUEST);
+        if (notification != null)
+        {notificationRepository.delete(notification);}
         notificationService.send(post.getUser().getId() , NotificationType.JOIN_REJECT, NotificationType.JOIN_REJECT.makeContent(user.getNickName()), post.getId());
     }
 

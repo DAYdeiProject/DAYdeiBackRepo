@@ -21,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class PostController {
+
     private final PostService postService;
 
     //일정 작성

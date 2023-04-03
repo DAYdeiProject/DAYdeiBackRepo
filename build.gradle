@@ -1,3 +1,4 @@
+
 buildscript {
 	ext {
 		queryDslVersion = "5.0.0"
@@ -31,15 +32,34 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'junit:junit:4.13.1'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'mysql:mysql-connector-java:8.0.28'
 	annotationProcessor 'org.projectlombok:lombok'
+//	testImplementation('junit:junit:4.13')
+//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation("org.junit.vintage:junit-vintage-engine") {
 		exclude group: "org.hamcrest", module: "hamcrest-core"
 	}
+//	testImplementation 'org.springframework:spring-test:5.3.9'
+	testImplementation 'org.springframework:spring-test:6.0.7'
+//	testImplementation 'junit:junit:4.13.2'
+	//JUnit 5
+	testImplementation('org.junit.jupiter:junit-jupiter:5.8.1')
+	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.8.1')
+
+	//Spring Test
+	testImplementation('org.springframework:spring-test:5.3.9')
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testImplementation('org.junit.jupiter:junit-jupiter:5.8.1')
+
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
@@ -65,9 +85,10 @@ dependencies {
 
 }
 
-//tasks.named('test') {
-//	useJUnitPlatform()
-//}
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
 def querydslDir = "$buildDir/generated/querydsl"
 
 querydsl {

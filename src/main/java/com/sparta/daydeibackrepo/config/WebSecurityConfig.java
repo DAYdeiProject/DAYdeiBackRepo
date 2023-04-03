@@ -64,6 +64,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .and()
                 .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
+        http.requiresChannel()
+                        .anyRequest().requiresSecure();
 
         http.cors();
         return http.build();

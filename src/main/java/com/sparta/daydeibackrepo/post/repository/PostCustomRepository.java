@@ -3,6 +3,9 @@ package com.sparta.daydeibackrepo.post.repository;
 import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.user.entity.User;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public interface PostCustomRepository {

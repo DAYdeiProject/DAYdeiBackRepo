@@ -7,7 +7,9 @@ import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.notification.entity.Notification;
+import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
+import com.sparta.daydeibackrepo.post.service.PostService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.KakaoUserInfoDto;
 import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
@@ -45,6 +47,7 @@ public class KakaoService {
     private final FriendRepository friendRepository;
     private final JwtUtil jwtUtil;
     private final NotificationRepository notificationRepository;
+    private final PostService postService;
 
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
@@ -139,6 +142,10 @@ public class KakaoService {
             Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(friendUser, user);
             if(friend1 == null && friend2 == null){
                 friendRepository.save(new Friend(user, friendUser, true));
+                user.addFriendCount();
+                friendUser.addFriendCount();
+                postService.createBirthday(user, friendUser);
+                Notification notification = notificationRepository.findNotification(friendUser, user.getId(), NotificationType.FRIEND_REQUEST);
             }
         }
 

@@ -19,7 +19,7 @@ import java.util.List;
 public class TagController {
     private final TagService tagService;
 
-    @GetMapping("/find")
+    @PostMapping("/find")
     public StatusResponseDto<List<TagResponseDto>> getFriendTagList(@RequestBody TagRequestDto tagRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return StatusResponseDto.success(tagService.getFriendTagList(tagRequestDto, userDetails));
     }

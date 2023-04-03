@@ -88,9 +88,6 @@ public class NotificationService {
         Long countNum = countUnReadNotifications(userId);
         List<Notification> notifications = notificationRepository.findAllByUserId(userId);
 
-        notifications.stream()
-                .forEach(notification -> notification.read());
-
         List<NotificationDto> notificationDtos = new ArrayList<>();
         for (Notification notification : notifications) {
             NotificationType notificationType = notification.getNotificationType();
@@ -105,6 +102,9 @@ public class NotificationService {
             }
             notificationDtos.add(NotificationDto.create(notification, post, user));
         }
+
+        notifications.stream()
+                .forEach(notification -> notification.read());
 
         return new NotificationGetDto(countNum, notificationDtos);
 

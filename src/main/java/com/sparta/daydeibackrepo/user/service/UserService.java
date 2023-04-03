@@ -97,9 +97,7 @@ public class UserService {
         }
         Optional<Notification> notification = notificationRepository.findByIdAndIsRead(user.getId(), false);
 
-        if(notification.isPresent()) {
-            user.setIsNewNotification();
-        }
+        user.setIsNewNotification(notification.isPresent());
 
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getEmail(), UserRoleEnum.USER));

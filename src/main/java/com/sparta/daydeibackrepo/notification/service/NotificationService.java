@@ -41,13 +41,16 @@ public class NotificationService {
     private final EmitterRepository emitterRepository;
 
     public SseEmitter connect(Long userId, String lastEventId) {
+        log.info(userId.toString());
         String emitterId = makeTimeIncludeId(userId);
+        log.info(emitterId);
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(timeout));
         emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
         emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
 
         // 503 에러를 방지하기 위한 더미 이벤트 전송
         String eventId = makeTimeIncludeId(userId);
+        log.info(eventId);
         sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userId + "]");
 
         // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방

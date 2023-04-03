@@ -8,6 +8,7 @@ import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.NOTIFIC
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class NotificationController {
@@ -26,6 +28,10 @@ public class NotificationController {
     @ResponseStatus(HttpStatus.OK)
     public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
                                 @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
+        log.info(userDetails.getUser().getId().toString());
+        log.info(userDetails.toString());
+        log.info(lastEventId);
+        log.error("error", notificationService.connect(userDetails.getUser().getId(), lastEventId));
         return notificationService.connect(userDetails.getUser().getId(), lastEventId);
     }
     @GetMapping("/api/notification")

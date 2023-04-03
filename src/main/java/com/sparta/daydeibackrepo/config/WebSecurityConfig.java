@@ -20,7 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 
 
 @Configuration
@@ -116,9 +116,5 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         return source;
     }
 
-    @Bean
-    public SseEmitter sseEmitter() {
-        return new SseEmitter();
-    }
 
 }

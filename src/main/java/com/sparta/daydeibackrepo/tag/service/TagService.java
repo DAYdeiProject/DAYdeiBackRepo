@@ -41,16 +41,19 @@ public class TagService {
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         List<TagResponseDto> tagResponseDtos = new ArrayList<>();
-        LocalDate startDate = LocalDate.parse(tagRequestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
-        LocalDate endDate = LocalDate.parse(tagRequestDto.getEndDate(), DateTimeFormatter.ISO_DATE);
         LocalTime startTime = LocalTime.parse(tagRequestDto.getStartTime());
         LocalTime endTime = LocalTime.parse(tagRequestDto.getEndTime());
+        LocalDate startDate = LocalDate.parse(tagRequestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate;
+        if (startTime.equals(LocalTime.parse("00:00")) && endTime.equals(LocalTime.parse("00:00"))){
+            endDate = LocalDate.parse(tagRequestDto.getEndDate(), DateTimeFormatter.ISO_DATE).plusDays(1);
+        }
+        else {endDate = LocalDate.parse(tagRequestDto.getEndDate(), DateTimeFormatter.ISO_DATE);}
         List<User> postUsers = postRepository.findAll().stream()
                 .filter(post -> (LocalDateTime.of(startDate,startTime).isAfter(LocalDateTime.of(post.getStartDate(),post.getStartTime()))
                         && LocalDateTime.of(startDate,startTime).isBefore(LocalDateTime.of(post.getEndDate(),post.getEndTime())))
                         || (LocalDateTime.of(endDate,endTime).isAfter(LocalDateTime.of(post.getStartDate(),post.getStartTime()))
-                        && LocalDateTime.of(endDate,endTime).isBefore(LocalDateTime.of(post.getEndDate(),post.getEndTime()))))
-                        .map(post -> post.getUser())
+                        && LocalDateTime.of(endDate,endTime).isBefore(LocalDateTime.of(post.getEndDate(),post.getEndTime())))).map(post -> post.getUser())
                 .collect(Collectors.toList());
         List<User> tagList = friendRepository.findTagUser(user, tagRequestDto.getSearchWord());
         for (User user1 : tagList){

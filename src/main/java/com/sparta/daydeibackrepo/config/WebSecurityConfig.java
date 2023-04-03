@@ -59,11 +59,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 //                .antMatchers("/api/users/signup").permitAll()
 //                .antMatchers("/api/users/login").permitAll()
                 .anyRequest().authenticated()
-
                 // JWT 인증/인가를 사용하기 위한 설정
                 .and()
                 .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
-
 
         http.cors();
         return http.build();

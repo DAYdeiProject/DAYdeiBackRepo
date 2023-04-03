@@ -16,12 +16,14 @@ public class TagResponseDto {
     private String profileImage;
 
     private String email;
+    private boolean scheduleCheck;
 
-    public TagResponseDto(User user){
+    public TagResponseDto(User user, boolean scheduleCheck){
         this.id = user.getId();
         this.nickName = user.getNickName();
         this.introduction = user.getIntroduction();
         this.profileImage = user.getProfileImage();
         this.email = user.getEmail();
+        this.scheduleCheck = scheduleCheck;
     }
 }

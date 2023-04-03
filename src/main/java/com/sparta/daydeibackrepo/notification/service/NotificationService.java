@@ -41,13 +41,16 @@ public class NotificationService {
     private final EmitterRepository emitterRepository;
 
     public SseEmitter connect(Long userId, String lastEventId) {
+        log.info(userId.toString());
         String emitterId = makeTimeIncludeId(userId);
+        log.info(emitterId);
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(timeout));
         emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
         emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
 
         // 503 에러를 방지하기 위한 더미 이벤트 전송
         String eventId = makeTimeIncludeId(userId);
+        log.info(eventId);
         sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userId + "]");
 
         // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방
@@ -85,10 +88,8 @@ public class NotificationService {
     //나한테 온 모든 알림 GET + 알림 다 읽은 것으로 변경
     @Transactional
     public NotificationGetDto findAllNotifications(Long userId) {
+        Long countNum = countUnReadNotifications(userId);
         List<Notification> notifications = notificationRepository.findAllByUserId(userId);
-
-        notifications.stream()
-                .forEach(notification -> notification.read());
 
         List<NotificationDto> notificationDtos = new ArrayList<>();
         for (Notification notification : notifications) {
@@ -105,7 +106,10 @@ public class NotificationService {
             notificationDtos.add(NotificationDto.create(notification, post, user));
         }
 
-        return new NotificationGetDto(countUnReadNotifications(userId), notificationDtos);
+        notifications.stream()
+                .forEach(notification -> notification.read());
+
+        return new NotificationGetDto(countNum, notificationDtos);
 
 
 //        return notifications.stream()

@@ -3,7 +3,7 @@ os: linux
 
 files:
   - source:  /
-    destination: /home/ubuntu/app
+    destination: /home/ubuntu/app/step3/zip/
     overwrite: yes
 
 permissions:
@@ -21,3 +21,7 @@ hooks:
     - location: scripts/start.sh
       timeout: 60
       runas: ubuntu
+  ValidateService:
+    - location: scripts/health.sh
+      timeout: 60
+      runas: ububtu

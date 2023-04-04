@@ -3,7 +3,7 @@ os: linux
 
 files:
   - source:  /
-    destination: /home/ubuntu/app/step3/zip/
+    destination: /home/ubuntu/app
     overwrite: yes
 
 permissions:

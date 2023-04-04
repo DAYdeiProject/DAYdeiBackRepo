@@ -103,6 +103,7 @@ public class PostService {
         for (Tag tag : tags) {
             joiners.add(tag.getUser());
         }
+
         postUpdateCheck(post, user);
         postSubscribeService.createJoin(savePost.getId(), joiners, userDetails);
         return StatusResponseDto.toResponseEntity(POST_CREATED_SUCCESS);

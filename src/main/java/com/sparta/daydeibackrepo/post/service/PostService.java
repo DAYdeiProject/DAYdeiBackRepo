@@ -97,6 +97,7 @@ public class PostService {
             Tag tag = new Tag(joiner, savePost);
             tagRepository.save(tag);
         }
+
         List<User> joiners = new ArrayList<>();
         List<Tag> tags = tagRepository.findAllByPostId(savePost.getId());
 

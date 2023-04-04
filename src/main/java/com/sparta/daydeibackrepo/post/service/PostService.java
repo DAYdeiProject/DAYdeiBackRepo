@@ -114,6 +114,7 @@ public class PostService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
+
         List<String> imageUrl = s3Service.uploadFiles(multipartFiles, "images");
         return imageUrl;
 

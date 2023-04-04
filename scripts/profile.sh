@@ -2,13 +2,13 @@
 
 function find_idle_profile()
 {
-    RESPONSE_CODE=$(sudo curl -s -o /dev/null -w "%{http_code}" https://sparta-daln.shop/)
+    RESPONSE_CODE=$(sudo curl -s -o /dev/null -w "%{http_code}" https://sparta-daln.shop/profile)
 
     if [ ${RESPONSE_CODE} -ge 400 ] # 400 보다 크면 (즉, 40x/50x 에러 모두 포함)
     then
         CURRENT_PROFILE=real2
     else
-        CURRENT_PROFILE=$(sudo curl -s https://sparta-daln.shop/)
+        CURRENT_PROFILE=$(sudo curl -s https://sparta-daln.shop/profile)
     fi
 
     if [ ${CURRENT_PROFILE} == real1 ]

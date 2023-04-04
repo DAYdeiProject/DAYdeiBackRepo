@@ -106,7 +106,6 @@ public class PostService {
         postUpdateCheck(post, user);
         postSubscribeService.createJoin(savePost.getId(), joiners, userDetails);
         return StatusResponseDto.toResponseEntity(POST_CREATED_SUCCESS);
-
     }
 
     public List<String> createPostImages(List<MultipartFile> multipartFiles, UserDetailsImpl userDetails) throws IOException {

@@ -146,11 +146,23 @@ public class PostService {
 
         PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         Boolean subscribeCheck = null;
-        ColorEnum colorEnum = post.getColor();
         if (postSubscribe != null) {
             subscribeCheck = postSubscribe.getPostSubscribeCheck();
+        }
+
+//        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscribingIdAndIsVisible(user, true);
+//        for (UserSubscribe userSubscribe : userSubscribes) {
+//            subscribePosts.addAll(postRepository.findSubscribeTodayPost(userSubscribe.getSubscriberId(), ScopeEnum.SUBSCRIBE));
+//        }
+
+
+
+        UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(user, post.getUser());
+        ColorEnum colorEnum = post.getColor();
+        if(userSubscribe != null && userSubscribe.getIsVisible() && post.getScope() == ScopeEnum.SUBSCRIBE) {
             colorEnum = ColorEnum.GRAY;
         }
+
 
 //        List<UserSubscribe> userSubscribes = userSubscribeRepository.findAllBySubscriberId(post.getUser());
 //        UserSubscribe userSubscribe = userSubscribeRepository.findBySubscribingIdAndSubscriberId(post.getUser(), user);

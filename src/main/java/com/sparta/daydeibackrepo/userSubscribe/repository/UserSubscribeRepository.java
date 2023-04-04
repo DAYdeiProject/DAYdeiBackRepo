@@ -10,5 +10,7 @@ public interface UserSubscribeRepository extends JpaRepository<UserSubscribe, Lo
     UserSubscribe findBySubscribingIdAndSubscriberId(User user, User user1);
 
     List<UserSubscribe> findAllBySubscribingId(User user);
+
+    UserSubscribe findBySubscribingId(User user);
     List<UserSubscribe> findAllBySubscribingIdAndIsVisible(User user, Boolean isVisible);
 }

@@ -88,7 +88,6 @@ public class PostService {
                 (startDate.isEqual(endDate) && (startTime.equals(endTime) && !startTime.equals(LocalTime.parse("00:00"))))) {
             throw new CustomException(TIME_SETTING_IS_INCORRECT);
         }
-
         for (Long participant : requestDto.getParticipant()) {
 //            List<Friend> friends = friendRepository.findidFriendList(participant, user);
             User joiner = userRepository.findById(participant).orElseThrow(

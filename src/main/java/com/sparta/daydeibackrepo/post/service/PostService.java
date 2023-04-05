@@ -350,7 +350,7 @@ public class PostService {
                 }
             }
             for (Post post : AllPosts) {
-                homeResponseDtos.add(new HomeResponseDto(post));
+                homeResponseDtos.add(new HomeResponseDto(post, post.getUser().getProfileImage()));
             }
         }
         // 홈페이지 주인과 친구X 인경우 (작성한 일정 : 전체공개(스크랩 허용, 비허용) / 친구O 인경우 (작성한 일정 : 친구공개 추가)
@@ -378,7 +378,7 @@ public class PostService {
                 }
             }
             for (Post post : AllPosts) {
-                homeResponseDtos.add(new HomeResponseDto(post));
+                homeResponseDtos.add(new HomeResponseDto(post, post.getUser().getProfileImage()));
             }
         }
         Collections.sort(homeResponseDtos, (o1, o2) -> {

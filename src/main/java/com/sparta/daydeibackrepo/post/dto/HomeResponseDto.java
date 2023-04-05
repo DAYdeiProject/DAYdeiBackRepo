@@ -12,6 +12,8 @@ import java.time.LocalTime;
 public class HomeResponseDto {
     private Long id;
 
+    private String userProfileImage;
+
     private String title;
 
     private LocalDate startDate;   //추후 Date 타입으로 변경해야함
@@ -23,8 +25,9 @@ public class HomeResponseDto {
     private LocalTime endTime;     //추후 Time 타입으로 변경해야함
 
     private ColorEnum color;
-    public HomeResponseDto(Post post) {
+    public HomeResponseDto(Post post, String userProfileImage) {
         this.id = post.getId();
+        this.userProfileImage = userProfileImage;
         this.title = post.getTitle();
         this.startDate = post.getStartDate();
         this.startTime = post.getStartTime();

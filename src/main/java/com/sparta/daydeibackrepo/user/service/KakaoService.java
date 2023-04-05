@@ -9,6 +9,7 @@ import com.sparta.daydeibackrepo.jwt.JwtUtil;
 import com.sparta.daydeibackrepo.notification.entity.Notification;
 import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
+import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.post.service.PostService;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.dto.KakaoUserInfoDto;
@@ -48,6 +49,7 @@ public class KakaoService {
     private final JwtUtil jwtUtil;
     private final NotificationRepository notificationRepository;
     private final PostService postService;
+    private final NotificationService notificationService;
 
     @Value("${KAKAO_API_KEY}")
     private String kakaoApiKey;
@@ -137,14 +139,12 @@ public class KakaoService {
 
             //만약 내가 requestUser일때 친구가 responseUser로 이미 존재하지 않고,
             //    내가 responseUser이고 친구가 requestUser인 것도 존재하지 않는다면 추가하기
-
             Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(user, friendUser);
             Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(friendUser, user);
             if(friend1 == null && friend2 == null){
-                friendRepository.save(new Friend(user, friendUser, true));
-                user.addFriendCount();
-                friendUser.addFriendCount();
-                postService.createBirthday(user, friendUser);
+                Friend friend = new Friend(user, friendUser, false);
+                friendRepository.save(friend);
+                notificationService.send(friendUser.getId() , NotificationType.FRIEND_REQUEST, NotificationType.FRIEND_REQUEST.makeContent(user.getNickName()), user.getId());
             }
         }
 

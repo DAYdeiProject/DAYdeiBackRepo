@@ -46,7 +46,7 @@ public class FriendService {
     private final NotificationService notificationService;
     private final PostService postService;
     @Transactional
-    public FriendResponseDto requestFriend(Long userId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> requestFriend(Long userId, UserDetailsImpl userDetails) {
         User requestUser = userRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -62,10 +62,10 @@ public class FriendService {
         Friend friend = new Friend(requestUser, responseUser, false);
         friendRepository.save(friend);
         notificationService.send(responseUser.getId() , NotificationType.FRIEND_REQUEST, NotificationType.FRIEND_REQUEST.makeContent(requestUser.getNickName()), requestUser.getId());
-        return new FriendResponseDto(friend);
+        return StatusResponseDto.toAlldataResponseEntity(new FriendResponseDto(friend));
     }
     @Transactional
-    public FriendResponseDto setFriend(Long userId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> setFriend(Long userId, UserDetailsImpl userDetails) {
         User responseUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -90,10 +90,10 @@ public class FriendService {
         if (notification != null)
         {notificationRepository.delete(notification);}
         notificationService.send(requestUser.getId() , NotificationType.FRIEND_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(responseUser.getNickName()), responseUser.getId());
-        return new FriendResponseDto(friend);
+        return StatusResponseDto.toAlldataResponseEntity(new FriendResponseDto(friend));
     }
     @Transactional
-    public StatusResponseDto deleteFriend(Long userId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> deleteFriend(Long userId, UserDetailsImpl userDetails) {
         User user1 = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -254,7 +254,7 @@ public class FriendService {
         return userResponseDtos;
     }
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getFriendList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
+    public StatusResponseDto<?> getFriendList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -265,7 +265,7 @@ public class FriendService {
         List<User> friends = friendRepository.findAllFriendsBySort(master, SortEnum.valueOf(sort.toUpperCase()));
         List<UserResponseDto> friendList = makeUserResponseDtos(master, friends).stream()
                 .filter(user -> user.getNickName().contains(searchWord) || user.getEmail().contains(searchWord)).collect(Collectors.toList());
-        return friendList;
+        return StatusResponseDto.toAlldataResponseEntity(friendList);
     }
 
     @Transactional(readOnly = true)

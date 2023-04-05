@@ -20,21 +20,27 @@ public class FriendController {
 
     private final FriendService friendService;
 
+    //친구 신청
     @PostMapping("/{userId}")
-    public StatusResponseDto<FriendResponseDto> requestFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.requestFriend(userId, userDetails));
+    public StatusResponseDto<?> requestFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.requestFriend(userId, userDetails);
     }
+
+    //친구 수락
     @PutMapping("/{userId}")
-    public StatusResponseDto<FriendResponseDto> setFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.setFriend(userId, userDetails));
+    public StatusResponseDto<?> setFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.setFriend(userId, userDetails);
     }
+
+    //친구 신청 취소 및 친구삭제
     @DeleteMapping("/{userId}")
     public StatusResponseDto<?> deleteFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.deleteFriend(userId, userDetails));
+        return friendService.deleteFriend(userId, userDetails);
     }
+
     @GetMapping("/list/{userId}")
-    public StatusResponseDto<List<UserResponseDto>> getFriendList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getFriendList(userId, userDetails, searchword, sort));
+    public StatusResponseDto<?> getFriendList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getFriendList(userId, userDetails, searchword, sort);
     }
 
     @GetMapping("/recommend")

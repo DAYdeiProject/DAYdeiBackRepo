@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 public class NotificationDto {
     private Long id;
 
+    private String notificationType;
+
     private String content;
 
 //    private Long returnId;
@@ -25,8 +27,8 @@ public class NotificationDto {
 
     private LocalDateTime createdAt;
 
-    public static NotificationDto create(Notification notification, Long postId, Long userId) {
-        return new NotificationDto(notification.getId(), notification.getContent()
+    public static NotificationDto create(Notification notification, String notificationType, Long postId, Long userId) {
+        return new NotificationDto(notification.getId(), notificationType, notification.getContent()
                 , postId, userId, notification.getIsRead(), notification.getCreatedAt());
     }
 }

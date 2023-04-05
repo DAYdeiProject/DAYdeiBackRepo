@@ -14,6 +14,8 @@ public class NotificationResponseDto {
 
     private Long id;
 
+    private String notificationType;
+
     private String content;
 
 //    private Long returnId;
@@ -23,8 +25,8 @@ public class NotificationResponseDto {
 
     private LocalDateTime createdAt;
 
-    public static NotificationResponseDto create(Notification notification, Long postId, Long userId) {
-        return new NotificationResponseDto(notification.getId(), notification.getContent(),
+    public static NotificationResponseDto create(Notification notification, String notificationType, Long postId, Long userId) {
+        return new NotificationResponseDto(notification.getId(), notificationType, notification.getContent(),
                 postId, userId, notification.getIsRead(), notification.getCreatedAt());
     }
 }

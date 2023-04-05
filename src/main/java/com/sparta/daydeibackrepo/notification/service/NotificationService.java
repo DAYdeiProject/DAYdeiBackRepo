@@ -81,7 +81,7 @@ public class NotificationService {
         emitters.forEach(
                 (key, emitter) -> {
                     emitterRepository.saveEventCache(key, notification);
-                    sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification, finalPost, finalUser));
+                    sendNotification(emitter, eventId, key, NotificationResponseDto.create(notification, NotificationType.getContentType(notification), finalPost, finalUser));
                 }
         );
     }
@@ -103,7 +103,7 @@ public class NotificationService {
             } else {
                 post = notification.getReturnId();
             }
-            notificationDtos.add(NotificationDto.create(notification, post, user));
+            notificationDtos.add(NotificationDto.create(notification, NotificationType.getContentType(notification), post, user));
         }
 
         notifications.stream()

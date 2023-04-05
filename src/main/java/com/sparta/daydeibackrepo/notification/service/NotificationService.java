@@ -12,6 +12,7 @@ import com.sparta.daydeibackrepo.post.repository.PostRepository;
 import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
+import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
+import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.NOTIFICATION_DELETED;
 
 @Slf4j
 @Service
@@ -87,7 +89,7 @@ public class NotificationService {
     }
     //나한테 온 모든 알림 GET + 알림 다 읽은 것으로 변경
     @Transactional
-    public NotificationGetDto findAllNotifications(Long userId) {
+    public StatusResponseDto<?> findAllNotifications(Long userId) {
         Long countNum = countUnReadNotifications(userId);
         List<Notification> notifications = notificationRepository.findAllByUserId(userId);
 
@@ -109,7 +111,7 @@ public class NotificationService {
         notifications.stream()
                 .forEach(notification -> notification.read());
 
-        return new NotificationGetDto(countNum, notificationDtos);
+        return StatusResponseDto.toAlldataResponseEntity(new NotificationGetDto(countNum, notificationDtos));
 
 
 //        return notifications.stream()
@@ -158,7 +160,7 @@ public class NotificationService {
     }
     // 알림 삭제
     @Transactional
-    public void deleteNotification(Long recieverId, UserDetailsImpl userDetails){
+    public StatusResponseDto<?> deleteNotification(Long recieverId, UserDetailsImpl userDetails){
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -167,6 +169,7 @@ public class NotificationService {
         }
         List<Notification> notifications = notificationRepository.findAllByUserId(recieverId);
         notificationRepository.deleteAll(notifications);
+        return StatusResponseDto.toResponseEntity(NOTIFICATION_DELETED);
     }
 
 }

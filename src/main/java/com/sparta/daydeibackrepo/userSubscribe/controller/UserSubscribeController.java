@@ -19,32 +19,37 @@ import java.util.List;
 @RequestMapping("/api/subscribes")
 public class UserSubscribeController {
     private final UserSubscribeService userSubscribeService;
+    
+    //구독하기
     @PostMapping("/{userid}")
-    public StatusResponseDto<UserSubscribeResponseDto> createSubscribe(@PathVariable Long userid, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
+    public StatusResponseDto<?> createSubscribe(@PathVariable Long userid, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        return StatusResponseDto.success(userSubscribeService.createSubscribe(userid, userDetails));
+        return userSubscribeService.createSubscribe(userid, userDetails);
     }
 
+    //구독취소
     @DeleteMapping("/{userid}")
-    public StatusResponseDto<String> deleteSubscribe(@PathVariable Long userid,  @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
+    public StatusResponseDto<?> deleteSubscribe(@PathVariable Long userid,  @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
     ) throws AccessDeniedException {
-        userSubscribeService.deleteSubscribe(userid, userDetails);
-        return StatusResponseDto.success("구독이 취소되었습니다.");
+        return userSubscribeService.deleteSubscribe(userid, userDetails);
     }
 
+    //내가 구독한 사람 리스트
     @GetMapping("/list/{userId}")
-    public StatusResponseDto<List<UserResponseDto>> getUserSubscribeList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(userSubscribeService.getUserSubscribeList(userId, userDetails, searchword, sort));
+    public StatusResponseDto<?> getUserSubscribeList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return userSubscribeService.getUserSubscribeList(userId, userDetails, searchword, sort);
     }
 
+    //나를 구독한 사람 리스트
     @GetMapping("/followers/{userId}")
-    public StatusResponseDto<List<UserResponseDto>> getUserFollowerList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(userSubscribeService.getUserFollowerList(userId, userDetails, searchword, sort));
+    public StatusResponseDto<?> getUserFollowerList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return userSubscribeService.getUserFollowerList(userId, userDetails, searchword, sort);
     }
 
+    //구독한 계정의 일정 숨김 여부
     @PutMapping("/show/{userId}")
     public StatusResponseDto<?> setSubscrbeVisibility(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(userSubscribeService.setSubscrbeVisibility(userId, userDetails));
+        return userSubscribeService.setSubscrbeVisibility(userId, userDetails);
     }
 
 

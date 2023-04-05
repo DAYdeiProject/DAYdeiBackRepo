@@ -14,6 +14,7 @@ import com.sparta.daydeibackrepo.tag.entity.Tag;
 import com.sparta.daydeibackrepo.tag.repository.TagRepository;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
+import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -129,7 +130,7 @@ public class PostSubscribeService {
     }
 
     @Transactional
-    public void approveJoin(Long postId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> approveJoin(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -145,10 +146,12 @@ public class PostSubscribeService {
         {notificationRepository.delete(notification);}
         postSubscribe.update(true);
         notificationService.send(post.getUser().getId() , NotificationType.JOIN_ACCEPT, NotificationType.JOIN_ACCEPT.makeContent(user.getNickName()), post.getId());
+
+        return StatusResponseDto.toResponseEntity(POST_REQUEST_ACCEPT_SUCCESS);
     }
 
     @Transactional
-    public void rejectJoin(Long postId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> rejectJoin(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -166,6 +169,8 @@ public class PostSubscribeService {
         if (notification != null)
         {notificationRepository.delete(notification);}
         notificationService.send(post.getUser().getId() , NotificationType.JOIN_REJECT, NotificationType.JOIN_REJECT.makeContent(user.getNickName()), post.getId());
+
+        return StatusResponseDto.toResponseEntity(POST_REQUEST_REJACT_SUCCESS);
     }
 
 

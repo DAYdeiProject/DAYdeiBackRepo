@@ -63,11 +63,11 @@ public class FriendController {
     }
 
     @GetMapping("/list/response")
-    public StatusResponseDto<List<UserResponseDto>> getPendingResponseList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getPendingResponseList(userDetails));
+    public StatusResponseDto<?> getPendingResponseList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getPendingResponseList(userDetails);
     }
     @GetMapping("/list/request")
-    public StatusResponseDto<List<UserResponseDto>> getPendingRequestList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getPendingRequestList(userDetails));
+    public StatusResponseDto<?> getPendingRequestList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getPendingRequestList(userDetails);
     }
 }

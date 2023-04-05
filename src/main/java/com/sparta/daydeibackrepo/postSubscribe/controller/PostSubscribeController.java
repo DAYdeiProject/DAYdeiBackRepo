@@ -15,15 +15,15 @@ public class PostSubscribeController {
 
     private final PostSubscribeService postSubscribeService;
 
+    //공유일정 수락
     @PutMapping("/{postId}")
-    public StatusResponseDto<String> approveJoin(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postSubscribeService.approveJoin(postId, userDetails);
-        return StatusResponseDto.success("일정을 수락하였습니다.");
+    public StatusResponseDto<?> approveJoin(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return postSubscribeService.approveJoin(postId, userDetails);
     }
 
+    //공유일정 거절
     @DeleteMapping("/{postId}")
-    public StatusResponseDto<String> rejectJoin(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postSubscribeService.rejectJoin(postId, userDetails);
-        return StatusResponseDto.success("일정을 거절하였습니다.");
+    public StatusResponseDto<?> rejectJoin(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return postSubscribeService.rejectJoin(postId, userDetails);
     }
 }

@@ -26,8 +26,8 @@ public class MemoController {
     }
 
     @GetMapping("/memos")
-    public StatusResponseDto<List<MemoResponseDto>> getAllMemo(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return StatusResponseDto.success(memoService.getAllMemo(userDetails));
+    public StatusResponseDto<?> getAllMemo(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return memoService.getAllMemo(userDetails);
     }
 
     @PatchMapping("/memos/{memoId}")

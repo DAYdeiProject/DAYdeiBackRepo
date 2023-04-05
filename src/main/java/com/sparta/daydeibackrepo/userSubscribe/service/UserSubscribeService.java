@@ -41,7 +41,7 @@ public class UserSubscribeService {
     private final UserRepository userRepository;
     private final FriendService friendService;
     @Transactional
-    public UserSubscribeResponseDto createSubscribe(Long userid, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> createSubscribe(Long userid, UserDetailsImpl userDetails) {
         User subscribing = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -59,10 +59,10 @@ public class UserSubscribeService {
         UserSubscribe userSubscribe1 = new UserSubscribe(subscribing, subscriber);
         userSubscribeRepository.save(userSubscribe1);
         notificationService.send(userid , NotificationType.SUBSCRIBE_ACCEPT, NotificationType.SUBSCRIBE_ACCEPT.makeContent(subscribing.getNickName()), subscribing.getId());
-        return new UserSubscribeResponseDto(userSubscribe1);
+        return StatusResponseDto.toAlldataResponseEntity(new UserSubscribeResponseDto(userSubscribe1));
     }
     @Transactional
-    public void deleteSubscribe(Long userid, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> deleteSubscribe(Long userid, UserDetailsImpl userDetails) {
         User subscribing = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -80,10 +80,12 @@ public class UserSubscribeService {
         if (notification != null)
         {notificationRepository.delete(notification);}
         userSubscribeRepository.delete(userSubscribe);
+
+        return StatusResponseDto.toResponseEntity(SUBSCRIBE_CANCEL_SUCCESS);
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getUserSubscribeList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
+    public StatusResponseDto<?> getUserSubscribeList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -96,13 +98,13 @@ public class UserSubscribeService {
                     .stream()
                     .filter(user -> user.getNickName().contains(searchWord) || user.getEmail().contains(searchWord))
                     .collect(Collectors.toList());
-            return userSubscribeList;
+            return StatusResponseDto.toAlldataResponseEntity(userSubscribeList);
         }
         throw new CustomException(USER_FORBIDDEN);
     }
 
     @Transactional
-    public List<UserResponseDto> getUserFollowerList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
+    public StatusResponseDto<?> getUserFollowerList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -115,7 +117,7 @@ public class UserSubscribeService {
                     .stream()
                     .filter(user -> user.getNickName().contains(searchWord) || user.getEmail().contains(searchWord))
                     .collect(Collectors.toList());
-            return userSubscribeList;
+            return StatusResponseDto.toAlldataResponseEntity(userSubscribeList);
         }
         throw new CustomException(USER_FORBIDDEN);
     }

@@ -197,14 +197,14 @@ public class FriendService {
         return StatusResponseDto.toAlldataResponseEntity(famousList.stream().limit(3).collect(Collectors.toList()));
     }
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getPendingResponseList(UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> getPendingResponseList(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
         List<User> pendingResponses = friendRepository.findRequestUser(user);
         List<UserResponseDto> pendingResponseList = makeUserResponseDtos(user, pendingResponses);
         Collections.sort(pendingResponseList, Comparator.comparing(UserResponseDto::getId));
-        return pendingResponseList;
+        return StatusResponseDto.toAlldataResponseEntity(pendingResponseList);
     }
     // 유저 본인(user)과 유저 리스트(users) 사이의 친구 상태, 구독 관계 등을 뽑아서 List<UserResponseDto>로 반환합니다.
     public List<UserResponseDto> makeUserResponseDtos(User user, List<User> users){
@@ -269,13 +269,13 @@ public class FriendService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getPendingRequestList(UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> getPendingRequestList(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
         List<User> pendingRequests = friendRepository.findResponseUser(user);
         List<UserResponseDto> pendingRequestList = makeUserResponseDtos(user, pendingRequests);
         Collections.sort(pendingRequestList, Comparator.comparing(UserResponseDto::getId));
-        return pendingRequestList;
+        return StatusResponseDto.toAlldataResponseEntity(pendingRequestList);
     }
 }

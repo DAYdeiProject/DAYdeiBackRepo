@@ -35,12 +35,11 @@ public class NotificationController {
         return notificationService.connect(userDetails.getUser().getId(), lastEventId);
     }
     @GetMapping("/api/notification")
-    public StatusResponseDto<NotificationGetDto> getNotification(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return StatusResponseDto.success(notificationService.findAllNotifications(userDetails.getUser().getId()));
+    public StatusResponseDto<?> getNotification(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return notificationService.findAllNotifications(userDetails.getUser().getId());
     }
     @DeleteMapping("/api/notification/{userId}")
-    public StatusResponseDto<SuccessMessage> deleteNotification(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        notificationService.deleteNotification(userId, userDetails);
-        return StatusResponseDto.success(NOTIFICATION_DELETED);
+    public StatusResponseDto<?> deleteNotification(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return notificationService.deleteNotification(userId, userDetails);
     }
 }

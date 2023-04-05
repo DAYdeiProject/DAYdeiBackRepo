@@ -22,7 +22,11 @@ public enum SuccessMessage {
     FRIEND_REQUEST_REJACT_SUCCESS(HttpStatus.OK, "친구 신청을 거절하였습니다."),
     SUBSCRIBE_PUST_VIEW_SUCCESS(HttpStatus.OK,"구독한 일정을 표시합니다"),
     SUBSCRIBE_NOT_PUST_VIEW_SUCCESS(HttpStatus.OK,"구독한 일정을 표시하지 않습니다"),
-    NOTIFICATION_DELETED(HttpStatus.OK,"알림 삭제 완료!");
+    SUBSCRIBE_CANCEL_SUCCESS(HttpStatus.OK,"구독이 취소되었습니다."),
+    NOTIFICATION_DELETED(HttpStatus.OK,"알림 삭제 완료!"),
+    POST_REQUEST_ACCEPT_SUCCESS(HttpStatus.OK, "일정을 수락하였습니다."),
+    POST_REQUEST_REJACT_SUCCESS(HttpStatus.OK, "일정을 거절하였습니다.");
+
     private final HttpStatus httpStatus;
     private final String detail;
 }

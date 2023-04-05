@@ -14,6 +14,7 @@ import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
+import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class TagService {
     private final PostRepository postRepository;
 
     // 시작, 종료 일자 시간도 받아와야함.
-    public List<TagResponseDto> getFriendTagList(TagRequestDto tagRequestDto, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> getFriendTagList(TagRequestDto tagRequestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -77,6 +78,6 @@ public class TagService {
             tagResponseDtos.add(new TagResponseDto(user1, scheduleCheck));
         }
         Collections.shuffle(tagResponseDtos);
-        return tagResponseDtos;
+        return StatusResponseDto.toAlldataResponseEntity(tagResponseDtos);
     }
 }

@@ -43,7 +43,7 @@ public class MemoService {
         return StatusResponseDto.toResponseEntity(MEMO_POST_SUCCESS);
     }
 
-    public List<MemoResponseDto> getAllMemo(UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> getAllMemo(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -55,11 +55,11 @@ public class MemoService {
             memoResponseDtos.add(memoResponseDto);
         }
 
-        return memoResponseDtos;
+        return StatusResponseDto.toAlldataResponseEntity(memoResponseDtos);
     }
 
     @Transactional
-    public StatusResponseDto updateMemo(Long memoId, MemoRequestDto requestDto, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> updateMemo(Long memoId, MemoRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -77,7 +77,7 @@ public class MemoService {
     }
 
     @Transactional
-    public StatusResponseDto deleteMemo(Long memoId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> deleteMemo(Long memoId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );

@@ -56,7 +56,7 @@ public class UserService {
 
 
     @Transactional
-    public StatusResponseDto signup(@Valid SignupRequestDto signupRequestDto){
+    public StatusResponseDto<?> signup(@Valid SignupRequestDto signupRequestDto){
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
         String passwordCheck = passwordEncoder.encode(signupRequestDto.getPasswordCheck());
@@ -75,7 +75,7 @@ public class UserService {
         return StatusResponseDto.toResponseEntity(SIGN_UP_SUCCESS);
     }
 
-    public StatusResponseDto emailCheck(String email) {
+    public StatusResponseDto<?> emailCheck(String email) {
         if(userRepository.findByEmail(email).isPresent()) {
             return StatusResponseDto.toAllExceptionResponseEntity(DUPLICATE_EMAIL);
         }
@@ -83,7 +83,7 @@ public class UserService {
     }
 
     @Transactional
-    public LoginResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+    public StatusResponseDto<?> login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
         Boolean isLogin = false;
@@ -102,11 +102,11 @@ public class UserService {
 
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(user.getEmail(), UserRoleEnum.USER));
         isLogin = true;
-        return new LoginResponseDto(user, isLogin);
+        return StatusResponseDto.toAlldataResponseEntity(new LoginResponseDto(user, isLogin));
     }
 
     @Transactional
-    public StatusResponseDto resetPassword(UserRequestDto userRequestDto) {
+    public StatusResponseDto<?> resetPassword(UserRequestDto userRequestDto) {
         User user = userRepository.findByEmail(userRequestDto.getEmail()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
@@ -120,7 +120,7 @@ public class UserService {
     }
 
     @Transactional
-    public StatusResponseDto setCategory(CategoryRequestDto categoryRequestDto, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> setCategory(CategoryRequestDto categoryRequestDto, UserDetailsImpl userDetails) {
 
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
@@ -140,7 +140,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfileResponseDto updateUser(UserProfileRequestDto userProfileRequestDto, MultipartFile profileImage, MultipartFile backgroundImage, UserDetailsImpl userDetails) throws IOException {
+    public StatusResponseDto<?> updateUser(UserProfileRequestDto userProfileRequestDto, MultipartFile profileImage, MultipartFile backgroundImage, UserDetailsImpl userDetails) throws IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -180,11 +180,11 @@ public class UserService {
 //        }
         user.update(userProfileRequestDto, profileImageUrl, backgroundImageUrl);
         userRepository.save(user);
-        return new UserProfileResponseDto(user);
+        return StatusResponseDto.toAlldataResponseEntity(new UserProfileResponseDto(user));
     }
 
     @Transactional
-    public UserResponseDto getUser(Long userId, UserDetailsImpl userDetails){
+    public StatusResponseDto<?> getUser(Long userId, UserDetailsImpl userDetails){
         User visitor = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -192,7 +192,7 @@ public class UserService {
                 ()-> new CustomException(USER_NOT_FOUND)
         );
         if (visitor == user){
-            return new UserResponseDto(user);
+            return StatusResponseDto.toAlldataResponseEntity(new UserResponseDto(user));
         }
         UserResponseDto userResponseDto;
         List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(visitor);
@@ -225,7 +225,7 @@ public class UserService {
         else {
             userResponseDto = new UserResponseDto(user, friendCheck, userSubscribeCheck, updateCheck, mutualFriends);
         }
-        return userResponseDto;
+        return StatusResponseDto.toAlldataResponseEntity(userResponseDto);
     }
     @Scheduled(cron="0 0 * * * ?")
     @Transactional

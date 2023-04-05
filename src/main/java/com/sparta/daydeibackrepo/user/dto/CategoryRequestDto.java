@@ -10,6 +10,7 @@ public class CategoryRequestDto {
     private List<CategoryEnum> category;
 
     public List<CategoryEnum> getCategory() {
+
         return category;
     }
 

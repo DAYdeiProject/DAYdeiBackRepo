@@ -38,25 +38,28 @@ public class FriendController {
         return friendService.deleteFriend(userId, userDetails);
     }
 
+    //친구 리스트
     @GetMapping("/list/{userId}")
     public StatusResponseDto<?> getFriendList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return friendService.getFriendList(userId, userDetails, searchword, sort);
     }
 
+    //친구 추천 찾기
     @GetMapping("/recommend")
-    public StatusResponseDto<List<UserResponseDto>> getRecommendList(@RequestParam List<String> category, @RequestParam String searchword, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getRecommendList(category,searchword,userDetails));
+    public StatusResponseDto<?> getRecommendList(@RequestParam List<String> category, @RequestParam String searchword, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getRecommendList(category,searchword,userDetails);
     }
 
     // 친구 불러오기 (왼쪽 사이드바)
     @GetMapping("/update")
     public StatusResponseDto<?> getUpdateFriend(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getUpdateFriend(userDetails));
+        return friendService.getUpdateFriend(userDetails);
     }
 
+    //최초 로그인시 친구 3명 추천 리스트
     @GetMapping("/list/famous")
-    public StatusResponseDto<List<UserResponseDto>> getFamousList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getFamousList(userDetails));
+    public StatusResponseDto<?> getFamousList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getFamousList(userDetails);
     }
 
     @GetMapping("/list/response")

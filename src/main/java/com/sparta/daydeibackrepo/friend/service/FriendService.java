@@ -152,7 +152,7 @@ public class FriendService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getRecommendList(List<String> categories, String searchWord, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> getRecommendList(List<String> categories, String searchWord, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -173,28 +173,28 @@ public class FriendService {
         else {
             Collections.sort(recommendResponseList, (o1, o2) -> o2.getSubscriberCount() - o1.getSubscriberCount());
         }
-        return recommendResponseList;
+        return StatusResponseDto.toAlldataResponseEntity(recommendResponseList);
     }
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getUpdateFriend(UserDetailsImpl userDetails){
+    public StatusResponseDto<?> getUpdateFriend(UserDetailsImpl userDetails){
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
         List<User> updateUsers = postRepository.findAllUpdateFriend(user);
 
         List<UserResponseDto> updateList = makeUserResponseDtos(user,updateUsers);
-        return updateList.stream().limit(10).collect(Collectors.toList());
+        return StatusResponseDto.toAlldataResponseEntity(updateList.stream().limit(10).collect(Collectors.toList()));
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getFamousList(UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> getFamousList(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         List<User> users = userRepository.findFamousList(user);
         List<UserResponseDto> famousList = makeUserResponseDtos(user, users);
         Collections.sort(famousList, Comparator.comparing(UserResponseDto::getSubscriberCount).reversed());
-        return famousList.stream().limit(3).collect(Collectors.toList());
+        return StatusResponseDto.toAlldataResponseEntity(famousList.stream().limit(3).collect(Collectors.toList()));
     }
     @Transactional(readOnly = true)
     public List<UserResponseDto> getPendingResponseList(UserDetailsImpl userDetails) {

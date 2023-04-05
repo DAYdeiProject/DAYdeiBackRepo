@@ -68,6 +68,7 @@ public class PostService {
         return user.getId().equals(post.getUser().getId()) || user.getRole().equals(UserRoleEnum.ADMIN);
     }
 
+    //일정 작성
     @Transactional
     public StatusResponseDto createPost(PostRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -109,18 +110,20 @@ public class PostService {
         return StatusResponseDto.toResponseEntity(POST_CREATED_SUCCESS);
     }
 
-    public List<String> createPostImages(List<MultipartFile> multipartFiles, UserDetailsImpl userDetails) throws IOException {
+    //일정 작성, 수정 시에 이미지 업로드
+    public StatusResponseDto<?> createPostImages(List<MultipartFile> multipartFiles, UserDetailsImpl userDetails) throws IOException {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
 
         List<String> imageUrl = s3Service.uploadFiles(multipartFiles, "images");
-        return imageUrl;
+        return StatusResponseDto.toAlldataResponseEntity(imageUrl);
 
     }
 
+    //일정 상세 조회
     @Transactional(readOnly = true)
-    public PostResponseDto getPostOne(Long postId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> getPostOne(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -173,14 +176,15 @@ public class PostService {
         } else if (post.getScope() == ScopeEnum.FRIEND && !friends.contains(user) && post.getUser() != user) {
             throw new CustomException(POST_VIEW_ONLY_FRIEND_FORBIDDEN);
         } else {
-            return PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck, colorEnum);
+            return StatusResponseDto.toAlldataResponseEntity(PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck, colorEnum));
         }
 
 
     }
 
+    //일정 수정
     @Transactional
-    public PostResponseDto updatePost(Long postId, PostRequestDto requestDto, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> updatePost(Long postId, PostRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -223,8 +227,6 @@ public class PostService {
             colorEnum = ColorEnum.GRAY;
         }
 
-        //태그당한 친구에게 알림
-
         if (hasAuthority(user, post)) {
             post.update(requestDto, startDate, endDate, startTime, endTime);
             List<User> joiners = new ArrayList<>();
@@ -235,14 +237,15 @@ public class PostService {
             }
             postUpdateCheck(post, user);
             postSubscribeService.updateJoin(postId, joiners, userDetails);
-            return PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck, colorEnum);
+            return StatusResponseDto.toAlldataResponseEntity(PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck, colorEnum));
         }
         throw new CustomException(UNAUTHORIZED_UPDATE_OR_DELETE);
 
     }
 
+    //일정 날짜 드래그하여 수정
     @Transactional
-    public StatusResponseDto dragUpdatePost(Long postId, PostDragRequestDto requestDto, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> dragUpdatePost(Long postId, PostDragRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -266,8 +269,9 @@ public class PostService {
 
     }
 
+    //일정 삭제
     @Transactional
-    public StatusResponseDto deletePost(Long postId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> deletePost(Long postId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -290,8 +294,9 @@ public class PostService {
         throw new CustomException(UNAUTHORIZED_UPDATE_OR_DELETE);
     }
 
+    //특정 날짜의 일정 ( 다른 사용자 )
     @Transactional(readOnly = true)
-    public List<TodayPostResponseDto> getPostByDate(Long userId, String date, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> getPostByDate(Long userId, String date, UserDetailsImpl userDetails) {
 
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
@@ -317,10 +322,11 @@ public class PostService {
                 .sorted(Comparator.comparing(o -> LocalDateTime.of(o.getStartDate(), o.getStartTime())))
                 .collect(Collectors.toList());
 
-        return todayPostResponseDtos;
+        return StatusResponseDto.toAlldataResponseEntity(todayPostResponseDtos);
     }
 
     //내가 구독하는 유저가 스크랩 가능으로 글을 올리고 나를 태그했다. > 현재는 2번 불러옴 > 1번만 불러올 수 있도록 고쳐야함.
+    //전체일정 홈화면
     @Transactional
     public StatusResponseDto<?> getHomePost(Long userId, UserDetailsImpl userDetails) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -389,8 +395,9 @@ public class PostService {
         return StatusResponseDto.toAlldataResponseEntity(homeResponseDtos);
     }
 
-    @Transactional // 업데이트 된 일정 (최근 일주일)
-    public List<PostResponseDto> getUpdatePost(Long userId, UserDetailsImpl userDetails) {
+    // 업데이트 된 일정 (최근 일주일)
+    @Transactional
+    public StatusResponseDto<?> getUpdatePost(Long userId, UserDetailsImpl userDetails) {
         User visitor = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -428,11 +435,12 @@ public class PostService {
                 })
                 .collect(Collectors.toList());
 
-        return postResponseDtos;
+        return StatusResponseDto.toAlldataResponseEntity(postResponseDtos);
     }
 
-    @Transactional //나와 공유한 일정
-    public List<PostResponseDto> getSharePost(Long userId, UserDetailsImpl userDetails) {
+    //나와 공유한 일정
+    @Transactional
+    public StatusResponseDto<?> getSharePost(Long userId, UserDetailsImpl userDetails) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -452,7 +460,7 @@ public class PostService {
                 .limit(5)
                 .collect(Collectors.toList());
 
-        return posts.stream()
+        return StatusResponseDto.toAlldataResponseEntity(posts.stream()
                 .map(post -> {
                     List<ParticipantsResponseDto> participants = post.getPostSubscribe().stream()
                             .filter(ps -> !ps.getUser().equals(post.getUser()))
@@ -461,9 +469,10 @@ public class PostService {
                     WriterResponseDto writer = new WriterResponseDto(post.getUser().getId(), post.getUser().getProfileImage(), post.getUser().getNickName());
                     return PostResponseDto.of(post, writer, participants);
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
+    //친구 맺음 시에 상대방과 내 캘린더에 서로의 생일을 생성
     public void createBirthday(User user1, User user2) {
         if (validBirthday(user1)){
             PostRequestDto postRequestDto2 = new PostRequestDto(user1);
@@ -475,6 +484,7 @@ public class PostService {
         }
     }
 
+    //생일 일정 삭제
     public void deleteBirthday(User user1, User user2) {
         Post post1 = postRepository.findBirthdayPost(user1, user2);
         Post post2 = postRepository.findBirthdayPost(user2, user1);
@@ -485,7 +495,8 @@ public class PostService {
             postRepository.delete(post2);
         }
     }
-
+    
+    //생일 일정 생성
     public void createBirthdayPost(PostRequestDto requestDto, User user) {
         LocalDate startDate = LocalDate.parse(requestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
         LocalDate endDate = LocalDate.parse(requestDto.getEndDate(), DateTimeFormatter.ISO_DATE);

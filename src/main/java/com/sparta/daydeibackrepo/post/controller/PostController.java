@@ -30,26 +30,28 @@ public class PostController {
         return postService.createPost(requestDto, userDetails);
     }
 
+    //일정 작성, 수정 시에 이미지 업로드
     @PostMapping(value = "/posts/images", consumes = "multipart/form-data")
-    public StatusResponseDto<List<String>> uploadImages(@RequestParam(value = "images") List<MultipartFile> multipartFiles, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        return StatusResponseDto.success(postService.createPostImages(multipartFiles, userDetails));
+    public StatusResponseDto<?> uploadImages(@RequestParam(value = "images") List<MultipartFile> multipartFiles, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        return postService.createPostImages(multipartFiles, userDetails);
     }
 
     //일정 상세 조회
     @GetMapping("/posts/{postId}")
-    public StatusResponseDto<PostResponseDto> getPostOne(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return StatusResponseDto.success(postService.getPostOne(postId, userDetails));
+    public StatusResponseDto<?> getPostOne(@PathVariable Long postId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return postService.getPostOne(postId, userDetails);
     }
 
     //일정 수정
     @PatchMapping("/posts/{postId}")
-    public StatusResponseDto<PostResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return StatusResponseDto.success(postService.updatePost(postId, requestDto, userDetails));
+    public StatusResponseDto<?> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return postService.updatePost(postId, requestDto, userDetails);
     }
 
+    //일정 날짜 드래그하여 수정
     @PatchMapping("/posts/drag/{postId}")
     public StatusResponseDto<?> dragUpdatePost(@PathVariable Long postId, @RequestBody PostDragRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return StatusResponseDto.success(postService.dragUpdatePost(postId, requestDto, userDetails));
+        return postService.dragUpdatePost(postId, requestDto, userDetails);
     }
 
     //일정 삭제
@@ -64,10 +66,10 @@ public class PostController {
 //        return StatusResponseDto.success(postService.getTodayPost(date, userDetails));
 //    }
 
-    // 특정 날짜의 일정 ( 다른 사용자 )
+    //특정 날짜의 일정 ( 다른 사용자 )
     @GetMapping("/home/today/{userId}")
-    public StatusResponseDto<Object> getPostByDate(@PathVariable Long userId, @RequestParam String date, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(postService.getPostByDate(userId, date, userDetails));
+    public StatusResponseDto<?> getPostByDate(@PathVariable Long userId, @RequestParam String date, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return postService.getPostByDate(userId, date, userDetails);
     }
 
     //전체일정 홈화면
@@ -76,13 +78,15 @@ public class PostController {
         return postService.getHomePost(userId, userDetails);
     }
 
+    //업데이트된 일정 조회(일주일간)
     @GetMapping("/post/update/{userId}")
-    public StatusResponseDto<List<PostResponseDto>> getUpdatePost(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(postService.getUpdatePost(userId, userDetails));
+    public StatusResponseDto<?> getUpdatePost(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return postService.getUpdatePost(userId, userDetails);
     }
 
+    //나와 공유한 일정 조회
     @GetMapping("/post/share/{userId}")
-    public StatusResponseDto<List<PostResponseDto>> getSharePost(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(postService.getSharePost(userId, userDetails));
+    public StatusResponseDto<?> getSharePost(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return postService.getSharePost(userId, userDetails);
     }
 }

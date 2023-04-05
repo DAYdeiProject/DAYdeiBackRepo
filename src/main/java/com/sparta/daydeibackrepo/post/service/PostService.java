@@ -322,7 +322,7 @@ public class PostService {
 
     //내가 구독하는 유저가 스크랩 가능으로 글을 올리고 나를 태그했다. > 현재는 2번 불러옴 > 1번만 불러올 수 있도록 고쳐야함.
     @Transactional
-    public List<HomeResponseDto> getHomePost(Long userId, UserDetailsImpl userDetails) {
+    public StatusResponseDto<?> getHomePost(Long userId, UserDetailsImpl userDetails) {
         User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -386,7 +386,7 @@ public class PostService {
             LocalDateTime o2DateTime = LocalDateTime.of(o2.getStartDate(), o2.getStartTime());
             return o1DateTime.compareTo(o2DateTime);
         });
-        return homeResponseDtos;
+        return StatusResponseDto.toAlldataResponseEntity(homeResponseDtos);
     }
 
     @Transactional // 업데이트 된 일정 (최근 일주일)

@@ -40,22 +40,29 @@ public class StatusResponseDto<T> {
                 );
     }
 
-    public static StatusResponseDto toResponseEntity(SuccessMessage message) {
+    public static StatusResponseDto<?> toResponseEntity(SuccessMessage message) {
         return StatusResponseDto.builder()
                     .statusCode(HttpStatus.OK.value())
                     .data(message.getDetail())
                     .build();
     }
 
+    public static <T> StatusResponseDto<?> toAlldataResponseEntity(T data) {
+        return StatusResponseDto.builder()
+                .statusCode(HttpStatus.OK.value())
+                .data(data)
+                .build();
+    }
 
-    public static StatusResponseDto toAllExceptionResponseEntity(ExceptionMessage exceptionMessage) {
+
+    public static StatusResponseDto<?> toAllExceptionResponseEntity(ExceptionMessage exceptionMessage) {
         return StatusResponseDto.builder()
                     .statusCode(exceptionMessage.getHttpStatus().value())
                     .data(exceptionMessage.getDetail())
                     .build();
     }
 
-    public static StatusResponseDto toAllExceptionResponseEntity(HttpStatus httpStatus,String message) {
+    public static StatusResponseDto<?> toAllExceptionResponseEntity(HttpStatus httpStatus,String message) {
         return StatusResponseDto.builder()
                     .statusCode(httpStatus.value())
                     .data(message)

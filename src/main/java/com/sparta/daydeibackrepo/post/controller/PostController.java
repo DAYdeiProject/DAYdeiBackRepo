@@ -72,8 +72,8 @@ public class PostController {
 
     //전체일정 홈화면
     @GetMapping("home/posts/{userId}")
-    public StatusResponseDto<List<HomeResponseDto>> getHomePost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long userId) {
-        return StatusResponseDto.success(postService.getHomePost(userId, userDetails));
+    public StatusResponseDto<?> getHomePost(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long userId) {
+        return postService.getHomePost(userId, userDetails);
     }
 
     @GetMapping("/post/update/{userId}")

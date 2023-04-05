@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
 
     //정규식
     @ExceptionHandler({BindException.class})
-    public StatusResponseDto bindException(BindException ex) {
+    public StatusResponseDto<?> bindException(BindException ex) {
         Sentry.captureException(ex); // Sentry로 예외를 보냅니다.
         return StatusResponseDto.toAllExceptionResponseEntity(HttpStatus.BAD_REQUEST,
                 ex.getFieldError().getDefaultMessage());
@@ -36,20 +36,20 @@ public class GlobalExceptionHandler {
 
     //토큰 없을시
     @ExceptionHandler({MissingRequestHeaderException.class})
-    public StatusResponseDto missingRequestHeaderException(MissingRequestHeaderException ex) {
+    public StatusResponseDto<?> missingRequestHeaderException(MissingRequestHeaderException ex) {
         Sentry.captureException(ex); // Sentry로 예외를 보냅니다.
         return StatusResponseDto.toAllExceptionResponseEntity(NOT_LOGGED_ID);
     }
 
     // 500
     @ExceptionHandler({Exception.class})
-    public StatusResponseDto handleAll(final Exception ex) {
+    public StatusResponseDto<?> handleAll(final Exception ex) {
         Sentry.captureException(ex); // Sentry로 예외를 보냅니다.
         return StatusResponseDto.toAllExceptionResponseEntity(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(value = {IOException.class})
-    public StatusResponseDto handleIOException(IOException ex) {
+    public StatusResponseDto<?> handleIOException(IOException ex) {
         Sentry.captureException(ex);
         return StatusResponseDto.toAllExceptionResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }

@@ -17,7 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/friends")
 public class FriendController {
-
     private final FriendService friendService;
 
     //친구 신청

@@ -145,7 +145,6 @@ public class KakaoService {
                 user.addFriendCount();
                 friendUser.addFriendCount();
                 postService.createBirthday(user, friendUser);
-                Notification notification = notificationRepository.findNotification(friendUser, user.getId(), NotificationType.FRIEND_REQUEST);
             }
         }
 

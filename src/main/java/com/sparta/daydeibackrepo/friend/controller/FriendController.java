@@ -7,7 +7,6 @@ import com.sparta.daydeibackrepo.user.dto.UserResponseDto;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,10 +61,13 @@ public class FriendController {
         return friendService.getFamousList(userDetails);
     }
 
+    //내가 받은 친구요청 리스트
     @GetMapping("/list/response")
     public StatusResponseDto<?> getPendingResponseList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return friendService.getPendingResponseList(userDetails);
     }
+    
+    //내가 보낸 친구요청 리스트
     @GetMapping("/list/request")
     public StatusResponseDto<?> getPendingRequestList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return friendService.getPendingRequestList(userDetails);

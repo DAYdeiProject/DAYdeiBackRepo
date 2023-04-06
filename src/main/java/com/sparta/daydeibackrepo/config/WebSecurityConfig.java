@@ -118,17 +118,5 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         return source;
     }
 
-    @Configuration
-    public class WebConfig implements WebMvcConfigurer {
-
-        @Override
-        public void addCorsMappings(CorsRegistry registry) {
-            registry.addMapping("/api/**")
-                    .allowedOrigins("https://daydei.life")
-                    .allowedMethods("GET", "POST")
-                    .allowedHeaders("authorization", "content-type");
-        }
-    }
-
 
 }

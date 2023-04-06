@@ -26,7 +26,6 @@ public class NotificationController {
 
     @GetMapping(value = "/api/connect", produces = "text/event-stream")
     @ResponseStatus(HttpStatus.OK)
-    @CrossOrigin(origins = "https://daydei.life")
     public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
                                 @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
         log.info(userDetails.getUser().getId().toString());

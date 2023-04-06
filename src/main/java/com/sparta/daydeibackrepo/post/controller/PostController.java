@@ -23,7 +23,7 @@ public class PostController {
     private final PostService postService;
 
     //일정 작성
-    @PostMapping("/")
+    @PostMapping
     public StatusResponseDto<?> createPost(@RequestBody PostRequestDto requestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return postService.createPost(requestDto, userDetails);
     }

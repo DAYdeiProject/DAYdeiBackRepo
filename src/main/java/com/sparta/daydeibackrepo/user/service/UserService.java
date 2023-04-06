@@ -48,13 +48,9 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final MailService mailService;
     private final S3Service s3Service;
-    private final FriendCustomRepository friendRepository;
-    private final UserSubscribeRepository userSubscribeRepository;
-    private final PostRepository postRepository;
-    private final FriendService friendService;
     private final NotificationRepository notificationRepository;
 
-
+    //회원가입
     @Transactional
     public StatusResponseDto<?> signup(@Valid SignupRequestDto signupRequestDto){
         String email = signupRequestDto.getEmail();
@@ -75,6 +71,7 @@ public class UserService {
         return StatusResponseDto.toResponseEntity(SIGN_UP_SUCCESS);
     }
 
+    //이메일 중복 체크
     public StatusResponseDto<?> emailCheck(String email) {
         if(userRepository.findByEmail(email).isPresent()) {
             return StatusResponseDto.toAllExceptionResponseEntity(DUPLICATE_EMAIL);
@@ -82,6 +79,7 @@ public class UserService {
         return StatusResponseDto.toResponseEntity(EMAIL_CHECK_SUCCESS);
     }
 
+    //로그인
     @Transactional
     public StatusResponseDto<?> login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
         String email = loginRequestDto.getEmail();
@@ -105,6 +103,7 @@ public class UserService {
         return StatusResponseDto.toAlldataResponseEntity(new LoginResponseDto(user, isLogin));
     }
 
+    //이메일로 임시 비밀번호 발급
     @Transactional
     public StatusResponseDto<?> resetPassword(UserRequestDto userRequestDto) {
         User user = userRepository.findByEmail(userRequestDto.getEmail()).orElseThrow(
@@ -119,6 +118,7 @@ public class UserService {
         return StatusResponseDto.toResponseEntity(TEMPORARY_PASSWORD_HAS_BEEN_EMAILED);
     }
 
+    //내 계정의 카테고리 선택
     @Transactional
     public StatusResponseDto<?> setCategory(CategoryRequestDto categoryRequestDto, UserDetailsImpl userDetails) {
 
@@ -183,50 +183,6 @@ public class UserService {
         return StatusResponseDto.toAlldataResponseEntity(new UserProfileResponseDto(user));
     }
 
-    @Transactional
-    public StatusResponseDto<?> getUser(Long userId, UserDetailsImpl userDetails){
-        User visitor = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
-                () -> new CustomException(UNAUTHORIZED_MEMBER)
-        );
-        User user = userRepository.findById(userId).orElseThrow(
-                ()-> new CustomException(USER_NOT_FOUND)
-        );
-        if (visitor == user){
-            return StatusResponseDto.toAlldataResponseEntity(new UserResponseDto(user));
-        }
-        UserResponseDto userResponseDto;
-        List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUser(visitor);
-        List<User> friends = friendRepository.findAllFriends(visitor);
-        List<User> responseUsers = friendRepository.findResponseUser(visitor);
-        List<User> requestUsers = friendRepository.findRequestUser(visitor);
-        List<User> mutualFriends = friendRepository.findAllFriends(user);
-        mutualFriends.retainAll(friends);
-        boolean friendCheck = false;
-        boolean userSubscribeCheck = false;
-        boolean updateCheck = false;
-        if (friends.contains(user)) {
-            friendCheck = true;
-        }
-        if (userSubscribers.contains(user)) {
-            userSubscribeCheck = true;
-        }
-        if(friendCheck) {
-            if (user.getFriendUpdateCheck()) {updateCheck = true;}
-        }
-        else{
-            if (user.getUserUpdateCheck()) {updateCheck = true;}
-        }
-        if (requestUsers.contains(user)) {
-            userResponseDto = new UserResponseDto(user, friendCheck, true, userSubscribeCheck, updateCheck, mutualFriends);
-            }
-        else if (responseUsers.contains(user)) {
-            userResponseDto = new UserResponseDto(user, friendCheck, false, userSubscribeCheck, updateCheck, mutualFriends);
-        }
-        else {
-            userResponseDto = new UserResponseDto(user, friendCheck, userSubscribeCheck, updateCheck, mutualFriends);
-        }
-        return StatusResponseDto.toAlldataResponseEntity(userResponseDto);
-    }
     @Scheduled(cron="0 0 * * * ?")
     @Transactional
     public void userUpdateStatusCheck(){

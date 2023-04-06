@@ -32,7 +32,8 @@ public class MemoService {
         return user.getId().equals(memo.getUser().getId()) || user.getRole().equals(UserRoleEnum.ADMIN);
     }
 
-    public StatusResponseDto createMemo(MemoRequestDto requestDto, UserDetailsImpl userDetails) {
+    //메모 작성
+    public StatusResponseDto<?> createMemo(MemoRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
@@ -43,6 +44,7 @@ public class MemoService {
         return StatusResponseDto.toResponseEntity(MEMO_POST_SUCCESS);
     }
 
+    //메모 전체 리스트
     public StatusResponseDto<?> getAllMemo(UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
@@ -58,6 +60,7 @@ public class MemoService {
         return StatusResponseDto.toAlldataResponseEntity(memoResponseDtos);
     }
 
+    //메모 수정
     @Transactional
     public StatusResponseDto<?> updateMemo(Long memoId, MemoRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
@@ -72,10 +75,9 @@ public class MemoService {
             return StatusResponseDto.toResponseEntity(MEMO_PUT_SUCCESS);
         }
         throw new CustomException(UNAUTHORIZED_UPDATE_OR_DELETE);
-
-
     }
 
+    //메모 삭제
     @Transactional
     public StatusResponseDto<?> deleteMemo(Long memoId, UserDetailsImpl userDetails) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(

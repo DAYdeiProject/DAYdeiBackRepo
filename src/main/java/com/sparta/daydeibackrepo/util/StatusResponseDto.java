@@ -26,10 +26,6 @@ public class StatusResponseDto<T> {
         return new StatusResponseDto<>(HttpStatus.OK.value(), data);
     }
 
-    public static <T> StatusResponseDto<T> fail(HttpStatus httpStatus, T data){
-        return new StatusResponseDto<>(httpStatus.value(), data);
-    }
-
     public static ResponseEntity<StatusResponseDto> toExceptionResponseEntity(ExceptionMessage exceptionMessage) {
         return ResponseEntity
                 .status(exceptionMessage.getHttpStatus())

@@ -36,7 +36,6 @@ import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.UNAUT
 public class TagService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
-    private final FriendService friendService;
     private final PostRepository postRepository;
 
     // 시작, 종료 일자 시간도 받아와야함.

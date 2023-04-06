@@ -22,15 +22,13 @@ public class UserSubscribeController {
     
     //구독하기
     @PostMapping("/{userid}")
-    public StatusResponseDto<?> createSubscribe(@PathVariable Long userid, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
+    public StatusResponseDto<?> createSubscribe(@PathVariable Long userid, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return userSubscribeService.createSubscribe(userid, userDetails);
     }
 
     //구독취소
     @DeleteMapping("/{userid}")
-    public StatusResponseDto<?> deleteSubscribe(@PathVariable Long userid,  @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) throws AccessDeniedException {
+    public StatusResponseDto<?> deleteSubscribe(@PathVariable Long userid,  @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return userSubscribeService.deleteSubscribe(userid, userDetails);
     }
 

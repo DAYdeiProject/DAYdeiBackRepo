@@ -1,4 +1,4 @@
-package com.sparta.daydeibackrepo.post.dto;
+package com.sparta.daydeibackrepo.home.dto;
 
 import com.sparta.daydeibackrepo.post.entity.ColorEnum;
 import com.sparta.daydeibackrepo.post.entity.Post;

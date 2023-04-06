@@ -56,8 +56,10 @@ public class PostSubscribeService {
             if(postSubscribe!=null){
                 throw new CustomException(DUPLICATE_TAG_USER_JOIN_POST);
             }
+
             PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
             Notification notification = notificationRepository.findNotification(user, postId, NotificationType.JOIN_REQUEST);
+
             if (notification != null)
             {notificationRepository.delete(notification);}
             postSubscribeRepository.save(postSubscribe1);
@@ -81,16 +83,10 @@ public class PostSubscribeService {
         postSubscribeRepository.deleteAll(postSubscribes);
 
         for(User joiner : joiners){
-//            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getUser().getId(), joiner.getId());
-//            postSubscribeRepository.deleteByPostAndUser(post, joiner);
-
-//            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getUser().getId(), joiner.getId());
-//            if(postSubscribe!=null){
-//                throw new IllegalArgumentException("해당 유저는 이미 일정 초대되었습니다.");
-//            }
             PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
             postSubscribeRepository.save(postSubscribe1);
             Notification notification = notificationRepository.findNotification(user, postId, NotificationType.JOIN_REQUEST);
+
             if (notification != null)
             {notificationRepository.delete(notification);}
             notificationService.send(joiner.getId() , NotificationType.JOIN_UPDATE_REQUEST, NotificationType.JOIN_UPDATE_REQUEST.makeContent(user.getNickName()), post.getId());
@@ -102,9 +98,11 @@ public class PostSubscribeService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
+
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
+
         if (!Objects.equals(user.getId(), post.getUser().getId())){
             throw new CustomException(INVALID_SHARED_POST_DELETE);
         }
@@ -116,15 +114,6 @@ public class PostSubscribeService {
         postSubscribeRepository.deleteAll(postSubscribes);
 
         for(User joiner : joiners){
-//            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getUser().getId(), joiner.getId());
-//            postSubscribeRepository.deleteByPostAndUser(post, joiner);
-//            postSubscribeRepository.deleteAllById(postId);
-//            PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getUser().getId(), joiner.getId());
-//            if(postSubscribe!=null){
-//                throw new IllegalArgumentException("해당 유저는 이미 일정 초대되었습니다.");
-//            }
-//            PostSubscribe postSubscribe1 = new PostSubscribe(post, joiner, false);
-//            postSubscribeRepository.save(postSubscribe1);
             notificationService.send(joiner.getId() , NotificationType.JOIN_DELETE_REQUEST, NotificationType.JOIN_DELETE_REQUEST.makeContent(user.getNickName()), post.getId());
         }
     }
@@ -134,9 +123,11 @@ public class PostSubscribeService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
+
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new CustomException(POST_NOT_FOUND)
         );
+
         PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         if (postSubscribe==null){
             throw new CustomException(NO_APPROVE_POST_JOIN_REQUEST);
@@ -155,16 +146,20 @@ public class PostSubscribeService {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
+
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new CustomException(POST_NOT_FOUND)
         );
+
         PostSubscribe postSubscribe = postSubscribeRepository.findByPostIdAndUserId(post.getId(), user.getId());
         if (postSubscribe==null){
             throw new CustomException(NO_REJACT_POST_JOIN_REQUEST);
         }
         postSubscribeRepository.delete(postSubscribe);
+
         Tag tag = tagRepository.findByPostIdAndUserId(post.getId(), user.getId());
         tagRepository.delete(tag);
+
         Notification notification = notificationRepository.findNotification(user, postId, NotificationType.JOIN_REQUEST);
         if (notification != null)
         {notificationRepository.delete(notification);}

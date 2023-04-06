@@ -50,18 +50,23 @@ public class FriendService {
         User requestUser = userRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
+
         User responseUser = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
+
         if(Objects.equals(requestUser, responseUser)){
             throw new CustomException(INVALID_FRIEND_REQUEST);
         }
+
         if(friendRepository.isFriendOrRequest(requestUser, responseUser)){
             throw new CustomException(ALREADY_FRIEND_OR_HAVE_UNPROCESSED_FRIEND_REQUEST);
         }
+
         Friend friend = new Friend(requestUser, responseUser, false);
         friendRepository.save(friend);
         notificationService.send(responseUser.getId() , NotificationType.FRIEND_REQUEST, NotificationType.FRIEND_REQUEST.makeContent(requestUser.getNickName()), requestUser.getId());
+
         return StatusResponseDto.toAlldataResponseEntity(new FriendResponseDto(friend));
     }
     @Transactional
@@ -69,12 +74,15 @@ public class FriendService {
         User responseUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
+
         User requestUser = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
+
         if(Objects.equals(requestUser, responseUser)){
             throw new CustomException(INVALID_FRIEND_REQUEST);
         }
+
         Friend friend = friendRepository.findByFriendRequestIdAndFriendResponseId(requestUser, responseUser);
         if (friend == null){
             throw new CustomException(NO_ACCEPTABLE_FRIEND_REQUEST);
@@ -90,6 +98,7 @@ public class FriendService {
         if (notification != null)
         {notificationRepository.delete(notification);}
         notificationService.send(requestUser.getId() , NotificationType.FRIEND_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(responseUser.getNickName()), responseUser.getId());
+
         return StatusResponseDto.toAlldataResponseEntity(new FriendResponseDto(friend));
     }
     @Transactional
@@ -97,9 +106,11 @@ public class FriendService {
         User user1 = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
+
         User user2 = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
+
         if(Objects.equals(user1, user2)){
             throw new CustomException(INVALID_FRIEND_REQUEST);
         }
@@ -206,6 +217,7 @@ public class FriendService {
         Collections.sort(pendingResponseList, Comparator.comparing(UserResponseDto::getId));
         return StatusResponseDto.toAlldataResponseEntity(pendingResponseList);
     }
+
     // 유저 본인(user)과 유저 리스트(users) 사이의 친구 상태, 구독 관계 등을 뽑아서 List<UserResponseDto>로 반환합니다.
     public List<UserResponseDto> makeUserResponseDtos(User user, List<User> users){
         List<UserResponseDto> userResponseDtos = new ArrayList<>();

@@ -82,7 +82,10 @@ save() 메서드를 사용하여 emitterId와 함께 emitterRepository에 저장
         emitter.onTimeout(() -> emitterRepository.deleteById(emitterId)); // SSEEmitter를 찾아 emitterRepository에서 삭제하는 메서드
 
 //        String eventId = makeTimeIncludeId(userDetails.getUser().getId());
-        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
+//        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
+        send(userDetails.getUser().getId(), NotificationType.SUBSCRIBE_ACCEPT, NotificationType.FRIEND_ACCEPT.makeContent(userDetails.getUser().getNickName()), userDetails.getUser().getId());
+
+
 
         return emitter;
     }

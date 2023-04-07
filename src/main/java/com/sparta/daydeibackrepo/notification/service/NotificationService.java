@@ -42,25 +42,51 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
 
-    public SseEmitter connect(Long userId, String lastEventId) {
-        log.info(userId.toString());
-        String emitterId = makeTimeIncludeId(userId);
-        log.info(emitterId);
-        SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(timeout));
-        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
-        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
+//    public SseEmitter connect(Long userId, String lastEventId) {
+//        log.info(userId.toString());
+//        String emitterId = makeTimeIncludeId(userId);
+//        log.info(emitterId);
+//        SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(timeout));
+//        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
+//        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
+//
+//        // 503 에러를 방지하기 위한 더미 이벤트 전송
+//        String eventId = makeTimeIncludeId(userId);
+//        log.info(eventId);
+//        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userId + "]");
+//
+//        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방
+//        if (hasLostData(lastEventId)) {
+//            sendLostData(lastEventId, userId, emitterId, emitter);
+//        }
+//        return emitter;
+//    }
 
-        // 503 에러를 방지하기 위한 더미 이벤트 전송
-        String eventId = makeTimeIncludeId(userId);
+    public SseEmitter subscribe(UserDetailsImpl userDetails) {
+        String emitterId = makeTimeIncludeId(userDetails.getUser().getId());
+        SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(0L));
+/* 이 코드는 SseEmitter 객체를 생성하고 emitterRepository를 사용하여 저장하는 부분입니다.
+SseEmitter는 Server-Sent Events(SSE)를 사용하여 실시간으로 클라이언트와 통신할 수 있는 객체입니다.
+save() 메서드를 사용하여 emitterId와 함께 emitterRepository에 저장하면,나중에 해당 emitter를 식별하고 관리할 수 있습니다.
+이 코드는 subscribe() 메서드에서 클라이언트가 새로운 SSE를 구독할 때마다 실행되며,
+새로운 SseEmitter 객체를 생성하고 이를 emitterRepository에 저장합니다.
+이후 생성된 SseEmitter는 클라이언트에게 실시간으로 알림을 보내는 데 사용됩니다. */
+
+//        send(userDetails.getUser(),AlarmType.eventSystem,"회원님이 알림 구독하였습니다.",null,null,null);
+        String eventId = makeTimeIncludeId(userDetails.getUser().getId());
         log.info(eventId);
-        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userId + "]");
+        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
+//        log.info("본인 구독하였습니다.");
 
-        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방
-        if (hasLostData(lastEventId)) {
-            sendLostData(lastEventId, userId, emitterId, emitter);
-        }
+        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId)); //onCompletion 메서드: SseEmitter가 완료될 때 호출되는 콜백 함수를 정의
+        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId)); // SSEEmitter를 찾아 emitterRepository에서 삭제하는 메서드
+
+//        String eventId = makeTimeIncludeId(userDetails.getUser().getId());
+        sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userDetails.getUser().getId() + "]");
+
         return emitter;
     }
+
     //API 메서드 사이에 껴서 알림 전송
     public void send(Long userId, NotificationType notificationType, String content, Long returnId) {
         Notification notification = notificationRepository.save(createNotification(userId, notificationType, content, returnId));

@@ -26,12 +26,13 @@ public class NotificationController {
 
     @GetMapping(value = "/api/connect", produces = "text/event-stream")
     @ResponseStatus(HttpStatus.OK)
-    public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
         log.info(userDetails.getUser().getId().toString());
         log.info(userDetails.toString());
-//        log.info(lastEventId);
-//        log.error("error", notificationService.subscribe(userDetails.getUser().getId()));
-        return notificationService.subscribe(userDetails);
+        log.info(lastEventId);
+        log.error("error", notificationService.connect(userDetails.getUser().getId(), lastEventId));
+        return notificationService.connect(userDetails.getUser().getId(), lastEventId);
     }
     @GetMapping("/api/notification")
     public StatusResponseDto<?> getNotification(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {

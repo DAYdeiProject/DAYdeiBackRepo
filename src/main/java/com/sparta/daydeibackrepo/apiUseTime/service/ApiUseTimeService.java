@@ -33,8 +33,7 @@ public class ApiUseTimeService {
             "|| execution(public * com.sparta.daydeibackrepo.memo.controller..* (..))"+
             "|| execution(public * com.sparta.daydeibackrepo.post.controller..* (..))"+
             "|| execution(public * com.sparta.daydeibackrepo.postSubscribe.controller..* (..))"+
-            "|| execution(public * com.sparta.daydeibackrepo.userSubscribe.controller..* (..))"+
-            "|| execution(public * com.sparta.daydeibackrepo.user.controller..* (..))")
+            "|| execution(public * com.sparta.daydeibackrepo.userSubscribe.controller..* (..))")
     public synchronized Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
         // 측정 시작 시간
         long startTime = System.currentTimeMillis();

@@ -1,5 +1,7 @@
 package com.sparta.daydeibackrepo.userSubscribe.entity;
 
+import com.sparta.daydeibackrepo.exception.CustomException;
+import com.sparta.daydeibackrepo.exception.message.ExceptionMessage;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.util.TimeStamped;
 import jdk.jfr.Timestamp;
@@ -8,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.USER_NOT_FOUND;
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.USER_NOT_VIEW;
 
 @Entity
 @Getter
@@ -35,6 +40,9 @@ public class UserSubscribe extends TimeStamped {
 
 
     public UserSubscribe(User subscribingId, User subscriberId){
+        if (subscriberId == null || subscribingId == null) {
+            throw new CustomException(USER_NOT_FOUND);
+        }
         this.subscribingId = subscribingId;
         this.subscriberId = subscriberId;
         this.isVisible = true;

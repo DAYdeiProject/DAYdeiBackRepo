@@ -38,8 +38,8 @@ public class UserSubscribeService {
     private final UserRepository userRepository;
     private final FriendService friendService;
     @Transactional
-    public StatusResponseDto<?> createSubscribe(Long userid, UserDetailsImpl userDetails) {
-        User subscribing = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+    public StatusResponseDto<?> createSubscribe(Long userid, String email) {
+        User subscribing = userRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User subscriber = userRepository.findById(userid).orElseThrow(

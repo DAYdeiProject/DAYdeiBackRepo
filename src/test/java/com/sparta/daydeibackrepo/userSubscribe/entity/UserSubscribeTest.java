@@ -14,30 +14,13 @@ class UserSubscribeTest {
     @Nested
     @DisplayName("회원이 요청한 정상 객체 생성")
     class CreateUserSubscribe {
-        Long kakaoId;
-        String email;
-        String nickName;
-        String img;
-        String birthday;
-        String password;
-
-        @BeforeEach
-        void setup() {
-            Long kakaoId = 12345L;
-            String email = "user@user.com";
-            String nickName = "nickName";
-            String img = "img";
-            String birthday = "0101";
-            String password = "password";
-        }
 
         @Test
         @DisplayName("정상 케이스")
         void createProduct_Normal() {
             // given
-            User subscriberId = new User(kakaoId, email, nickName, img, birthday, password);
-            User subscribingId = new User(kakaoId, email, nickName, img, birthday, password);
-            Boolean isVisible = true;
+            User subscriberId = new User();
+            User subscribingId = new User();
 
             // when - 테스트하려는 로직 수행!
             UserSubscribe userSubscribe = new UserSubscribe(subscribingId, subscriberId);
@@ -46,7 +29,7 @@ class UserSubscribeTest {
             assertNull(userSubscribe.getId()); // (6-a)
             assertEquals(subscriberId, userSubscribe.getSubscriberId()); // (6-b)
             assertEquals(subscribingId, userSubscribe.getSubscribingId());
-            assertEquals(isVisible, userSubscribe.getIsVisible());
+            assertEquals(true, userSubscribe.getIsVisible());
         }
 
         @Nested
@@ -60,7 +43,7 @@ class UserSubscribeTest {
                 void fail1() {
                     // given
                     User subscribingId = null;
-                    User subscriberId = new User(kakaoId, email, nickName, img, birthday, password);
+                    User subscriberId = new User();
                     ;
 
                     // when
@@ -75,7 +58,7 @@ class UserSubscribeTest {
                 @DisplayName("Subscriber null")
                 void fail2() {
                     // given
-                    User subscribingId = new User(kakaoId, email, nickName, img, birthday, password);
+                    User subscribingId = new User();
                     User subscriberId = null;
                     ;
 

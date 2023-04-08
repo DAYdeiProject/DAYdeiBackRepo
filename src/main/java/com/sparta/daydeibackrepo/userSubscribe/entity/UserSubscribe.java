@@ -38,7 +38,6 @@ public class UserSubscribe extends TimeStamped {
     private Boolean isVisible;
 
 
-
     public UserSubscribe(User subscribingId, User subscriberId){
         if (subscriberId == null || subscribingId == null) {
             throw new CustomException(USER_NOT_FOUND);

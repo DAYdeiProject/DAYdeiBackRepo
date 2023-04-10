@@ -43,7 +43,6 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
 
-    @Transactional
     public SseEmitter connect(Long userId, String lastEventId) {
         log.info(userId.toString());
         String emitterId = makeTimeIncludeId(userId);

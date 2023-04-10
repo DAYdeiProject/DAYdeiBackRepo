@@ -25,6 +25,8 @@ import static org.mockito.Mockito.when;
 class UserSubscribeServiceTest {
     @Mock //  (1)
     UserRepository userRepository;
+    @Mock //  (1)
+    UserSubscribeRepository userSubscribeRepository;
 
     @Mock //  (1)
     NotificationService notificationService;

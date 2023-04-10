@@ -14,9 +14,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.NOTIFICATION_DELETED;
-
-import java.util.List;
 
 @Slf4j
 @RestController

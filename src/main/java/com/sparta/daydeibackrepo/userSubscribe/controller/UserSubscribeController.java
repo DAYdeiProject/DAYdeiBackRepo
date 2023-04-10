@@ -29,25 +29,25 @@ public class UserSubscribeController {
     //구독취소
     @DeleteMapping("/{userid}")
     public StatusResponseDto<?> deleteSubscribe(@PathVariable Long userid,  @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return userSubscribeService.deleteSubscribe(userid, userDetails);
+        return userSubscribeService.deleteSubscribe(userid, userDetails.getUsername());
     }
 
     //내가 구독한 사람 리스트
     @GetMapping("/list/{userId}")
     public StatusResponseDto<?> getUserSubscribeList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return userSubscribeService.getUserSubscribeList(userId, userDetails, searchword, sort);
+        return userSubscribeService.getUserSubscribeList(userId, userDetails.getUsername(), searchword, sort);
     }
 
     //나를 구독한 사람 리스트
     @GetMapping("/followers/{userId}")
     public StatusResponseDto<?> getUserFollowerList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return userSubscribeService.getUserFollowerList(userId, userDetails, searchword, sort);
+        return userSubscribeService.getUserFollowerList(userId, userDetails.getUsername(), searchword, sort);
     }
 
     //구독한 계정의 일정 숨김 여부
     @PutMapping("/show/{userId}")
-    public StatusResponseDto<?> setSubscrbeVisibility(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return userSubscribeService.setSubscrbeVisibility(userId, userDetails);
+    public StatusResponseDto<?> setSubscribeVisibility(@PathVariable Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return userSubscribeService.setSubscribeVisibility(userId, userDetails.getUsername());
     }
 
 

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
@@ -59,8 +60,8 @@ public class UserSubscribeService {
         return StatusResponseDto.toAlldataResponseEntity(new UserSubscribeResponseDto(userSubscribe1));
     }
     @Transactional
-    public StatusResponseDto<?> deleteSubscribe(Long userid, UserDetailsImpl userDetails) {
-        User subscribing = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+    public StatusResponseDto<?> deleteSubscribe(Long userid, String email) {
+        User subscribing = userRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User subscriber = userRepository.findById(userid).orElseThrow(
@@ -82,13 +83,17 @@ public class UserSubscribeService {
     }
 
     @Transactional(readOnly = true)
-    public StatusResponseDto<?> getUserSubscribeList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
-        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+    public StatusResponseDto<?> getUserSubscribeList(Long userId, String email, String searchWord, String sort) {
+        User visitor = userRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User master = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
+        if (!sort.toUpperCase().equals("FAMOUS") && !sort.toUpperCase().equals("NAME") &&
+                !sort.toUpperCase().equals("RECENT") && !sort.toUpperCase().equals("OLD")){
+            throw new CustomException(INVALID_SORT_TYPE);
+        }
         if (visitor == master || friendRepository.findFriend(visitor, master) != null){ // 친구이면
             List<User> userSubscribers = userSubscribeRepository.findAllSubscriberUserBySort(master, SortEnum.valueOf(sort.toUpperCase()));
             List<UserResponseDto> userSubscribeList = friendService.makeUserResponseDtos(master, userSubscribers)
@@ -101,13 +106,17 @@ public class UserSubscribeService {
     }
 
     @Transactional
-    public StatusResponseDto<?> getUserFollowerList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
-        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+    public StatusResponseDto<?> getUserFollowerList(Long userId, String email, String searchWord, String sort) {
+        User visitor = userRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User master = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
+        if (!sort.toUpperCase().equals("FAMOUS") && !sort.toUpperCase().equals("NAME") &&
+                !sort.toUpperCase().equals("RECENT") && !sort.toUpperCase().equals("OLD")){
+            throw new CustomException(INVALID_SORT_TYPE);
+        }
         if (visitor == master || friendRepository.findFriend(visitor, master) != null) { // 친구이면
             List<User> userSubscribers = userSubscribeRepository.findAllSubscribingUserBySort(master, SortEnum.valueOf(sort.toUpperCase()));
             List<UserResponseDto> userSubscribeList = friendService.makeUserResponseDtos(visitor, userSubscribers)
@@ -119,8 +128,8 @@ public class UserSubscribeService {
         throw new CustomException(USER_FORBIDDEN);
     }
     @Transactional
-    public StatusResponseDto setSubscrbeVisibility(Long userId, UserDetailsImpl userDetails){
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+    public StatusResponseDto setSubscribeVisibility(Long userId, String email){
+        User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User subscribe = userRepository.findById(userId).orElseThrow(

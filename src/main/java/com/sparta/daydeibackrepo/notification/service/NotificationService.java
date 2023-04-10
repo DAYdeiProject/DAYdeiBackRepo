@@ -42,7 +42,6 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
 
-    @Transactional
     public SseEmitter subscribe(Long userId, String lastEventId) {
 
         String emitterId = makeTimeIncludeId(userId);

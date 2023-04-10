@@ -18,25 +18,21 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @GetMapping(value = "/api/connect", produces = "text/event-stream")
-    @ResponseStatus(HttpStatus.OK)
-    public SseEmitter subscribe(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                @RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
-        log.info(userDetails.getUser().getId().toString());
-        log.info(userDetails.toString());
-        log.info(lastEventId);
-        log.error("error", notificationService.connect(userDetails.getUser().getId(), lastEventId));
-        return notificationService.connect(userDetails.getUser().getId(), lastEventId);
+    @GetMapping(value = "/subscribe", produces = "text/event-stream")
+    public SseEmitter subscribe(@RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId,
+                                @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return notificationService.subscribe(userDetails.getUser().getId(), lastEventId);
     }
-    @GetMapping("/api/notification")
+    @GetMapping("/notification")
     public StatusResponseDto<?> getNotification(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return notificationService.findAllNotifications(userDetails.getUser().getId());
     }
-    @DeleteMapping("/api/notification/{userId}")
+    @DeleteMapping("/notification/{userId}")
     public StatusResponseDto<?> deleteNotification(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
         return notificationService.deleteNotification(userId, userDetails);
     }

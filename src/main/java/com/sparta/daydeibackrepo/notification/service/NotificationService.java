@@ -38,28 +38,41 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 
-    @Value("${spring.sse.time}")
-    private Long timeout;
+    private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 20;
     private final NotificationRepository notificationRepository;
     private final EmitterRepository emitterRepository;
 
-    public SseEmitter connect(Long userId, String lastEventId) {
-        log.info(userId.toString());
-        String emitterId = makeTimeIncludeId(userId);
-        log.info(emitterId);
-        SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(timeout));
-        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
-        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
+    @Transactional
+    public SseEmitter subscribe(Long userId, String lastEventId) {
 
-        // 503 에러를 방지하기 위한 더미 이벤트 전송
+        String emitterId = makeTimeIncludeId(userId);
+        // lastEventId가 있을 경우, userId와 비교해서 유실된 데이터일 경우 재전송할 수 있다.
+
+        emitterRepository.deleteAllEmitterStartWithId(String.valueOf(userId));
+
+        SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
+
+        emitter.onCompletion(() -> {
+            log.info("SSE 연결 Complete");
+            emitterRepository.deleteById(emitterId);
+//            onClientDisconnect(emitter, "Compeletion");
+        });
+        //시간이 만료된 경우 자동으로 레포지토리에서 삭제하고 클라이언트에서 재요청을 보낸다.
+        emitter.onTimeout(() -> {
+            log.info("SSE 연결 Timeout");
+            emitterRepository.deleteById(emitterId);
+//            onClientDisconnect(emitter, "Timeout");
+        });
+        emitter.onError((e) -> emitterRepository.deleteById(emitterId));
+        //Dummy 데이터를 보내 503에러 방지. (SseEmitter 유효시간 동안 어느 데이터도 전송되지 않으면 503에러 발생)
         String eventId = makeTimeIncludeId(userId);
-        log.info(eventId);
         sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userId + "]");
 
-        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방
+        // 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방한다.
         if (hasLostData(lastEventId)) {
             sendLostData(lastEventId, userId, emitterId, emitter);
         }
+
         return emitter;
     }
 

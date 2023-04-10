@@ -19,7 +19,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 @RequiredArgsConstructor
 public class NotificationController {
-
     private final NotificationService notificationService;
 
     @GetMapping(value = "/api/connect", produces = "text/event-stream")

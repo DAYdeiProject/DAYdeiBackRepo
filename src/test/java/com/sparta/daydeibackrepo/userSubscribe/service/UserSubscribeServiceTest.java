@@ -4,14 +4,12 @@ import com.sparta.daydeibackrepo.exception.CustomException;
 import com.sparta.daydeibackrepo.friend.entity.Friend;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
 import com.sparta.daydeibackrepo.friend.service.FriendService;
-import com.sparta.daydeibackrepo.notification.entity.NotificationType;
 import com.sparta.daydeibackrepo.notification.repository.NotificationRepository;
 import com.sparta.daydeibackrepo.notification.service.NotificationService;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,30 +43,19 @@ class UserSubscribeServiceTest {
     UserSubscribeService userSubscribeService;
 
     @Mock
-    User user;
+    User subscribingId;
+    @Mock
+    User subscriberId;
 
     @Test
     @DisplayName("구독 신청 - 성공")
     void createSubscribe_Success() {
-        // given
-        String email = "user@user.com";
-        String nickName = "nickName";
-        String birthday = "0101";
-        String password = "password";
 
-        User subscribingId = new User(email, password, nickName, birthday);
-        User subscriberId = new User(email, password, nickName, birthday);
-
-        //  (3)
         when(userRepository.findById(subscriberId.getId()))
                 .thenReturn(Optional.of(subscriberId));
         when(userRepository.findByEmail(subscribingId.getEmail()))
                 .thenReturn(Optional.of(subscribingId));
 
-
-
-
-        // when, then
         assertDoesNotThrow( () -> {
             userSubscribeService.createSubscribe(subscriberId.getId(), subscribingId.getEmail());
         });
@@ -77,46 +64,25 @@ class UserSubscribeServiceTest {
     @Test
     @DisplayName("구독 신청 - 같은 유저에게 구독 신청")
     void createSubscribe_Fail1() {
-        // given
-        String email = "user@user.com";
-        String nickName = "nickName";
-        String birthday = "0101";
-        String password = "password";
 
-        User subscriberId = new User(email, password, nickName, birthday);
         User subscribingId = subscriberId;
-
         //  (3)
         when(userRepository.findById(subscriberId.getId()))
                 .thenReturn(Optional.of(subscriberId));
         when(userRepository.findByEmail(subscribingId.getEmail()))
                 .thenReturn(Optional.of(subscribingId));
-
         // when
         CustomException exception = assertThrows(CustomException.class, () -> {
             userSubscribeService.createSubscribe(subscriberId.getId(), subscribingId.getEmail());
         });
-
         // then
         assertEquals(INVALID_SUBSCRIBE_REQUEST, exception.getExceptionMessage());
     }
 
     @Test
-    @DisplayName("구독 신청 - 이미 구독 되어있음") // 에러가 안뜨는중
+    @DisplayName("구독 신청 - 이미 구독 되어있음")
     void createSubscribe_Fail2() {
-        // given
-        String email = "user@user.com";
-        String nickName = "nickName";
-        String birthday = "0101";
-        String password = "password";
 
-        String email1 = "user1@user.com";
-        String nickName1 = "nickName1";
-        String birthday1 = "0102";
-        String password1 = "password1";
-
-        User subscribingId = new User(email, password, nickName, birthday);
-        User subscriberId = new User(email1, password1, nickName1, birthday1);
         UserSubscribe userSubscribe = new UserSubscribe(subscribingId, subscriberId);
 
         //  (3)
@@ -139,19 +105,6 @@ class UserSubscribeServiceTest {
     @Test
     @DisplayName("구독 취소 - 성공")
     void deleteSubscribe_Success() {
-        // given
-        String email = "user@user.com";
-        String nickName = "nickName";
-        String birthday = "0101";
-        String password = "password";
-
-        String email1 = "user1@user.com";
-        String nickName1 = "nickName1";
-        String birthday1 = "0102";
-        String password1 = "password1";
-
-        User subscribingId = new User(email, password, nickName, birthday);
-        User subscriberId = new User(email1, password1, nickName1, birthday1);
         UserSubscribe userSubscribe = new UserSubscribe(subscribingId, subscriberId);
 
         //  (3)
@@ -162,9 +115,6 @@ class UserSubscribeServiceTest {
         when(userSubscribeRepository.findBySubscribingIdAndSubscriberId(subscribingId, subscriberId))
                 .thenReturn(userSubscribe);
 
-
-
-
         // when, then
         assertDoesNotThrow( () -> {
             userSubscribeService.deleteSubscribe(subscriberId.getId(), subscribingId.getEmail());
@@ -172,17 +122,10 @@ class UserSubscribeServiceTest {
     }
 
     @Test
-    @DisplayName("구독 취소 - 같은 유저에게 구독 취")
+    @DisplayName("구독 취소 - 같은 유저에게 구독 취소")
     void deleteSubscribe_Fail1() {
-        // given
-        String email = "user@user.com";
-        String nickName = "nickName";
-        String birthday = "0101";
-        String password = "password";
 
-        User subscriberId = new User(email, password, nickName, birthday);
         User subscribingId = subscriberId;
-
         //  (3)
         when(userRepository.findById(subscriberId.getId()))
                 .thenReturn(Optional.of(subscriberId));
@@ -201,21 +144,8 @@ class UserSubscribeServiceTest {
     @Test
     @DisplayName("구독 취소 - 구독 관계가 없는 유저에게 구독 취소")
     void deleteSubscribe_Fail2() {
-        // given
-        String email = "user@user.com";
-        String nickName = "nickName";
-        String birthday = "0101";
-        String password = "password";
 
-        String email1 = "user1@user.com";
-        String nickName1 = "nickName1";
-        String birthday1 = "0102";
-        String password1 = "password1";
-
-        User subscribingId = new User(email, password, nickName, birthday);
-        User subscriberId = new User(email1, password1, nickName1, birthday1);
         UserSubscribe userSubscribe = null;
-
         //  (3)
         when(userRepository.findById(subscriberId.getId()))
                 .thenReturn(Optional.of(subscriberId));
@@ -236,22 +166,9 @@ class UserSubscribeServiceTest {
     @Test
     @DisplayName("구독 목록 조회 - 성공")
     void getUserSubscribeList_Success() {
-        // given
-        String email = "user@user.com";
-        String nickName = "nickName";
-        String birthday = "0101";
-        String password = "password";
-
-        String email1 = "user1@user.com";
-        String nickName1 = "nickName1";
-        String birthday1 = "0102";
-        String password1 = "password1";
 
         String searchWord = "user";
         String sort = "old";
-
-        User subscribingId = new User(email, password, nickName, birthday);
-        User subscriberId = new User(email1, password1, nickName1, birthday1);
         Friend friend = new Friend(subscribingId, subscriberId, true);
 
         //  (3)
@@ -271,22 +188,9 @@ class UserSubscribeServiceTest {
     @Test
     @DisplayName("구독 목록 조회 - 친구 관계가 아닌 경우")
     void getUserSubscribeList_Fail1() {
-        // given
-        String email = "user@user.com";
-        String nickName = "nickName";
-        String birthday = "0101";
-        String password = "password";
-
-        String email1 = "user1@user.com";
-        String nickName1 = "nickName1";
-        String birthday1 = "0102";
-        String password1 = "password1";
 
         String searchWord = "user";
         String sort = "old";
-
-        User subscribingId = new User(email, password, nickName, birthday);
-        User subscriberId = new User(email1, password1, nickName1, birthday1);
         Friend friend = null;
 
         //  (3)
@@ -309,22 +213,9 @@ class UserSubscribeServiceTest {
     @Test
     @DisplayName("구독 목록 조회 - sort enum이 잘못 입력된 경우")
     void getUserSubscribeList_Fail2() {
-        // given
-        String email = "user@user.com";
-        String nickName = "nickName";
-        String birthday = "0101";
-        String password = "password";
-
-        String email1 = "user1@user.com";
-        String nickName1 = "nickName1";
-        String birthday1 = "0102";
-        String password1 = "password1";
 
         String searchWord = "user";
-        String sort = "sample";
-
-        User subscribingId = new User(email, password, nickName, birthday);
-        User subscriberId = new User(email1, password1, nickName1, birthday1);
+        String sort = "notCorrect";
 
         //  (3)
         when(userRepository.findById(subscriberId.getId()))

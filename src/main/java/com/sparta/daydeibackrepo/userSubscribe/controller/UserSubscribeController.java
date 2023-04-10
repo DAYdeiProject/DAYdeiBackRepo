@@ -29,13 +29,13 @@ public class UserSubscribeController {
     //구독취소
     @DeleteMapping("/{userid}")
     public StatusResponseDto<?> deleteSubscribe(@PathVariable Long userid,  @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return userSubscribeService.deleteSubscribe(userid, userDetails);
+        return userSubscribeService.deleteSubscribe(userid, userDetails.getUsername());
     }
 
     //내가 구독한 사람 리스트
     @GetMapping("/list/{userId}")
     public StatusResponseDto<?> getUserSubscribeList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return userSubscribeService.getUserSubscribeList(userId, userDetails, searchword, sort);
+        return userSubscribeService.getUserSubscribeList(userId, userDetails.getUsername(), searchword, sort);
     }
 
     //나를 구독한 사람 리스트

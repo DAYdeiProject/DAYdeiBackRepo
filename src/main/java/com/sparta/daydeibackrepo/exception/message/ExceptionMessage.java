@@ -24,6 +24,7 @@ public enum ExceptionMessage {
     ALREADY_FRIEND_OR_HAVE_UNPROCESSED_FRIEND_REQUEST(BAD_REQUEST,"이미 친구 상태이거나 처리 되지 않은 친구 신청이 있습니다"),
     FRIEND_STATUS_INCORRECT(BAD_REQUEST,"친구 상태가 올바르지 않습니다."),
     INVALID_REQUEST(BAD_REQUEST,"올바르지 않은 요청입니다."),
+    INVALID_SORT_TYPE(BAD_REQUEST,"올바르지 않은 분류 타입입니다."),
     INVALID_SHARED_POST_CREATE(BAD_REQUEST,"올바르지 않은 공유일정 생성입니다."),
     INVALID_SHARED_POST_MODIFY(BAD_REQUEST,"올바르지 않은 공유일정 수정입니다."),
     INVALID_SHARED_POST_DELETE(BAD_REQUEST,"올바르지 않은 공유일정 삭제입니다."),

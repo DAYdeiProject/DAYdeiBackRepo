@@ -24,9 +24,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserSubscribeServiceTest {
     @Mock //  (1)
-    UserSubscribeRepository userSubscribeRepository;
-    @Mock //  (1)
     UserRepository userRepository;
+    @Mock //  (1)
+    UserSubscribeRepository userSubscribeRepository;
 
     @Mock //  (1)
     NotificationService notificationService;
@@ -77,7 +77,6 @@ class UserSubscribeServiceTest {
 
         User subscriberId = new User(email, password, nickName, birthday);
         User subscribingId = subscriberId;
-        UserSubscribe userSubscribe = new UserSubscribe(subscribingId, subscriberId);
 
         //  (3)
         when(userRepository.findById(subscriberId.getId()))

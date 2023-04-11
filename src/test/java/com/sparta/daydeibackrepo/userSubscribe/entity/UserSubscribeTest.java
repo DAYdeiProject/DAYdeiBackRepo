@@ -17,7 +17,7 @@ class UserSubscribeTest {
 
         @Test
         @DisplayName("정상 케이스")
-        void createProduct_Normal() {
+        void createUserSubscribe_Normal() {
             // given
             User subscriberId = new User();
             User subscribingId = new User();

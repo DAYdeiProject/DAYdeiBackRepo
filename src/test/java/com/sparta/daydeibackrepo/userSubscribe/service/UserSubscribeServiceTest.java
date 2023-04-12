@@ -229,7 +229,7 @@ class UserSubscribeServiceTest {
         void getUserSubscribeList_Fail2() {
 
             String searchWord = "user";
-            String sort = "notCorrect";
+            String sort = "incorrect";
 
             //  (3)
             when(userRepository.findById(subscriberId.getId()))

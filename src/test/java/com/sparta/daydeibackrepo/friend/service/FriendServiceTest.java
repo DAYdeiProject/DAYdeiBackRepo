@@ -11,6 +11,7 @@ import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
+import com.sparta.daydeibackrepo.util.SortEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,8 @@ class FriendServiceTest {
     FriendRepository friendRepository;
     @Mock
     UserDetailsImpl userDetails;
+    @Mock
+    PostRepository postRepository;
     @Mock
     UserSubscribeRepository userSubscribeRepository;
     @Mock
@@ -66,12 +69,10 @@ class FriendServiceTest {
                 friendService.requestFriend(responseUser.getId(), userDetails);
             });
         }
-
         @Test
         @DisplayName("친구 신청 - 동일 유저에게 친구 신청")
         void requestFriend_Fail1() {
             responseUser = requestUser;
-
             // when
             when(userRepository.findById(responseUser.getId()))
                     .thenReturn(Optional.of(responseUser));
@@ -82,7 +83,6 @@ class FriendServiceTest {
             });
             // then
             assertEquals(INVALID_FRIEND_REQUEST, exception.getExceptionMessage());
-
         }
         @Test
         @DisplayName("친구 신청 - 이미 entity 존재")
@@ -122,7 +122,6 @@ class FriendServiceTest {
                 friendService.setFriend(responseUser.getId(), userDetails);
             });
         }
-
         @Test
         @DisplayName("친구 수락 - 동일 유저에게 친구 수락")
         void setFriend_Fail1() {
@@ -199,7 +198,6 @@ class FriendServiceTest {
             });
 
         }
-
         @Test
         @DisplayName("친구 취소/거절/삭제 - 동일 유저에게 친구 취소/거절/삭제")
         void deleteFriend_Fail1() {
@@ -237,7 +235,6 @@ class FriendServiceTest {
             // then
             assertEquals(INVALID_FRIEND_DELETE_REQUEST, exception.getExceptionMessage());
         }
-
         @Test
         @DisplayName("친구 취소/거절/삭제 - friend 객체 2개 존재")
         void deleteFriend_Fail3() {
@@ -277,7 +274,6 @@ class FriendServiceTest {
                 friendService.getRecommendList(categories, searchWord, userDetails);
             });
         }
-
         @Test
         @DisplayName("친구/구독 추천 - Category Enum incorrect")
         void getRecommendList_Fail1() {
@@ -301,13 +297,15 @@ class FriendServiceTest {
         @Test
         @DisplayName("업데이트한 친구 조회 - 성공")
         void getUpdateFriend_Success() {
+            List<User> users = new ArrayList<>();
+            when(userRepository.findByEmail(userDetails.getUsername()))
+                    .thenReturn(Optional.of(requestUser));
+            when(postRepository.findAllUpdateFriend(requestUser))
+                    .thenReturn(users);
 
-        }
-
-        @Test
-        @DisplayName("업데이트한 친구 조회 - 실패")
-        void getUpdateFriend_Fail1() {
-
+            assertDoesNotThrow( () -> {
+                friendService.getUpdateFriend(userDetails);
+            });
         }
     }
 
@@ -317,61 +315,49 @@ class FriendServiceTest {
         @Test
         @DisplayName("인기 있는 친구/구독 조회 - 성공")
         void  getFamousList_Success() {
+            List<User> users = new ArrayList<>();
+            when(userRepository.findByEmail(userDetails.getUsername()))
+                    .thenReturn(Optional.of(requestUser));
+            when(userRepository.findFamousList(requestUser))
+                    .thenReturn(users);
 
-        }
-
-        @Test
-        @DisplayName("인기 있는 친구/구독 조회 - 실패")
-        void  getFamousList_Fail1() {
-
+            assertDoesNotThrow(() -> {
+                friendService.getFamousList(userDetails);
+            });
         }
     }
-
     @Nested
     @DisplayName("친구 승인 대기 목록 조회")
     class  getPendingResponseList {
         @Test
         @DisplayName("친구 승인 대기 목록 조회 - 성공")
         void  getPendingResponseList_Success() {
+            List<User> users = new ArrayList<>();
+            when(userRepository.findByEmail(userDetails.getUsername()))
+                    .thenReturn(Optional.of(requestUser));
+            when(friendRepository.findRequestUser(requestUser))
+                    .thenReturn(users);
 
-        }
-
-        @Test
-        @DisplayName("친구 승인 대기 목록 조회 - 실패")
-        void  getPendingResponseList_Fail1() {
-
+            assertDoesNotThrow(() -> {
+                friendService.getPendingResponseList(userDetails);
+            });
         }
     }
-
     @Nested
     @DisplayName("친구 신청 목록 조회")
     class  getPendingRequestList {
         @Test
         @DisplayName("친구 신청 목록 조회 - 성공")
         void  getPendingRequestList_Success() {
+            List<User> users = new ArrayList<>();
+            when(userRepository.findByEmail(userDetails.getUsername()))
+                    .thenReturn(Optional.of(requestUser));
+            when(friendRepository.findResponseUser(requestUser))
+                    .thenReturn(users);
 
-        }
-
-        @Test
-        @DisplayName("친구 신청 목록 조회 - 실패")
-        void  getPendingRequestList_Fail1() {
-
-        }
-    }
-
-    @Nested
-    @DisplayName("userResposeDto 생성")
-    class  makeUserResponseDtos {
-        @Test
-        @DisplayName("userResposeDto 생성 - 성공")
-        void  makeUserResponseDtos_Success() {
-
-        }
-
-        @Test
-        @DisplayName("userResposeDto 생성 - 실패")
-        void  makeUserResponseDtos_Fail1() {
-
+            assertDoesNotThrow(() -> {
+                friendService.getPendingRequestList(userDetails);
+            });
         }
     }
 
@@ -381,14 +367,57 @@ class FriendServiceTest {
         @Test
         @DisplayName("친구 목록 조회 - 성공")
         void  getFriendList_Success() {
-
+            Friend friend = new Friend(requestUser,responseUser,true);
+            String searchWord = "user";
+            String sort = "old";
+            List<User> users = new ArrayList<>();
+            when(userRepository.findById(responseUser.getId()))
+                    .thenReturn(Optional.of(responseUser));
+            when(userRepository.findByEmail(userDetails.getUsername()))
+                    .thenReturn(Optional.of(requestUser));
+            when(friendRepository.findFriend(requestUser, responseUser))
+                    .thenReturn(friend);
+            when(friendRepository.findAllFriendsBySort(responseUser, SortEnum.valueOf(sort.toUpperCase())))
+                    .thenReturn(users);
+            assertDoesNotThrow(() -> {
+                friendService.getFriendList(responseUser.getId(), userDetails, searchWord, sort);
+            });
         }
-
         @Test
-        @DisplayName("친구 목록 조회 - 실패")
+        @DisplayName("친구 목록 조회 - 친구 관계가 아닌 경우")
         void  getFriendList_Fail1() {
-
+            Friend friend = null;
+            String searchWord = "user";
+            String sort = "recent";
+            List<User> users = new ArrayList<>();
+            when(userRepository.findById(responseUser.getId()))
+                    .thenReturn(Optional.of(responseUser));
+            when(userRepository.findByEmail(userDetails.getUsername()))
+                    .thenReturn(Optional.of(requestUser));
+            when(friendRepository.findFriend(requestUser, responseUser))
+                    .thenReturn(friend);
+            CustomException exception = assertThrows(CustomException.class, () -> {
+                friendService.getFriendList(responseUser.getId(), userDetails, searchWord, sort);
+            });
+            // then
+            assertEquals(USER_FORBIDDEN, exception.getExceptionMessage());
+        }
+        @Test
+        @DisplayName("친구 목록 조회 - sort enum이 잘못 입력된 경우")
+        void  getFriendList_Fail2() {
+            Friend friend = new Friend(requestUser,responseUser,true);
+            String searchWord = "user";
+            String sort = "incorrect";
+            List<User> users = new ArrayList<>();
+            when(userRepository.findById(responseUser.getId()))
+                    .thenReturn(Optional.of(responseUser));
+            when(userRepository.findByEmail(userDetails.getUsername()))
+                    .thenReturn(Optional.of(requestUser));
+            CustomException exception = assertThrows(CustomException.class, () -> {
+                friendService.getFriendList(responseUser.getId(), userDetails, searchWord, sort);
+            });
+            // then
+            assertEquals(INVALID_SORT_TYPE, exception.getExceptionMessage());
         }
     }
-
 }

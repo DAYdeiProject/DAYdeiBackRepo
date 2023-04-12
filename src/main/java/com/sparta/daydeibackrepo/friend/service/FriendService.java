@@ -278,11 +278,17 @@ public class FriendService {
         User master = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
-
+        if (!sort.toUpperCase().equals("FAMOUS") && !sort.toUpperCase().equals("NAME") &&
+                !sort.toUpperCase().equals("RECENT") && !sort.toUpperCase().equals("OLD")){
+            throw new CustomException(INVALID_SORT_TYPE);
+        }
+        if (visitor == master || friendRepository.findFriend(visitor, master) != null) { // 친구이면
         List<User> friends = friendRepository.findAllFriendsBySort(master, SortEnum.valueOf(sort.toUpperCase()));
         List<UserResponseDto> friendList = makeUserResponseDtos(master, friends).stream()
                 .filter(user -> user.getNickName().contains(searchWord) || user.getEmail().contains(searchWord)).collect(Collectors.toList());
         return StatusResponseDto.toAlldataResponseEntity(friendList);
+        }
+        throw new CustomException(USER_FORBIDDEN);
     }
 
     @Transactional(readOnly = true)

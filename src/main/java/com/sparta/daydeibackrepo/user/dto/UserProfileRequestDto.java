@@ -14,4 +14,7 @@ public class UserProfileRequestDto {
     private String newPassword;
 //    private String newPasswordConfirm;
     private String introduction;
+
+    private Boolean deleteProfile;
+    private Boolean deleteBackground;
 }

@@ -154,12 +154,16 @@ public class UserService {
 
         if (profileImage != null && !profileImage.isEmpty()) {
             profileImageUrl = s3Service.uploadFile(profileImage, "image");
-        } else if (profileImage == null) {
+        } else if ((profileImage == null || profileImage.isEmpty())&& (userProfileRequestDto.getDeleteProfile() != null && userProfileRequestDto.getDeleteProfile() == true)) {
+            profileImageUrl = null;
+        } else if (profileImage == null || profileImage.isEmpty()) {
             profileImageUrl = user.getProfileImage();
         }
 
         if (backgroundImage != null && !backgroundImage.isEmpty()) {
             backgroundImageUrl = s3Service.uploadFile(backgroundImage, "image");
+        } else if ((backgroundImage == null || backgroundImage.isEmpty())&& (userProfileRequestDto.getDeleteBackground() != null && userProfileRequestDto.getDeleteBackground() == true)) {
+            backgroundImageUrl = null;
         } else if (profileImage == null) {
             backgroundImageUrl = user.getBackgroundImage();
         }
@@ -178,6 +182,8 @@ public class UserService {
 //        else {
 //            newPassword = passwordEncoder.encode(newPassword);
 //        }
+
+
         user.update(userProfileRequestDto, profileImageUrl, backgroundImageUrl);
         userRepository.save(user);
         return StatusResponseDto.toAlldataResponseEntity(new UserProfileResponseDto(user));

@@ -13,7 +13,7 @@ public enum ExceptionMessage {
 
     /* 400 BAD_REQUEST : 잘못된 요청 */
     TIME_SETTING_IS_INCORRECT(BAD_REQUEST,"일정의 시간 설정이 올바르지 않습니다."),
-    START_DATE_MUST_BE_EARLY_END_DATE(BAD_REQUEST,"일정의 시간 설정이 올바르지 않습니다."),
+    START_DATE_MUST_BE_EARLY_END_DATE(BAD_REQUEST,"일정의 기간 설정이 올바르지 않습니다."),
     CANNOT_FOLLOW_MYSELF(BAD_REQUEST, "자기 자신은 팔로우 할 수 없습니다"),
     IMAGE_INVALID(BAD_REQUEST,"이미지가 잘못 되었습니다."),
     PASSWORD_INCORRECT_MISMATCH(BAD_REQUEST,"비밀번호가 일치하지 않습니다."),

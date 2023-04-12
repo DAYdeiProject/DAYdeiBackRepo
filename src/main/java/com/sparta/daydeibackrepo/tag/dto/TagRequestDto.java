@@ -16,4 +16,11 @@ public class TagRequestDto {
 
     private String endTime;
     private String searchWord;
+    public TagRequestDto(String startDate, String endDate, String startTime, String endTime, String searchWord){
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.searchWord = searchWord;
+    }
 }

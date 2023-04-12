@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.TIME_SETTING_IS_INCORRECT;
 import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.UNAUTHORIZED_MEMBER;
 
 @Slf4j
@@ -39,11 +40,15 @@ public class TagService {
     private final PostRepository postRepository;
 
     // 시작, 종료 일자 시간도 받아와야함.
-    public StatusResponseDto<?> getFriendTagList(TagRequestDto tagRequestDto, UserDetailsImpl userDetails) {
-        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
+    public StatusResponseDto<?> getFriendTagList(TagRequestDto tagRequestDto, String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         List<TagResponseDto> tagResponseDtos = new ArrayList<>();
+        validTime(tagRequestDto.getStartTime());
+        validTime(tagRequestDto.getEndTime());
+        validDate(tagRequestDto.getStartDate());
+        validDate(tagRequestDto.getEndDate());
         LocalTime startTime = LocalTime.parse(tagRequestDto.getStartTime());
         LocalTime endTime = LocalTime.parse(tagRequestDto.getEndTime());
         LocalDate startDate = LocalDate.parse(tagRequestDto.getStartDate(), DateTimeFormatter.ISO_DATE);
@@ -78,5 +83,17 @@ public class TagService {
         }
         Collections.shuffle(tagResponseDtos);
         return StatusResponseDto.toAlldataResponseEntity(tagResponseDtos);
+    }
+    public void validTime(String time){
+        if (time.length()==5 && Integer.parseInt(time.substring(0,2))>=0 && Integer.parseInt(time.substring(0,2))<=23
+        && time.charAt(2) == ':' && time.substring(3).equals("00")){}
+        else throw new CustomException(TIME_SETTING_IS_INCORRECT);
+    }
+    public void validDate(String date){
+        if (date.length()==10 && Integer.parseInt(date.substring(0,4))>=2000 && Integer.parseInt(date.substring(0,4))<=2100
+                && date.charAt(4) == '-' && date.charAt(7) == '-'
+                && Integer.parseInt(date.substring(5,7))>=1 && Integer.parseInt(date.substring(5,7))<=12
+                && Integer.parseInt(date.substring(8))>=1 && Integer.parseInt(date.substring(8))<=31){}
+        else throw new CustomException(TIME_SETTING_IS_INCORRECT);
     }
 }

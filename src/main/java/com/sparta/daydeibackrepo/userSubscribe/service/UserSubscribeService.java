@@ -39,8 +39,8 @@ public class UserSubscribeService {
     private final UserRepository userRepository;
     private final FriendService friendService;
     @Transactional
-    public StatusResponseDto<?> createSubscribe(Long userid, String email) {
-        User subscribing = userRepository.findByEmail(email).orElseThrow(
+    public StatusResponseDto<?> createSubscribe(Long userid, UserDetailsImpl userDetails) {
+        User subscribing = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User subscriber = userRepository.findById(userid).orElseThrow(
@@ -60,8 +60,8 @@ public class UserSubscribeService {
         return StatusResponseDto.toAlldataResponseEntity(new UserSubscribeResponseDto(userSubscribe1));
     }
     @Transactional
-    public StatusResponseDto<?> deleteSubscribe(Long userid, String email) {
-        User subscribing = userRepository.findByEmail(email).orElseThrow(
+    public StatusResponseDto<?> deleteSubscribe(Long userid, UserDetailsImpl userDetails) {
+        User subscribing = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User subscriber = userRepository.findById(userid).orElseThrow(
@@ -83,8 +83,8 @@ public class UserSubscribeService {
     }
 
     @Transactional(readOnly = true)
-    public StatusResponseDto<?> getUserSubscribeList(Long userId, String email, String searchWord, String sort) {
-        User visitor = userRepository.findByEmail(email).orElseThrow(
+    public StatusResponseDto<?> getUserSubscribeList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
+        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User master = userRepository.findById(userId).orElseThrow(
@@ -106,8 +106,8 @@ public class UserSubscribeService {
     }
 
     @Transactional
-    public StatusResponseDto<?> getUserFollowerList(Long userId, String email, String searchWord, String sort) {
-        User visitor = userRepository.findByEmail(email).orElseThrow(
+    public StatusResponseDto<?> getUserFollowerList(Long userId, UserDetailsImpl userDetails, String searchWord, String sort) {
+        User visitor = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User master = userRepository.findById(userId).orElseThrow(
@@ -128,8 +128,8 @@ public class UserSubscribeService {
         throw new CustomException(USER_FORBIDDEN);
     }
     @Transactional
-    public StatusResponseDto setSubscribeVisibility(Long userId, String email){
-        User user = userRepository.findByEmail(email).orElseThrow(
+    public StatusResponseDto setSubscribeVisibility(Long userId, UserDetailsImpl userDetails){
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         User subscribe = userRepository.findById(userId).orElseThrow(

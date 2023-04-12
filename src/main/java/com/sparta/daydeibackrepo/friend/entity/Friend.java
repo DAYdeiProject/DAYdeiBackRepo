@@ -33,6 +33,14 @@ public class Friend extends TimeStamped {
     @Column
     private Boolean friendCheck;
 
+    public Friend(User friendRequestId, User friendResponseId) {
+        if (friendRequestId == null || friendResponseId == null) {
+            throw new CustomException(USER_NOT_FOUND);
+        }
+        this.friendRequestId = friendRequestId;
+        this.friendResponseId = friendResponseId;
+        this.friendCheck = false;
+    }
     public Friend(User friendRequestId, User friendResponseId, boolean friendCheck) {
         if (friendRequestId == null || friendResponseId == null) {
             throw new CustomException(USER_NOT_FOUND);
@@ -45,11 +53,5 @@ public class Friend extends TimeStamped {
         this.friendRequestId =  friendRequestId;
         this.friendResponseId = friendResponseId;
         this.friendCheck = friendCheck;
-    }
-
-    public Friend(User loggedUser, User friend, Boolean isTrue) {
-        this.friendRequestId = loggedUser;
-        this.friendResponseId = friend;
-        this.friendCheck = isTrue;
     }
 }

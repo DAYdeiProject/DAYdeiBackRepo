@@ -47,7 +47,7 @@ public class FriendService {
     private final PostService postService;
     @Transactional
     public StatusResponseDto<?> requestFriend(Long userId, UserDetailsImpl userDetails) {
-        User requestUser = userRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
+        User requestUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
 
@@ -63,7 +63,7 @@ public class FriendService {
             throw new CustomException(ALREADY_FRIEND_OR_HAVE_UNPROCESSED_FRIEND_REQUEST);
         }
 
-        Friend friend = new Friend(requestUser, responseUser, false);
+        Friend friend = new Friend(requestUser, responseUser);
         friendRepository.save(friend);
         notificationService.send(responseUser.getId() , NotificationType.FRIEND_REQUEST, NotificationType.FRIEND_REQUEST.makeContent(requestUser.getNickName()), requestUser.getId());
 
@@ -84,7 +84,7 @@ public class FriendService {
         }
 
         Friend friend = friendRepository.findByFriendRequestIdAndFriendResponseId(requestUser, responseUser);
-        if (friend == null){
+        if (friend == null || friend.getFriendCheck()){
             throw new CustomException(NO_ACCEPTABLE_FRIEND_REQUEST);
         }
 
@@ -169,6 +169,11 @@ public class FriendService {
         );
                 List<CategoryEnum> categoryEnums = new ArrayList<>();
         for (String category : categories) {
+            if (!category.toUpperCase().equals("GAME") && !category.toUpperCase().equals("ECONOMY") &&
+                    !category.toUpperCase().equals("SPORTS") && !category.toUpperCase().equals("EDUCATION") &&
+                    !category.toUpperCase().equals("OTT") && !category.toUpperCase().equals("ENTERTAINMENT")){
+                throw new CustomException(INVALID_CATEGORY);
+            }
             categoryEnums.add(CategoryEnum.valueOf(category.toUpperCase()));
         }
         List<User> recommendList = userRepository.findRecommmedList(searchWord, user, categoryEnums);

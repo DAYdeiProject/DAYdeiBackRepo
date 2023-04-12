@@ -142,7 +142,7 @@ public class KakaoService {
             Friend friend1 = friendRepository.findByFriendRequestIdAndFriendResponseId(user, friendUser);
             Friend friend2 = friendRepository.findByFriendRequestIdAndFriendResponseId(friendUser, user);
             if(friend1 == null && friend2 == null){
-                Friend friend = new Friend(user, friendUser, false);
+                Friend friend = new Friend(user, friendUser);
                 friendRepository.save(friend);
                 notificationService.send(friendUser.getId() , NotificationType.FRIEND_REQUEST, NotificationType.FRIEND_REQUEST.makeContent(user.getNickName()), user.getId());
             }

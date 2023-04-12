@@ -18,7 +18,7 @@ class FriendTest {
         void createFriend_Normal() {
             User requestUser = new User();
             User responseUser = new User();
-            Friend friend = new Friend(requestUser, responseUser, false);
+            Friend friend = new Friend(requestUser, responseUser);
 
             // when - 테스트하려는 로직 수행!
             assertNull(friend.getId()); // (6-a)
@@ -38,7 +38,7 @@ class FriendTest {
 
                 // when
                 CustomException exception = assertThrows(CustomException.class, () -> {
-                    Friend friend = new Friend(requestUser, responseUser, false);
+                    Friend friend = new Friend(requestUser, responseUser);
                 });
 
                 // then
@@ -53,7 +53,7 @@ class FriendTest {
 
             // when
             CustomException exception = assertThrows(CustomException.class, () -> {
-                Friend friend = new Friend(requestUser, responseUser, false);
+                Friend friend = new Friend(requestUser, responseUser);
             });
 
             // then

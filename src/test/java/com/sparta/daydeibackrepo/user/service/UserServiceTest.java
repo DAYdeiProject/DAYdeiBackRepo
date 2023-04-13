@@ -24,10 +24,28 @@ class UserServiceTest {
     private UserService userService;
     @Mock
     private UserRepository userRepository;
+//    @Mock
+//    private PasswordEncoder passwordEncoder;
 
     @Test
     void signup_Success() {
+        // Given
+        SignupRequestDto signupRequestDto = new SignupRequestDto();
+        signupRequestDto.setEmail("test@example.com");
+        signupRequestDto.setPassword("myPassword123*");
+        signupRequestDto.setPasswordCheck("myPassword123*");
+        signupRequestDto.setNickName("nickname");
+        signupRequestDto.setBirthday("0101");
 
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        // When
+        StatusResponseDto<?> response = userService.signup(signupRequestDto);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+        assertEquals("SIGN_UP_SUCCESS", response.getData());
     }
 
     @Test

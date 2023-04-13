@@ -207,7 +207,7 @@ public class KakaoService {
 //        body.add("redirect_uri", "http://3.34.137.234:8080/api/users/kakao/callback");
 //        body.add("redirect_uri", "http://54.180.94.139/api/users/kakao/callback");
 //        body.add("redirect_uri", "http://daydei.s3-website.ap-northeast-2.amazonaws.com/kakao");
-        body.add("redirect_uri", "http://daydei.life/kakao");
+        body.add("redirect_uri", "https://daydei.life/kakao");
 //        body.add("redirect_uri", "http://localhost:8080/api/users/kakao/callback");
 //        body.add("redirect_uri", "https://daydei.life/kakao");
         body.add("code", code);

@@ -22,6 +22,6 @@ public class TagController {
     //일정 작성 시 친구 검색 태그
     @PostMapping("/find")
     public StatusResponseDto<?> getFriendTagList(@RequestBody TagRequestDto tagRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return tagService.getFriendTagList(tagRequestDto, userDetails.getUsername());
+        return tagService.getFriendTagList(tagRequestDto, userDetails);
     }
 }

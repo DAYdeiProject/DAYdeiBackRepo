@@ -2,12 +2,13 @@ package com.sparta.daydeibackrepo.tag.service;
 
 import com.sparta.daydeibackrepo.exception.CustomException;
 import com.sparta.daydeibackrepo.friend.repository.FriendRepository;
-import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.post.repository.PostRepository;
+import com.sparta.daydeibackrepo.security.UserDetailsImpl;
 import com.sparta.daydeibackrepo.tag.dto.TagRequestDto;
 import com.sparta.daydeibackrepo.user.entity.User;
 import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,8 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-
-import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.INVALID_SUBSCRIBE_REQUEST;
 import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.TIME_SETTING_IS_INCORRECT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -31,9 +30,13 @@ class TagServiceTest {
     FriendRepository friendRepository;
     @Mock
     User user;
+    @Mock
+    UserDetailsImpl userDetails;
     @InjectMocks //  (2)
     TagService tagService;
-
+    @Nested
+    @DisplayName("태그 리스트 조회")
+    class getFriendTagList{
     @Test
     @DisplayName("태그 리스트 조회 - 성공")
     void getFriendTagList_Success() {
@@ -44,11 +47,11 @@ class TagServiceTest {
         String searchWord = "user";
         TagRequestDto tagRequestDto = new TagRequestDto(startDate,endDate,startTime,endTime,searchWord);
 
-        when(userRepository.findByEmail(user.getEmail()))
+        when(userRepository.findByEmail(userDetails.getUsername()))
                 .thenReturn(Optional.of(user));
 
         assertDoesNotThrow( () -> {
-            tagService.getFriendTagList(tagRequestDto, user.getEmail());
+            tagService.getFriendTagList(tagRequestDto, userDetails);
         });
     }
 
@@ -63,10 +66,10 @@ class TagServiceTest {
         TagRequestDto tagRequestDto = new TagRequestDto(startDate,endDate,startTime,endTime,searchWord);
 
         // when
-        when(userRepository.findByEmail(user.getEmail()))
+        when(userRepository.findByEmail(userDetails.getUsername()))
                 .thenReturn(Optional.of(user));
         CustomException exception = assertThrows(CustomException.class, () -> {
-            tagService.getFriendTagList(tagRequestDto, user.getEmail());
+            tagService.getFriendTagList(tagRequestDto, userDetails);
         });
         // then
         assertEquals(TIME_SETTING_IS_INCORRECT, exception.getExceptionMessage());
@@ -83,12 +86,13 @@ class TagServiceTest {
         TagRequestDto tagRequestDto = new TagRequestDto(startDate,endDate,startTime,endTime,searchWord);
 
         // when
-        when(userRepository.findByEmail(user.getEmail()))
+        when(userRepository.findByEmail(userDetails.getUsername()))
                 .thenReturn(Optional.of(user));
         CustomException exception = assertThrows(CustomException.class, () -> {
-            tagService.getFriendTagList(tagRequestDto, user.getEmail());
+            tagService.getFriendTagList(tagRequestDto, userDetails);
         });
         // then
         assertEquals(TIME_SETTING_IS_INCORRECT, exception.getExceptionMessage());
+    }
     }
 }

@@ -47,7 +47,7 @@ public class FriendService {
     private final PostService postService;
     @Transactional
     public StatusResponseDto<?> requestFriend(Long userId, UserDetailsImpl userDetails) {
-        User requestUser = userRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
+        User requestUser = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
 
@@ -63,7 +63,7 @@ public class FriendService {
             throw new CustomException(ALREADY_FRIEND_OR_HAVE_UNPROCESSED_FRIEND_REQUEST);
         }
 
-        Friend friend = new Friend(requestUser, responseUser, false);
+        Friend friend = new Friend(requestUser, responseUser);
         friendRepository.save(friend);
         notificationService.send(responseUser.getId() , NotificationType.FRIEND_REQUEST, NotificationType.FRIEND_REQUEST.makeContent(requestUser.getNickName()), requestUser.getId());
 
@@ -84,7 +84,7 @@ public class FriendService {
         }
 
         Friend friend = friendRepository.findByFriendRequestIdAndFriendResponseId(requestUser, responseUser);
-        if (friend == null){
+        if (friend == null || friend.getFriendCheck()){
             throw new CustomException(NO_ACCEPTABLE_FRIEND_REQUEST);
         }
 
@@ -169,6 +169,11 @@ public class FriendService {
         );
                 List<CategoryEnum> categoryEnums = new ArrayList<>();
         for (String category : categories) {
+            if (!category.toUpperCase().equals("GAME") && !category.toUpperCase().equals("ECONOMY") &&
+                    !category.toUpperCase().equals("SPORTS") && !category.toUpperCase().equals("EDUCATION") &&
+                    !category.toUpperCase().equals("OTT") && !category.toUpperCase().equals("ENTERTAINMENT")){
+                throw new CustomException(INVALID_CATEGORY);
+            }
             categoryEnums.add(CategoryEnum.valueOf(category.toUpperCase()));
         }
         List<User> recommendList = userRepository.findRecommmedList(searchWord, user, categoryEnums);
@@ -273,11 +278,17 @@ public class FriendService {
         User master = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
         );
-
+        if (!sort.toUpperCase().equals("FAMOUS") && !sort.toUpperCase().equals("NAME") &&
+                !sort.toUpperCase().equals("RECENT") && !sort.toUpperCase().equals("OLD")){
+            throw new CustomException(INVALID_SORT_TYPE);
+        }
+        if (visitor == master || friendRepository.findFriend(visitor, master) != null) { // 친구이면
         List<User> friends = friendRepository.findAllFriendsBySort(master, SortEnum.valueOf(sort.toUpperCase()));
         List<UserResponseDto> friendList = makeUserResponseDtos(master, friends).stream()
                 .filter(user -> user.getNickName().contains(searchWord) || user.getEmail().contains(searchWord)).collect(Collectors.toList());
         return StatusResponseDto.toAlldataResponseEntity(friendList);
+        }
+        throw new CustomException(USER_FORBIDDEN);
     }
 
     @Transactional(readOnly = true)

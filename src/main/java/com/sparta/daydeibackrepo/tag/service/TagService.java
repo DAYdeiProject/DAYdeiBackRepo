@@ -40,8 +40,8 @@ public class TagService {
     private final PostRepository postRepository;
 
     // 시작, 종료 일자 시간도 받아와야함.
-    public StatusResponseDto<?> getFriendTagList(TagRequestDto tagRequestDto, String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(
+    public StatusResponseDto<?> getFriendTagList(TagRequestDto tagRequestDto, UserDetailsImpl userDetails) {
+        User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(
                 () -> new CustomException(UNAUTHORIZED_MEMBER)
         );
         List<TagResponseDto> tagResponseDtos = new ArrayList<>();

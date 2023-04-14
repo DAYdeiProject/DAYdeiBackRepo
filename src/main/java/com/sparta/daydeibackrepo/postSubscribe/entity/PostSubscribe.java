@@ -4,11 +4,13 @@ import com.sparta.daydeibackrepo.post.entity.Post;
 import com.sparta.daydeibackrepo.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 public class PostSubscribe {
 

@@ -30,6 +30,7 @@ public enum ExceptionMessage {
     INVALID_SHARED_POST_DELETE(BAD_REQUEST,"올바르지 않은 공유일정 삭제입니다."),
     INVALID_SUBSCRIBE_REQUEST(BAD_REQUEST,"구독 요청이 올바르지 않습니다."),
     INVALID_SUBSCRIBE_CANCEL(BAD_REQUEST,"구독 취소 요청이 올바르지 않습니다."),
+    USER_DELETE_FAIL(BAD_REQUEST, "입력한 아이디가 다릅니다."),
 
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */

@@ -51,11 +51,8 @@ class UserServiceTest {
         User user = new User(signupRequestDto.getEmail(), signupRequestDto.getPassword(), signupRequestDto.getNickName(), signupRequestDto.getBirthday());
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenReturn(user);
-//        when(passwordEncoder.encode(signupRequestDto.getPassword())).thenReturn(passwordEncoder.encode(signupRequestDto.getPassword()));
-//        when(passwordEncoder.encode(signupRequestDto.getPasswordCheck())).thenReturn(passwordEncoder.encode(signupRequestDto.getPasswordCheck()));
         // When
         StatusResponseDto<?> response = userService.signup(signupRequestDto);
-
         // Then
         assertNotNull(response);
         assertEquals(HttpStatus.SC_OK, response.getStatusCode());

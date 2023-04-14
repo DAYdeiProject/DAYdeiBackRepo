@@ -55,18 +55,17 @@ public class UserService {
     //회원가입
     @Transactional
     public StatusResponseDto<?> signup(@Valid SignupRequestDto signupRequestDto){
+        if (!signupRequestDto.getPassword().equals(signupRequestDto.getPasswordCheck())){
+            throw new CustomException(PASSWORD_INCORRECT_MISMATCH);
+        }
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
-        String passwordCheck = passwordEncoder.encode(signupRequestDto.getPasswordCheck());
         String nickName = signupRequestDto.getNickName();
         String birthday = signupRequestDto.getBirthday();
 
         Optional<User> foundUsername = userRepository.findByEmail(email);
         if (foundUsername.isPresent()) {
             throw new CustomException(DUPLICATE_USER);
-        }
-        if (password.equals(passwordCheck)){
-            throw new CustomException(PASSWORD_INCORRECT_MISMATCH);
         }
         User user = new User(email, password, nickName, birthday);
         userRepository.save(user);

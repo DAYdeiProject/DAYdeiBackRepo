@@ -60,7 +60,7 @@ public class User {
 //    private List<CategoryEnum> categoryEnum = new ArrayList<>();
 
     @Convert(converter = CategoryEnumConverter.class)
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
 //    @CollectionTable(name = "users_category_enum", joinColumns = @JoinColumn(name = "user_id"))
 //    @Column(name = "category_enum")
     private List<CategoryEnum> categoryEnum = new ArrayList<>();

@@ -35,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
+import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.POST_DELETE_SUCCESS;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -243,7 +244,7 @@ class PostServiceTest {
     class UpdatePostTest {
         @Test
         @DisplayName("일정 수정 - 성공")
-        public void updatePostTest_Success() {
+        void updatePostTest_Success() {
             // given
             Long postId = 1L;
             PostRequestDto requestDto = new PostRequestDto();
@@ -289,7 +290,7 @@ class PostServiceTest {
         }
         @Test
         @DisplayName("일정 수정 - 권한 없음")
-        public void updatePostTest_Fail() {
+        void updatePostTest_Fail() {
             // given
             Long postId = 1L;
             PostRequestDto requestDto = new PostRequestDto();
@@ -330,6 +331,63 @@ class PostServiceTest {
             // when
             CustomException exception = assertThrows(CustomException.class, () -> {
                 postService.updatePost(postId, requestDto, userDetails);
+            });
+
+            // then
+            assertEquals(UNAUTHORIZED_UPDATE_OR_DELETE, exception.getExceptionMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("일정 삭제")
+    class deletePostTest {
+        @Test
+        @DisplayName("일정 삭제 - 성공")
+        void deletePostTest_Success() {
+            // given
+            Long postId = 1L;
+            User user = new User("testuser@test.com", "password", "nickname", "1990-01-01");
+            user.setId(1L);
+            Post post = new Post();
+            post.setId(postId);
+            post.setUser(user);
+            post.setColor(ColorEnum.RED);
+            post.setScope(ScopeEnum.FRIEND);
+            when(userRepository.findByEmail(userDetails.getUsername()))
+                    .thenReturn(Optional.of(user));
+            when(postRepository.findById(postId))
+                    .thenReturn(Optional.of(post));
+            postRepository.delete(post);
+
+            // when
+            StatusResponseDto<?> responseDto = postService.deletePost(postId, userDetails);
+
+            // then
+            assertEquals(POST_DELETE_SUCCESS.getDetail(), responseDto.getData());
+        }
+        @Test
+        @DisplayName("일정 삭제 - 권한 없음")
+        void deletePostTest_Fail() {
+            // given
+            Long postId = 1L;
+            User user1 = new User("testuser1@test.com", "password", "nickname1", "1990-01-01");
+            User user2 = new User("testuser2@test.com", "password", "nickname2", "1990-01-02");
+            user1.setId(1L);
+            user2.setId(2L);
+            Post post = new Post();
+            post.setId(postId);
+            post.setUser(user1);
+            post.setColor(ColorEnum.RED);
+            post.setScope(ScopeEnum.FRIEND);
+            when(userRepository.findByEmail(userDetails.getUsername()))
+                    .thenReturn(Optional.of(user2));
+            when(postRepository.findById(postId))
+                    .thenReturn(Optional.of(post));
+            postRepository.delete(post);
+
+            // when
+            CustomException exception = assertThrows(CustomException.class, () -> {
+                postService.deletePost(postId, userDetails);
             });
 
             // then

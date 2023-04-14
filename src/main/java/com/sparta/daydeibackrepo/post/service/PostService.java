@@ -160,8 +160,6 @@ public class PostService {
         } else {
             return StatusResponseDto.toAlldataResponseEntity(PostResponseDto.of(post, writerResponseDto, participants, subscribeCheck, colorEnum));
         }
-
-
     }
 
     //일정 수정

@@ -8,6 +8,7 @@ import jdk.jfr.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -16,6 +17,7 @@ import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.USER_
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Timestamp

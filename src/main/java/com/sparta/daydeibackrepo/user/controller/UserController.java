@@ -86,4 +86,9 @@ public class UserController {
         return userService.updateUser(userProfileRequestDto, profileImage, backgroundImage, userDetails);
     }
 
+    @PutMapping("/delete")
+    public StatusResponseDto<?> deleteUser(@RequestBody DeleteUserRequestDto deleteUserRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return userService.deleteUser(deleteUserRequestDto, userDetails);
+    }
+
 }

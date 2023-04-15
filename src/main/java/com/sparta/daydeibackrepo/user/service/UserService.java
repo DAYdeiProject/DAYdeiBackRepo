@@ -19,6 +19,7 @@ import com.sparta.daydeibackrepo.user.repository.UserRepository;
 import com.sparta.daydeibackrepo.userSubscribe.repository.UserSubscribeRepository;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.mysql.cj.util.StringUtils.indexOf;
 import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
 import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.*;
 
@@ -44,6 +46,7 @@ import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.*;
 public class UserService {
 
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final MailService mailService;
@@ -53,18 +56,24 @@ public class UserService {
     //회원가입
     @Transactional
     public StatusResponseDto<?> signup(@Valid SignupRequestDto signupRequestDto){
+        if (!signupRequestDto.getPassword().equals(signupRequestDto.getPasswordCheck())){
+            throw new CustomException(PASSWORD_INCORRECT_MISMATCH);
+        }
         String email = signupRequestDto.getEmail();
         String password = passwordEncoder.encode(signupRequestDto.getPassword());
-        String passwordCheck = passwordEncoder.encode(signupRequestDto.getPasswordCheck());
         String nickName = signupRequestDto.getNickName();
         String birthday = signupRequestDto.getBirthday();
 
         Optional<User> foundUsername = userRepository.findByEmail(email);
         if (foundUsername.isPresent()) {
+            //이미 존재하는데 isDeleted가 true면 탈퇴했던 사용자가 재가입한 거니까 false로 바꾸고 success
+            User user = foundUsername.get();
+            if (user.getIsDeleted()){
+                user.setIsDeleted(false);
+                userRepository.save(user);
+                return StatusResponseDto.toResponseEntity(SIGN_UP_SUCCESS); // 재가입완료
+            }
             throw new CustomException(DUPLICATE_USER);
-        }
-        if (password.equals(passwordCheck)){
-            throw new CustomException(PASSWORD_INCORRECT_MISMATCH);
         }
         User user = new User(email, password, nickName, birthday);
         userRepository.save(user);
@@ -187,6 +196,22 @@ public class UserService {
         user.update(userProfileRequestDto, profileImageUrl, backgroundImageUrl);
         userRepository.save(user);
         return StatusResponseDto.toAlldataResponseEntity(new UserProfileResponseDto(user));
+    }
+
+    @Transactional
+    public StatusResponseDto<?> deleteUser(DeleteUserRequestDto deleteUserRequestDto, UserDetailsImpl userDetails){
+        User user = userRepository.findByEmail(userDetails.getUser().getEmail()).orElseThrow(
+                () -> new CustomException(USER_NOT_FOUND)
+        );
+
+        String userKey = user.getEmail().substring(0, user.getEmail().indexOf('@'));
+        if (deleteUserRequestDto.getUserKey().equals(userKey)){
+            user.setIsDeleted(true);
+            return StatusResponseDto.toResponseEntity(USER_DELETE_SUCCESS);
+        }
+        else {
+            return StatusResponseDto.toResponseEntity(USER_DELETE_SUCCESS);
+        }
     }
 
     @Scheduled(cron="0 0 * * * ?")

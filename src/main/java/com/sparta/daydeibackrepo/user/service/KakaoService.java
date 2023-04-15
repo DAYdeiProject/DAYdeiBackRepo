@@ -64,28 +64,6 @@ public class KakaoService {
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
         // 3. 필요 시에 회원 가입
         User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
-//        User kakaoUser = null;
-////        Long kakaoId = kakaoUserInfo.getId();
-////        User kakaoUser = userRepository.findByKakaoId(kakaoId);
-//        if (userDetails.getUser() != null){
-//            if (userDetails.getUser().getKakaoId() == null) {
-//                kakaoUser = kakaoUser.emailUpdate(kakaoUserInfo.getEmail());
-//                kakaoUser = kakaoUser.kakaoIdUpdate(kakaoUser.getKakaoId());
-////                userDetails.getUser().updateEmailAndKakaoId(kakaoUserInfo.getEmail(), kakaoUser.getKakaoId());
-//                userRepository.save(kakaoUser);
-//            }
-//        }
-//        // 3. 필요시에 회원가입
-//        else {
-//            kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
-//        }
-//        kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
-
-//        Optional<Notification> notification = notificationRepository.findByIdAndIsRead(kakaoUser.getId(), false);
-//
-//        if(notification.isPresent()) {
-//            kakaoUser.setIsNewNotification();
-//        }
 
         // 4. JWT 토큰 반환
         HttpHeaders headers = new HttpHeaders();
@@ -280,8 +258,6 @@ public class KakaoService {
             // 카카오 사용자 email 동일한 email 가진 회원이 있는지 확인
             String kakaoEmail = kakaoUserInfo.getEmail();
             User sameEmailUser = userRepository.findByEmail(kakaoEmail).orElse(null);
-
-
             if (sameEmailUser != null) { // 같은 이메일로 로그인한 일반 회원이 카카오 로그인을 시도했을 때
                 kakaoUser = sameEmailUser;
                 // 기존 회원정보에 카카오 Id 추가
@@ -304,6 +280,9 @@ public class KakaoService {
 
             userRepository.save(kakaoUser);
             log.warn(kakaoUser.getEmail());
+        }
+        if (kakaoUser.getIsDeleted()){
+            kakaoUser.setIsDeleted(false);
         }
         return kakaoUser;
     }

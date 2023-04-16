@@ -89,6 +89,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         config.addAllowedOrigin("https://jeongda.shop/");
         config.addAllowedOrigin("https://sparta-daln.shop/");
         config.addAllowedOrigin("https://daydei.life/");
+        config.addAllowedOrigin("https://daydei.life/api/");
 //        //채팅 테스트용 origin
         config.addAllowedOrigin("http://localhost:8080");
 

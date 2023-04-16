@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 
+@CrossOrigin(origins = {"https://sparta-daln.shop/", "https://www.daydei.life/"}, allowedHeaders = "*")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")

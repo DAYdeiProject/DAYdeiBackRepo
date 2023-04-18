@@ -4,9 +4,14 @@ import lombok.Getter;
 
 @Getter
 public enum ColorEnum {
-    BLUE,
+    LIGHTGRAY,
+    GRAY,
     RED,
     YELLOW,
-    GRAY
+    GREEN,
+    LIGHTBLUE,
+    BLUE,
+    PURPLE,
+    PINK
 
 }

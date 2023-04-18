@@ -16,28 +16,60 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/friends")
 public class FriendController {
+
     private final FriendService friendService;
+
+    //친구 신청
     @PostMapping("/{userId}")
-    public StatusResponseDto<FriendResponseDto> requestFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.requestFriend(userId, userDetails));
+    public StatusResponseDto<?> requestFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.requestFriend(userId, userDetails);
     }
 
+    //친구 수락
     @PutMapping("/{userId}")
-    public StatusResponseDto<FriendResponseDto> setFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.setFriend(userId, userDetails));
+    public StatusResponseDto<?> setFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.setFriend(userId, userDetails);
     }
 
+    //친구 신청 취소 및 친구삭제
     @DeleteMapping("/{userId}")
-    public StatusResponseDto<String> deleteFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.deleteFriend(userId, userDetails));
+    public StatusResponseDto<?> deleteFriend(@PathVariable Long userId, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.deleteFriend(userId, userDetails);
     }
 
-    @GetMapping("/list")
-    public StatusResponseDto<List<UserResponseDto>> getFriendList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getFriendList(userDetails));
+    //친구 리스트
+    @GetMapping("/list/{userId}")
+    public StatusResponseDto<?> getFriendList(@PathVariable Long userId, @RequestParam String searchword, @RequestParam String sort, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getFriendList(userId, userDetails, searchword, sort);
     }
+
+    //친구 추천 찾기
     @GetMapping("/recommend")
-    public StatusResponseDto<List<UserResponseDto>> getRecommendList(@RequestParam String category, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return StatusResponseDto.success(friendService.getRecommendList(category,userDetails));
+    public StatusResponseDto<?> getRecommendList(@RequestParam List<String> category, @RequestParam String searchword, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getRecommendList(category,searchword,userDetails);
+    }
+
+    // 친구 불러오기 (왼쪽 사이드바)
+    @GetMapping("/update")
+    public StatusResponseDto<?> getUpdateFriend(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getUpdateFriend(userDetails);
+    }
+
+    //최초 로그인시 친구 3명 추천 리스트
+    @GetMapping("/list/famous")
+    public StatusResponseDto<?> getFamousList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getFamousList(userDetails);
+    }
+
+    //내가 받은 친구요청 리스트
+    @GetMapping("/list/response")
+    public StatusResponseDto<?> getPendingResponseList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getPendingResponseList(userDetails);
+    }
+    
+    //내가 보낸 친구요청 리스트
+    @GetMapping("/list/request")
+    public StatusResponseDto<?> getPendingRequestList(@Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return friendService.getPendingRequestList(userDetails);
     }
 }

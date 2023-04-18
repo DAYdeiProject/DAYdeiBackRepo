@@ -1,15 +1,21 @@
 package com.sparta.daydeibackrepo.friend.entity;
 
+import com.sparta.daydeibackrepo.exception.CustomException;
 import com.sparta.daydeibackrepo.user.entity.User;
+import com.sparta.daydeibackrepo.util.TimeStamped;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
+import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.USER_NOT_FOUND;
+
 @Entity
+@Setter
 @Getter
 @NoArgsConstructor
-public class Friend {
+public class Friend extends TimeStamped {
 
     @Id
     @Column
@@ -27,7 +33,18 @@ public class Friend {
     @Column
     private Boolean friendCheck;
 
+    public Friend(User friendRequestId, User friendResponseId) {
+        if (friendRequestId == null || friendResponseId == null) {
+            throw new CustomException(USER_NOT_FOUND);
+        }
+        this.friendRequestId = friendRequestId;
+        this.friendResponseId = friendResponseId;
+        this.friendCheck = false;
+    }
     public Friend(User friendRequestId, User friendResponseId, boolean friendCheck) {
+        if (friendRequestId == null || friendResponseId == null) {
+            throw new CustomException(USER_NOT_FOUND);
+        }
         this.friendRequestId = friendRequestId;
         this.friendResponseId = friendResponseId;
         this.friendCheck = friendCheck;
@@ -36,11 +53,5 @@ public class Friend {
         this.friendRequestId =  friendRequestId;
         this.friendResponseId = friendResponseId;
         this.friendCheck = friendCheck;
-    }
-
-    public Friend(User loggedUser, User friend, Boolean isTrue) {
-        this.friendRequestId = loggedUser;
-        this.friendResponseId = friend;
-        this.friendCheck = isTrue;
     }
 }

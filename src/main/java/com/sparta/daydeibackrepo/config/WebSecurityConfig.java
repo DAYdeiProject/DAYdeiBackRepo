@@ -23,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
+
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -30,7 +31,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebSecurityConfig implements WebMvcConfigurer {
 
     private final JwtUtil jwtUtil;
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -60,14 +60,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 //                .antMatchers("/docs").permitAll()
 //                .antMatchers("/api/users/signup").permitAll()
 //                .antMatchers("/api/users/login").permitAll()
-               // .antMatchers(HttpMethod.GET, "/api/studies/**").permitAll()
                 .anyRequest().authenticated()
-
                 // JWT 인증/인가를 사용하기 위한 설정
                 .and()
                 .addFilterBefore(new JwtAuthFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
-
+//        http.requiresChannel().anyRequest().requiresSecure();
         http.cors();
         return http.build();
     }
@@ -82,9 +80,17 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         // 사전에 약속된 출처를 명시
         config.addAllowedOrigin("http://localhost:3000");
+//        config.addAllowedOrigin("*");
+//        config.addAllowedOriginPattern("*");
 //        config.addAllowedOrigin("http://localhost:3001");
-        config.addAllowedOrigin("http://daydei.s3-website.ap-northeast-2.amazonaws.com");
-        //채팅 테스트용 origin
+//        config.addAllowedOrigin("http://daydei.s3-website.ap-northeast-2.amazonaws.com");
+        config.addAllowedOrigin("http://daydei.s3-website.ap-northeast-2.amazonaws.com/");
+        config.addAllowedOrigin("https://daydei.vercel.app/");
+        config.addAllowedOrigin("https://jeongda.shop/");
+        config.addAllowedOrigin("https://sparta-daln.shop/");
+        config.addAllowedOrigin("https://www.daydei.life/");
+
+//        //채팅 테스트용 origin
         config.addAllowedOrigin("http://localhost:8080");
 
 
@@ -112,4 +118,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         return source;
     }
+
+
 }

@@ -2,70 +2,93 @@ package com.sparta.daydeibackrepo.user.controller;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sparta.daydeibackrepo.user.dto.LoginRequestDto;
-import com.sparta.daydeibackrepo.user.dto.LoginResponseDto;
-import com.sparta.daydeibackrepo.user.dto.SignupRequestDto;
+import com.sparta.daydeibackrepo.security.UserDetailsImpl;
+import com.sparta.daydeibackrepo.user.dto.*;
 import com.sparta.daydeibackrepo.user.service.KakaoService;
 import com.sparta.daydeibackrepo.user.service.UserService;
 import com.sparta.daydeibackrepo.util.StatusResponseDto;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
     private final KakaoService kakaoService;
-
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
-
-    @PostMapping("/users/signup")
-    public StatusResponseDto<String> signup(@RequestBody @Valid SignupRequestDto signupRequestDto) {
+    
+    //회원가입
+    @PostMapping("/signup")
+    public StatusResponseDto<?> signup(@RequestBody @Valid SignupRequestDto signupRequestDto) {
         System.out.println("test");
-        return StatusResponseDto.success(userService.signup(signupRequestDto));
+        return userService.signup(signupRequestDto);
     }
 
-    @PostMapping("/users/signup/{email}")
-    public ResponseEntity<StatusResponseDto> checkEmail(@PathVariable String email) {
+    //이메일 중복 체크
+    @PostMapping("/signup/{email}")
+    public StatusResponseDto<?> checkEmail(@PathVariable String email) {
         return userService.emailCheck(email);
     }
 
-    @PostMapping("/users/login")
-    public StatusResponseDto<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
-        return StatusResponseDto.success(userService.login(loginRequestDto, response));
+    //로그인
+    @PostMapping("/login")
+    public StatusResponseDto<?> login(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse response){
+        return userService.login(loginRequestDto, response);
     }
 //    ResponseEntity<StatusResponseDto<String>>
-    @GetMapping("/users/kakao/callback")
-    public ResponseEntity<StatusResponseDto<String>> kakaoCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+    //카카오 로그인
+    @GetMapping("/kakao/callback") //ResponseEntity<StatusResponseDto<LoginResponseDto>> //HttpServletResponse response
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoCallback(@RequestParam String code, UserDetailsImpl userDetails) throws JsonProcessingException {
 //        String createToken = kakaoService.kakaoLogin(code, response);
 //        // Cookie 생성 및 직접 브라우저에 Set
 //        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, createToken.substring(7));
 //        cookie.setPath("/");
 //        response.addCookie(cookie);
 //        return "success";
-        return kakaoService.kakaoLogin(code, response);
+        return kakaoService.kakaoLogin(code, userDetails);
     }
 
-
-    // TODO: 2023/03/14 프론트한테 아이디 받기 ?
-    @GetMapping("/users/kakao_friends/callback")                                                //HttpServletResponse response
-    public ResponseEntity<StatusResponseDto<String>> kakaoFriendsCallback(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
-        return kakaoService.kakaoFriends(code, response);
+    //카카오톡 친구목록 불러오기
+    @GetMapping("/kakao_friends/callback")                                                //HttpServletResponse response
+    public ResponseEntity<StatusResponseDto<LoginResponseDto>> kakaoFriendsCallback(@RequestParam String code, @AuthenticationPrincipal UserDetailsImpl userDetails) throws JsonProcessingException {
+        return kakaoService.kakaoFriends(code, userDetails);
+    }
+    
+    //이메일로 임시 비밀번호 발급
+    @PostMapping("/reset/password")
+    public StatusResponseDto<?> resetPassword(@RequestBody UserRequestDto userRequestDto){
+        return userService.resetPassword(userRequestDto);
     }
 
+    //내 계정의 카테고리 선택
+    @PostMapping("/categories")
+    public StatusResponseDto<?> setCategory(@RequestBody CategoryRequestDto categoryRequestDto, @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return userService.setCategory(categoryRequestDto, userDetails);
+    }
 
+    //프로필 수정
+    @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public StatusResponseDto<?> updateUser(
+            @RequestPart UserProfileRequestDto userProfileRequestDto,
+            @RequestPart(value="profileImage",required = false) MultipartFile  profileImage,
+            @RequestPart(value="backgroundImage",required = false) MultipartFile backgroundImage,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetailsImpl userDetails)
+            throws IOException {
+        return userService.updateUser(userProfileRequestDto, profileImage, backgroundImage, userDetails);
+    }
 
+    @PutMapping("/delete")
+    public StatusResponseDto<?> deleteUser(@RequestBody DeleteUserRequestDto deleteUserRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return userService.deleteUser(deleteUserRequestDto, userDetails);
+    }
 
 }

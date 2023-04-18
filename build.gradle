@@ -1,11 +1,18 @@
+
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.9'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.sparta'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1-SNAPSHOT' + new Date().format("yyyyMMddHHmmss")
 sourceCompatibility = '17'
 
 configurations {
@@ -25,15 +32,34 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'junit:junit:4.13.1'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'mysql:mysql-connector-java:8.0.28'
 	annotationProcessor 'org.projectlombok:lombok'
+//	testImplementation('junit:junit:4.13')
+//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation("org.junit.vintage:junit-vintage-engine") {
 		exclude group: "org.hamcrest", module: "hamcrest-core"
 	}
+//	testImplementation 'org.springframework:spring-test:5.3.9'
+	testImplementation 'org.springframework:spring-test:6.0.7'
+//	testImplementation 'junit:junit:4.13.2'
+	//JUnit 5
+	testImplementation('org.junit.jupiter:junit-jupiter:5.8.1')
+	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.8.1')
+
+	//Spring Test
+	testImplementation('org.springframework:spring-test:5.3.9')
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	testImplementation('org.junit.jupiter:junit-jupiter:5.8.1')
+
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
@@ -42,14 +68,52 @@ dependencies {
 
 	//Swagger
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.6'
-
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	//mail service
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.3.1'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// querydsl
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+	//sentry
+	implementation 'io.sentry:sentry-spring-boot-starter:6.16.0'
+
+	//mockito
+	testImplementation 'org.mockito:mockito-core:4.8.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:4.8.0'
 
 }
 
-//tasks.named('test') {
-//	useJUnitPlatform()
-//}
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+	main.java.srcDir querydslDir
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
+}
+
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
 
 jar {
 	enabled = false

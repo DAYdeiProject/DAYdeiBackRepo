@@ -1,12 +1,13 @@
 package com.sparta.daydeibackrepo.user.entity;
 
-import com.sparta.daydeibackrepo.friend.entity.Friend;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sparta.daydeibackrepo.user.dto.UserProfileRequestDto;
+import com.sparta.daydeibackrepo.userSubscribe.entity.UserSubscribe;
 import lombok.*;
-import org.hibernate.boot.model.relational.SqlStringGenerationContext;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity(name = "users")
@@ -18,6 +19,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Email
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -28,9 +30,10 @@ public class User {
     private String nickName;
 
     @Column
-    private String birthday; //추후 Date 타입으로 바꿔야 함
+    private String birthday;
 
-    private String profileImage; //추후 s3 Multipart 로 타입 변경해야 함
+    private String profileImage;
+    private String backgroundImage;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -39,12 +42,30 @@ public class User {
     private String introduction;
 
     private Long kakaoId;
+    private int friendCount;
 
-    @Enumerated(value = EnumType.STRING)
-    private CategoryEnum categoryEnum;
-//
-//    @ElementCollection
-//    private List<String> friendEmailList;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscribingId")
+    private List<UserSubscribe> subscribing;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "subscriberId")
+    private List<UserSubscribe> subscriber;
+    private Boolean friendUpdateCheck;
+    private Boolean userUpdateCheck;
+
+    private Boolean isNewNotification;
+
+    private Boolean isDeleted;
+
+
+//    @ElementCollection(fetch = FetchType.EAGER)
+//    @JsonFormat(shape = JsonFormat.Shape.STRING)
+//    private List<CategoryEnum> categoryEnum = new ArrayList<>();
+
+    @Convert(converter = CategoryEnumConverter.class)
+    @ElementCollection(fetch = FetchType.LAZY)
+//    @CollectionTable(name = "users_category_enum", joinColumns = @JoinColumn(name = "user_id"))
+//    @Column(name = "category_enum")
+    private List<CategoryEnum> categoryEnum = new ArrayList<>();
 
 
     //카카오 회원가입
@@ -55,8 +76,11 @@ public class User {
         this.password = password;
         this.profileImage = img;
         this.birthday = birthday;
-//        this.friendEmailList = friendEmailList;
         this.role = UserRoleEnum.USER;
+        this.isNewNotification = false;
+        this.friendUpdateCheck = false;
+        this.userUpdateCheck = false;
+        this.isDeleted = false;
     }
 
     //일반 회원가입
@@ -66,19 +90,66 @@ public class User {
         this.nickName = nickName;
         this.birthday = birthday;
         this.role = UserRoleEnum.USER;
-    }
+        this.friendUpdateCheck = false;
+        this.userUpdateCheck = false;
+        this.isNewNotification = false;
+        this.isDeleted = false;
 
-//    public User(Long id, String email, String nickName, String password) {
-//        this.id = id;
-//        this.email = email;
-//        this.password = password;
-//        this.nickName = nickName;
-//        this.role = UserRoleEnum.USER;
-//    }
+    }
 
     public User kakaoIdUpdate(Long kakaoId) {
         this.kakaoId = kakaoId;
         return this;
+    }
+
+    public User emailUpdate(String email){
+        this.email = email;
+        return this;
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    public void update(UserProfileRequestDto requestDto, String profileImageUrl, String backgroundImageUrl){
+        this.nickName = requestDto.getNickName();
+        this.password = requestDto.getNewPassword();
+        this.profileImage = profileImageUrl;
+        this.backgroundImage = backgroundImageUrl;
+        this.introduction = requestDto.getIntroduction();
+//        this.nickName = nickName;
+//        this.password = newPassword;
+//        this.introduction = introduction;
+//        this.profileImage = profileImageUrl;
+//        this.backgroundImage = backgroundImageUrl;
+    }
+
+    public void update(UserProfileRequestDto requestDto){
+        this.nickName = requestDto.getNickName();
+        this.password = requestDto.getNewPassword();
+//        this.profileImage = requestDto.getProfileImage();
+        this.introduction = requestDto.getIntroduction();
+    }
+
+    public void updateEmailAndKakaoId(String email, Long kakaoId){
+        this.email = email;
+        this.kakaoId = kakaoId;
+    }
+    public void addFriendCount(){
+        this.friendCount += 1;
+    }
+    public void substractFriendCount(){
+        this.friendCount -= 1;
+    }
+    public void userUpdateCheck(){
+        this.userUpdateCheck = true;
+    }
+    public void friendUpdateCheck(){
+        this.userUpdateCheck = true;
+    }
+    public void setIsNewNotification(Boolean bool) {
+
+        this.isNewNotification = bool;
     }
 
 }

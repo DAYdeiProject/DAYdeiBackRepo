@@ -1,9 +1,11 @@
 package com.sparta.daydeibackrepo.util;
 
+import com.sparta.daydeibackrepo.exception.message.ExceptionMessage;
+import com.sparta.daydeibackrepo.exception.message.SuccessMessage;
+import com.sun.net.httpserver.Authenticator;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -24,28 +26,42 @@ public class StatusResponseDto<T> {
         return new StatusResponseDto<>(HttpStatus.OK.value(), data);
     }
 
-    public static <T> StatusResponseDto<T> fail(HttpStatus httpStatus, T data){
-        return new StatusResponseDto<>(httpStatus.value(), data);
-    }
-
-    public static ResponseEntity<StatusResponseDto> toResponseEntity(String message) {
+    public static ResponseEntity<StatusResponseDto> toExceptionResponseEntity(ExceptionMessage exceptionMessage) {
         return ResponseEntity
-                .status(HttpStatus.OK)
+                .status(exceptionMessage.getHttpStatus())
                 .body(StatusResponseDto.builder()
-                        .statusCode(HttpStatus.OK.value())
-                        .data(message)
+                        .statusCode(exceptionMessage.getHttpStatus().value())
+                        .data(exceptionMessage.getDetail())
                         .build()
                 );
     }
 
+    public static StatusResponseDto<?> toResponseEntity(SuccessMessage message) {
+        return StatusResponseDto.builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .data(message.getDetail())
+                    .build();
+    }
 
-    public static ResponseEntity<StatusResponseDto> toAllExceptionResponseEntity(String message) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(StatusResponseDto.builder()
-                        .statusCode(HttpStatus.BAD_REQUEST.value())
-                        .data(message)
-                        .build()
-                );
+    public static <T> StatusResponseDto<?> toAlldataResponseEntity(T data) {
+        return StatusResponseDto.builder()
+                .statusCode(HttpStatus.OK.value())
+                .data(data)
+                .build();
+    }
+
+
+    public static StatusResponseDto<?> toAllExceptionResponseEntity(ExceptionMessage exceptionMessage) {
+        return StatusResponseDto.builder()
+                    .statusCode(exceptionMessage.getHttpStatus().value())
+                    .data(exceptionMessage.getDetail())
+                    .build();
+    }
+
+    public static StatusResponseDto<?> toAllExceptionResponseEntity(HttpStatus httpStatus,String message) {
+        return StatusResponseDto.builder()
+                    .statusCode(httpStatus.value())
+                    .data(message)
+                    .build();
     }
 }

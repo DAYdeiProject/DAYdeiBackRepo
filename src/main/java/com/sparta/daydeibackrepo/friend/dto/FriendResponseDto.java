@@ -17,6 +17,4 @@ public class FriendResponseDto {
         this.friendResponseUserId = friend.getFriendResponseId().getId();
         this.friendCheck = friend.getFriendCheck();
     }
-
-
 }

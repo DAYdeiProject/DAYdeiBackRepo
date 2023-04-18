@@ -33,8 +33,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 jwtExceptionHandler(response, "Token Error", HttpStatus.UNAUTHORIZED.value());
                 return;
             }
+            //토큰을 디코딩해서 받아옴
             Claims info = jwtUtil.getUserInfoFromToken(token);
-            setAuthentication(info.getSubject());
+            setAuthentication(info.getSubject()); // username 받아오기
         } else {
             SecurityContextHolder.clearContext();
         }

@@ -1,23 +1,32 @@
 # DAYdeiBackRepo
 ## DAYDEI 배포 링크
 
-🗓️[지금 바로 daydei사이트 방문하기](https://www.daydei.life/)
 <p>
-  <img src="https://user-images.githubusercontent.com/51226340/232444605-f65642c7-5bfe-4457-8f97-2956fd17edb1.png">
+  <img src="https://user-images.githubusercontent.com/94800969/232995084-4eb7d3d4-2d75-44af-8921-a28765e2c881.gif">
 </p>
 
-## 깃허브 레포
+🗓️[지금 바로 daydei사이트 방문하기](https://www.daydei.life/)
 
+## 깃허브 레포
+***
 > FE :
 [DAYdei FE 깃허브 바로가기](https://github.com/DAYdeiProject/DAYdei_FE.git)
-> 
+
 
 > BE :
 [DAYdei BE 깃허브 바로가기](https://github.com/DAYdeiProject/DAYdeiBackRepo)
 
+## 노션
+***
+>프로젝트 노션 :
+[프로젝트 노션 바로가기](https://shard-velvet-790.notion.site/daydei-258f1b00e93c4c719b92be10e78a3a51)
+
+
+>원페이지 노션 :
+[원페이지 노션 바로가기](https://shard-velvet-790.notion.site/A-4-SA-ae22a288543d455c810012fd6ac9b3a0)
 
 ### 팀원
-
+***
 | 이름   | 포지션 | 팀원구분        |             Github              |
 | ------ | :----: | --------------- | :-----------------------------: |
 | 김주희 |   BE   | 백엔드 팀장 |    https://github.com/Jjuhui313     |
@@ -25,19 +34,37 @@
 | 한지윤 |   BE   | 백엔드 팀원 | https://github.com/trueyoon |
 
 ## 기술스택
-
+***
 <div> 
   <img src="https://img.shields.io/badge/JAVA-007396?style=for-the-badge&logo=java&logoColor=white">
-  <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=white">
+  <img src="https://img.shields.io/badge/IntelliJIDEA-000000?style=for-the-badge&logo=IntelliJIDEA&logoColor=white">
+  <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=Gradle&logoColor=white">
+  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=Linux&logoColor=white">
+  <img src="https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=Ubuntu&logoColor=white">
+  <img src="https://img.shields.io/badge/jsonwebtokens-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white">
+  <img src="https://img.shields.io/badge/SSE-000000?style=for-the-badge&logo=&logoColor=white"/> <br>
+  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+  <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white">
+  <img src="https://img.shields.io/badge/AmazonEC2-FF9900?style=for-the-badge&logo=AmazonEC2&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/AmazonS3-569A31?style=for-the-badge&logo=AmazonS3&logoColor=white"/>
+  <img src="https://img.shields.io/badge/AmazonRDS-527FFF?style=for-the-badge&logo=AmazonRDS&logoColor=white"/> <br>
   <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
   <img src="https://img.shields.io/badge/jquery-0769AD?style=for-the-badge&logo=jquery&logoColor=white">
-  <img src="https://img.shields.io/badge/NGINX-009639?style=for-the-badge&logo=css3&logoColor=white">
-  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
-  <img src="https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=aws&logoColor=white">
+  <img src="https://img.shields.io/badge/CODEDEPLOY-181717?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/NGINX-009639?style=for-the-badge&logo=nginx&logoColor=white"/>
+  <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white"/>
+  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"/>
+  <img src="https://img.shields.io/badge/GithubActions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=Postman&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black"/>
+  <img src="https://img.shields.io/badge/Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white"/>
+
 </div>
 
 ## 프로젝트 기능
-
+***
 ### 😊 회원가입  / 카카오 로그인
 
 > 개인 캘린더 기능 구현을 위해 회원가입과 로그인을 구현하였습니다.
@@ -109,7 +136,7 @@ DAYDEI 서비스를 이용 중인 카카오 친구에게 일괄 친구 신청을
 </div>
 
 ## BE 적용 기술
-
+***
 ### ◻ Swagger
 
 > 프론트엔드와 정확하고 원활한 소통을 위해 스웨거를 도입하여 적용했습니다.
@@ -171,19 +198,21 @@ DAYDEI 서비스를 이용 중인 카카오 친구에게 일괄 친구 신청을
 > 
 
 ## ⚙ Development Environment
-
-`Java 17` `SpringBoot 2.7.9` `Ubuntu 20.04.5 LTS`
+***
+`Java 17` `SpringBoot 2.7.9` `Ubuntu 18.04.5 LTS` `QueryDSL 5.0.0`
 
 ## 🚨 Trouble Shooting BE
-
-- 1
+***
+- 1. SSL 인증서
     - 문제 : 
     SSL 인증서를 생성하는 과정에서 `- the following errors were reported by the server:` 에러 발생
     - 시도 : 
     nginx와 certbot 완전 삭제 후 다시 진행하였으나 같은 오류 발생
     - 해결 : 
     인스턴스 재생성 후 설정되어 있는 PortForwarding 모두 삭제 후 다시 진행하여 정상적으로 인증서 생성
-- 2
+  
+  <br>
+- 2. SSL+SSE HTTP 프로토콜 버전 이슈
     - 문제 : 
     SSL 적용 후 클라이언트 console에 다음과 같은 에러 발생
     **`net::ERR_INCOMPLETE_CHUNKED_ENCODING`**
@@ -202,13 +231,17 @@ DAYDEI 서비스를 이용 중인 카카오 친구에게 일괄 친구 신청을
     `proxy_send_timeout 3600s`
 
 ## 🌐 Architecture
-
+***
 <div>
   <img src="https://user-images.githubusercontent.com/51226340/232834573-221c4144-93a0-4c6c-a4e2-8320388a4a07.jpg">
 </div>
 
 ## 📋 ERD Diagram
 
+***
 
 
-## 📝 Technologies & Tools (BE) 📝
+
+<p>
+  <img src="https://user-images.githubusercontent.com/51226340/232444605-f65642c7-5bfe-4457-8f97-2956fd17edb1.png">
+</p>

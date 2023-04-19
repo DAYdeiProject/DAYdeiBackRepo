@@ -43,7 +43,7 @@ public class Post extends TimeStamped {
     private String content;
 
     @Column
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     private List<String> image; //s3 연동 후 multipart로 변경해야함
 
     @Column

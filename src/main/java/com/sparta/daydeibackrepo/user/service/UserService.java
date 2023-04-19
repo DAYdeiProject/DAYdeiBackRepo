@@ -83,8 +83,12 @@ public class UserService {
 
     //이메일 중복 체크
     public StatusResponseDto<?> emailCheck(String email) {
-        if(userRepository.findByEmail(email).isPresent()) {
-            return StatusResponseDto.toAllExceptionResponseEntity(DUPLICATE_EMAIL);
+        Optional<User> foundUsername = userRepository.findByEmail(email);
+        if(foundUsername.isPresent()) { //중복이고
+            User user = foundUsername.get();
+            if (!user.getIsDeleted()){ //false이면 탈퇴 안 한 사용자니까 중복메시지
+                return StatusResponseDto.toAllExceptionResponseEntity(DUPLICATE_EMAIL);
+            }
         }
         return StatusResponseDto.toResponseEntity(EMAIL_CHECK_SUCCESS);
     }

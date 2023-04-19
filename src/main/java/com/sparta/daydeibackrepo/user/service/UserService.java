@@ -39,6 +39,7 @@ import java.util.UUID;
 import static com.mysql.cj.util.StringUtils.indexOf;
 import static com.sparta.daydeibackrepo.exception.message.ExceptionMessage.*;
 import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.*;
+import static com.sparta.daydeibackrepo.exception.message.SuccessMessage.USER_DELETE_FAIL;
 
 @Service
 @Validated
@@ -94,6 +95,7 @@ public class UserService {
         String email = loginRequestDto.getEmail();
         String password = loginRequestDto.getPassword();
         Boolean isLogin = false;
+
 
         User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(USER_NOT_FOUND)
@@ -210,7 +212,7 @@ public class UserService {
             return StatusResponseDto.toResponseEntity(USER_DELETE_SUCCESS);
         }
         else {
-            return StatusResponseDto.toResponseEntity(USER_DELETE_SUCCESS);
+            return StatusResponseDto.toResponseEntity(USER_DELETE_FAIL);
         }
     }
 

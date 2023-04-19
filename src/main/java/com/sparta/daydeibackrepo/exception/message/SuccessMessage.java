@@ -26,7 +26,8 @@ public enum SuccessMessage {
     NOTIFICATION_DELETED(HttpStatus.OK,"알림 삭제 완료!"),
     POST_REQUEST_ACCEPT_SUCCESS(HttpStatus.OK, "일정을 수락하였습니다."),
     POST_REQUEST_REJACT_SUCCESS(HttpStatus.OK, "일정을 거절하였습니다."),
-    USER_DELETE_SUCCESS(HttpStatus.OK, "탈퇴가 완료되었습니다.");
+    USER_DELETE_SUCCESS(HttpStatus.OK, "탈퇴가 완료되었습니다."),
+    USER_DELETE_FAIL(HttpStatus.OK, "탈퇴 실패");
 
 
     private final HttpStatus httpStatus;
